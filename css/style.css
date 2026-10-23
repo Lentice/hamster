@@ -464,3 +464,10 @@ img.missing { visibility: hidden; }
 /* 觸控裝置：避免快速點擊觸發雙擊放大、點擊時的灰色閃爍 */
 button, .stage, .hole, .mcard { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
 body { -webkit-text-size-adjust: 100%; padding-bottom: env(safe-area-inset-bottom); }
+
+/* 依輸入方式顯示操作提示 */
+.touch-only { display: none; }
+@media (hover: none) and (pointer: coarse) {
+  .kb-only { display: none; }
+  .touch-only { display: inline; }
+}

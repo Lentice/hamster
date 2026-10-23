@@ -2,9 +2,11 @@
 // 世界座標 2400x1600，物件以底部中心 (x, y) 定位，依 y 排前後。
 
 (() => {
-  const WW = 2800, WH = 1900, VIEW_W = 1100;
+  const WW = 2800, WH = 1900;
   const PET_W = 150, SPEED = 320;
   const viewport = $('#viewport');
+  // 一次看到的世界寬度：手機畫面窄，就拉近一點
+  const viewW = () => (viewport.clientWidth < 700 ? 620 : 1100);
   const world = $('#world');
 
   // r：碰撞半徑（0 = 可穿過）；act：互動
@@ -71,6 +73,9 @@
       <defs><pattern id="pathTex" width="260" height="260" patternUnits="userSpaceOnUse"><image href="${assetUrl('ground_path')}" width="260" height="260"/></pattern></defs>
       ${PATHS.map((d) => `<path d="${d}" fill="none" stroke="#E9D3A8" stroke-width="118" stroke-linecap="round"/><path d="${d}" fill="none" stroke="url(#pathTex)" stroke-width="104" stroke-linecap="round"/>`).join('')}
     </svg>`;
+    const tex = new Image();
+    tex.onerror = () => $('#pathTex image', world)?.remove();
+    tex.src = assetUrl('ground_path');
     for (const p of PROPS) {
       const { w, h } = sizeOf(p);
       const el = html(`<img class="prop ${p.act ? 'interactive' : ''}" src="${assetUrl(p.img)}" alt="" draggable="false">`);
@@ -179,7 +184,7 @@
     if (uiBlocked()) return;
     viewport.focus();
     const r = viewport.getBoundingClientRect();
-    const s = r.width / VIEW_W;
+    const s = r.width / viewW();
     const x = cam.x + (e.clientX - r.left) / s, y = cam.y + (e.clientY - r.top) / s;
     const actEl = e.target.closest('[data-act]');
     if (actEl) {
@@ -290,8 +295,8 @@
 
     // 鏡頭
     const r = viewport.getBoundingClientRect();
-    const s = r.width / VIEW_W;
-    const vw = VIEW_W, vh = r.height / s;
+    const s = r.width / viewW();
+    const vw = viewW(), vh = r.height / s;
     const tx = Math.max(0, Math.min(WW - vw, player.x - vw / 2));
     const ty = Math.max(0, Math.min(WH - vh, player.y - vh / 2 - 40));
     cam.x += (tx - cam.x) * Math.min(1, dt * 6);
@@ -307,8 +312,8 @@
       renderPlayer();
       // 從家或商店出來時站在門口
       const r = viewport.getBoundingClientRect();
-      const s = r.width / VIEW_W;
-      cam.x = Math.max(0, Math.min(WW - VIEW_W, player.x - VIEW_W / 2));
+      const s = r.width / viewW();
+      cam.x = Math.max(0, Math.min(WW - viewW(), player.x - viewW() / 2));
       cam.y = Math.max(0, Math.min(WH - r.height / s, player.y - r.height / s / 2));
       last = performance.now();
       raf = requestAnimationFrame(tick);
