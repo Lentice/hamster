@@ -70,7 +70,7 @@
     world.style.height = `${WH}px`;
     world.style.backgroundImage = `url(${assetUrl('ground_grass')})`;
     world.innerHTML = `<svg class="paths" width="${WW}" height="${WH}" viewBox="0 0 ${WW} ${WH}">
-      <defs><pattern id="pathTex" width="260" height="260" patternUnits="userSpaceOnUse"><image href="${assetUrl('ground_path')}" width="260" height="260"/></pattern></defs>
+      <defs><pattern id="pathTex" width="420" height="420" patternUnits="userSpaceOnUse"><image href="${assetUrl('ground_path')}" width="420" height="420"/></pattern></defs>
       ${PATHS.map((d) => `<path d="${d}" fill="none" stroke="#E9D3A8" stroke-width="118" stroke-linecap="round"/><path d="${d}" fill="none" stroke="url(#pathTex)" stroke-width="104" stroke-linecap="round"/>`).join('')}
     </svg>`;
     const tex = new Image();

@@ -258,7 +258,7 @@ main { max-width: 1180px; margin: 16px auto; padding: 0 16px 32px; }
   position: relative; overflow: hidden; aspect-ratio: 16 / 10; border-radius: 16px;
   background: #A8DE8C; outline: none; touch-action: none; user-select: none; cursor: pointer;
 }
-.world { position: absolute; left: 0; top: 0; transform-origin: 0 0; background-size: 300px; background-color: #A8DE8C; }
+.world { position: absolute; left: 0; top: 0; transform-origin: 0 0; background-size: 520px; background-color: #A8DE8C; }
 .paths { position: absolute; left: 0; top: 0; pointer-events: none; }
 .prop { position: absolute; pointer-events: none; -webkit-user-drag: none; }
 .prop.interactive { pointer-events: auto; cursor: pointer; transition: filter .2s; }

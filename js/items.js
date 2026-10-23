@@ -468,11 +468,11 @@ const HELD = [
     render: () => `<path d="M222 310 L316 240" stroke="${LINE}" stroke-width="11" stroke-linecap="round"/><path d="M222 310 L316 240" stroke="#B8A4F0" stroke-width="5" stroke-linecap="round"/>
       ${star(322, 234, 24, '#FFD54F', SW3)}<circle cx="352" cy="206" r="4" fill="#FFD54F"/><circle cx="350" cy="262" r="3" fill="#FF8FA3"/>`,
   },
-  { id: 'r_lollipop', name: '棒棒糖', price: 60, img: 'held_lollipop', place: { w: 90, cx: 228, bottom: 330 } },
-  { id: 'r_sunflower', name: '向日葵', price: 60, img: 'held_sunflower', place: { w: 100, cx: 232, bottom: 330 } },
-  { id: 'r_icecream', name: '冰淇淋', price: 80, img: 'held_icecream', place: { w: 80, cx: 200, bottom: 340 } },
+  { id: 'r_lollipop', name: '棒棒糖', price: 60, img: 'held_lollipop', place: { w: 72, cx: 252, bottom: 336 } },
+  { id: 'r_sunflower', name: '向日葵', price: 60, img: 'held_sunflower', place: { w: 84, cx: 252, bottom: 336 } },
+  { id: 'r_icecream', name: '冰淇淋', price: 80, img: 'held_icecream', place: { w: 62, cx: 246, bottom: 334 } },
   { id: 'r_teddy', name: '小熊玩偶', price: 120, img: 'held_teddy', place: { w: 96, cx: 200, bottom: 346 } },
-  { id: 'r_umbrella', name: '小雨傘', price: 100, img: 'held_umbrella', place: { w: 190, cx: 250, bottom: 320 } },
+  { id: 'r_umbrella', name: '小雨傘', price: 100, img: 'held_umbrella', place: { w: 170, cx: 296, bottom: 318 } },
 ];
 
 // ───────────────────────── 特效 ─────────────────────────

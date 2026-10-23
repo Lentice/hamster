@@ -19,7 +19,7 @@ MAX_STICKER = 512
 SCENES = {
     "room_": (1500, 1000),
     "bg_": (800, 800),
-    "ground_": (512, 512),
+    "ground_": (768, 768),
 }
 
 
@@ -45,6 +45,17 @@ def process_sticker(im):
     return im
 
 
+def mirror_tile(im):
+    """2x2 鏡射拼接：任何圖都會變成無縫貼圖（給地面紋理用）"""
+    w, h = im.size
+    out = Image.new("RGB", (w * 2, h * 2))
+    out.paste(im, (0, 0))
+    out.paste(im.transpose(Image.FLIP_LEFT_RIGHT), (w, 0))
+    out.paste(im.transpose(Image.FLIP_TOP_BOTTOM), (0, h))
+    out.paste(im.transpose(Image.ROTATE_180), (w, h))
+    return out
+
+
 def process_scene(im, size):
     im = im.convert("RGB")
     tw, th = size
@@ -61,9 +72,11 @@ def main():
         name = src.stem
         im = Image.open(src)
         size = scene_size(name)
+        if name.startswith("ground_"):
+            im = mirror_tile(im.convert("RGB"))
         out = process_scene(im, size) if size else process_sticker(im)
         dst = OUT / f"{name}.webp"
-        out.save(dst, "WEBP", quality=86, method=6)
+        out.save(dst, "WEBP", quality=86, method=4)
         sizes[name] = out.size
         print(f"{name:24s} {im.size} -> {out.size}  {dst.stat().st_size // 1024} KB")
 
