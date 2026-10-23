@@ -41,6 +41,8 @@ function runGame(id, m) {
     onStop: (f) => stopFns.push(f),
     finish: (score, coins) => {
       if (stopped) return;
+      // 結算後也算停止，跑酷、迷宮的動畫迴圈才會結束
+      stopped = true;
       stopFns.forEach((f) => f());
       stopFns.length = 0;
       const record = recordBest(id, score);

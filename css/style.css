@@ -550,6 +550,15 @@ input, textarea { -webkit-user-select: text; user-select: text; }
   .actions .btn { width: 100%; white-space: nowrap; }
 }
 
+/* 平板直放：左欄太窄，按鈕放不進預覽旁邊，改成上下排 */
+@media (min-width: 700px) and (max-width: 860px) {
+  .stage-wrap { grid-template-columns: minmax(0, 1fr); }
+  .stage { grid-row: auto; }
+  .name-row { flex-direction: row; align-items: center; }
+  .actions { flex-direction: row; }
+  .actions .btn { width: auto; flex: 1; }
+}
+
 /* 手機橫放（畫面很矮）：頂部列不固定，換裝改成左右兩欄，小遊戲縮減周邊空間 */
 @media (max-height: 520px) and (orientation: landscape) {
   .topbar { position: static; }

@@ -80,13 +80,13 @@
   function renderPetLook() {
     const look = { ...save.look, expression: pet.expr || save.look.expression };
     const cls = pet.state === 'walk' ? 'walking' : pet.state === 'run' ? 'running' : '';
-    pet.el.innerHTML = petSvg(look, cls) + `<div class="bubble ${near && control ? 'show' : ''}">${bubbleText()}</div>`;
+    pet.el.innerHTML = petSvg(look, cls) + `<div class="bubble tappable ${near && control ? 'show' : ''}">${bubbleText()}</div>`;
   }
 
   function bubbleText() {
     if (!near) return '';
     const f = furnitureOf(near);
-    return `按 <kbd>空白鍵</kbd>：${USE[f.use].verb}${f.name}`;
+    return `<span class="kb-only">按 <kbd>空白鍵</kbd> 或點一下：</span><span class="touch-only">👆 點這裡：</span>${USE[f.use].verb}${f.name}`;
   }
 
   function placePet() {
@@ -213,6 +213,8 @@
       toast('還沒有其他樓層～點左邊的「＋ 加蓋」蓋新的一層吧！');
       return;
     }
+    // 彈窗開著時收不到放開按鍵，先放開，關掉彈窗後鼠鼠才不會自己一直走
+    Object.keys(keys).forEach((k) => { keys[k] = false; });
     if (!control || !(up && down)) return goFloor(house.petFloor + (up && (!down || Math.random() < 0.5) ? 1 : -1), ladder);
     const m = modal(`<div class="game-intro"><div class="game-icon">🪜</div><h2>要去哪一層？</h2>
       <div class="modal-actions"><button class="btn btn-pink" data-d="1">⬆ 上樓 ${floorName(house.petFloor + 1)}</button>
@@ -315,6 +317,11 @@
       drag = { it, el, dx: it.x - p.x, dy: it.y - p.y };
       el.setPointerCapture(e.pointerId);
       e.preventDefault();
+      return;
+    }
+    // 手機沒有空白鍵：點提示泡泡就使用家具
+    if (e.target.closest('.room-pet .bubble.show') && near) {
+      startUse(near, performance.now());
       return;
     }
     if (e.target.closest('.room-pet')) {
