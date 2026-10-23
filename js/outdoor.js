@@ -82,7 +82,7 @@
       Object.assign(el.style, { left: `${p.x - w / 2}px`, top: `${p.y - h}px`, width: `${w}px`, zIndex: p.flat ? 1 : Math.round(p.y) });
       if (p.act) {
         el.dataset.act = p.act;
-        const tag = html(`<div class="prop-label" style="left:${p.x}px;top:${p.y - h - 10}px">${p.label}</div>`);
+        const tag = html(`<div class="prop-label" data-act="${p.act}" style="left:${p.x}px;top:${p.y - h - 10}px">${p.label}</div>`);
         world.appendChild(tag);
       }
       p.el = el;
@@ -136,9 +136,11 @@
     Object.assign(el.style, { left: `${x - w / 2}px`, top: `${y - h * 0.97}px`, width: `${w}px`, zIndex: Math.round(y) + 1 });
   }
 
+  const promptText = (p) => (p ? `<span class="kb-only">按 <kbd>空白鍵</kbd> 或點一下：</span><span class="touch-only">👆 點這裡：</span>${p.label}` : '');
+
   function renderPlayer() {
     player.el.innerHTML = petSvg(save.look, player.moving ? 'walking' : '') +
-      `<div class="bubble ${near ? 'show' : ''}">${near ? `按 <kbd>空白鍵</kbd> 或點一下：${near.label}` : ''}</div>`;
+      `<div class="bubble tappable ${near ? 'show' : ''}">${promptText(near)}</div>`;
   }
 
   // ───────────── 互動 ─────────────
@@ -186,9 +188,17 @@
     const r = viewport.getBoundingClientRect();
     const s = r.width / viewW();
     const x = cam.x + (e.clientX - r.left) / s, y = cam.y + (e.clientY - r.top) / s;
+    if (e.target.closest('.walker.player .bubble.show') && near) {
+      interact(near.act);
+      return;
+    }
     const actEl = e.target.closest('[data-act]');
     if (actEl) {
-      const p = PROPS.find((q) => q.el === actEl);
+      const p = PROPS.find((q) => q.act === actEl.dataset.act);
+      if (nearestProp() === p) {
+        interact(p.act);
+        return;
+      }
       player.tx = p.x; player.ty = p.y + 60; player.pendingAct = p.act;
     } else if (e.target.closest('.walker.npc')) {
       const n = npcs.find((q) => q.el === e.target.closest('.walker.npc'));
@@ -283,11 +293,18 @@
 
     // 附近的攤位
     const np = nearestProp();
+    if (player.pendingAct && np?.act === player.pendingAct) {
+      const a = player.pendingAct;
+      player.pendingAct = null;
+      player.tx = null;
+      interact(a);
+      return;
+    }
     if (np !== near) {
       near = np;
       const b = $('.bubble', player.el);
       if (b) {
-        b.innerHTML = near ? `按 <kbd>空白鍵</kbd> 或點一下：${near.label}` : '';
+        b.innerHTML = promptText(near);
         b.classList.toggle('show', !!near);
       }
       PROPS.forEach((p) => p.el?.classList.toggle('glow', p === near));

@@ -471,3 +471,8 @@ body { -webkit-text-size-adjust: 100%; padding-bottom: env(safe-area-inset-botto
   .kb-only { display: none; }
   .touch-only { display: inline; }
 }
+
+/* 觸控：攤位名牌、玩家頭上的提示泡泡都可以點 */
+.prop-label { pointer-events: auto; cursor: pointer; }
+.bubble.tappable.show { pointer-events: auto; cursor: pointer; }
+.bubble.tappable { background: #FFF8D6; border-color: #F7D46A; }

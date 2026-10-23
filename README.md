@@ -32,7 +32,7 @@ python -m http.server 8000
 ## 發布到 GitHub Pages
 
 1. 在 GitHub 建立 repository，推上這個資料夾（`.gitignore` 已排除原始大圖）
-   - 更新程式後，把 `index.html` 裡的 `?v=3` 版本號加一，玩家的瀏覽器才會抓新版
+   - 更新程式後，把 `index.html` 裡的 `?v=4` 版本號加一，玩家的瀏覽器才會抓新版
 2. **Settings → Pages → Source** 選 `Deploy from a branch`，Branch 選 `main`、資料夾 `/ (root)`
 3. 約一分鐘後就能在 `https://<帳號>.github.io/<repository>/` 遊玩
 
