@@ -1,0 +1,5 @@
+# Codex 生成的原始大圖，遊戲只使用處理過的 assets/*.webp
+assets/raw/
+art-test/
+.playwright-cli/
+__pycache__/

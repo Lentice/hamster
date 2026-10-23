@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>鼠鼠小屋</title>
+  <meta name="description" content="可愛的寵物鼠養成換裝遊戲：換裝、蓋小屋、出門玩小遊戲賺鼠鼠幣！">
+  <meta name="theme-color" content="#FF8FA3">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="鼠鼠小屋">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐹</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Huninn&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="logo">🐹 <span>鼠鼠小屋</span></div>
+    <nav class="nav">
+      <button class="nav-btn" data-screen="wardrobe"><span>👗</span>換裝</button>
+      <button class="nav-btn" data-screen="home"><span>🏠</span>我的家</button>
+      <button class="nav-btn" data-screen="outdoor"><span>🌳</span>出門玩</button>
+      <button class="nav-btn" data-screen="shop"><span>🛒</span>商店</button>
+    </nav>
+    <div class="top-right">
+      <div id="coins" class="coins" title="鼠鼠幣"><span class="coin-icon">🪙</span><span id="coin-count">0</span></div>
+      <button id="mute" class="icon-btn" aria-label="音效開關">🔊</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- 換裝 -->
+    <section id="screen-wardrobe" class="screen">
+      <div class="layout">
+        <div class="card stage-wrap">
+          <div id="stage" class="stage" aria-label="鼠鼠預覽，點一下會跳跳"></div>
+          <div class="name-row">
+            <label for="name">名字</label>
+            <input id="name" type="text" maxlength="12" placeholder="幫鼠鼠取個名字～" autocomplete="off">
+          </div>
+          <div class="actions">
+            <button id="random" class="btn btn-pink">🎲 隨機搭配</button>
+            <button id="reset" class="btn btn-yellow">↺ 脫光光</button>
+            <button id="save-img" class="btn btn-blue">📷 存成圖片</button>
+          </div>
+        </div>
+        <div class="card closet">
+          <nav id="tabs" class="tabs" role="tablist"></nav>
+          <div id="grid" class="grid"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 我的家 -->
+    <section id="screen-home" class="screen">
+      <div class="card home-card">
+        <div class="home-head">
+          <h2>🏠 <span id="home-title">鼠鼠的家</span></h2>
+          <div class="home-tools">
+            <button id="control-toggle" class="btn btn-blue">🎮 我來控制</button>
+            <button id="edit-toggle" class="btn btn-yellow">🔨 佈置房間</button>
+          </div>
+        </div>
+        <div class="house">
+          <div id="floors" class="floors" aria-label="樓層"></div>
+          <div class="room-wrap">
+            <div id="room" class="room" tabindex="0"></div>
+            <div id="control-hint" class="control-hint">⌨️ 方向鍵 / WASD 移動・空白鍵使用家具・🪜 走到梯子可以上下樓　🖱️ 點地板或家具</div>
+          </div>
+        </div>
+        <div id="edit-panel" class="edit-panel">
+          <div id="sel-bar" class="sel-bar">
+            <span class="sel-hint">點選家具可以移動，拖曳到喜歡的位置</span>
+            <span class="sel-btns">
+              <button data-act="flip" class="btn btn-small">↔ 翻轉</button>
+              <button data-act="bigger" class="btn btn-small">＋ 放大</button>
+              <button data-act="smaller" class="btn btn-small">－ 縮小</button>
+              <button data-act="remove" class="btn btn-small btn-red">收起來</button>
+            </span>
+          </div>
+          <div class="panel-tabs">
+            <button class="panel-tab active" data-panel="furniture">🪑 家具</button>
+            <button class="panel-tab" data-panel="rooms">🖼️ 房間</button>
+          </div>
+          <div id="inventory" class="inventory"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 出門玩 -->
+    <section id="screen-outdoor" class="screen">
+      <div class="card outdoor-card">
+        <div id="viewport" class="viewport" tabindex="0" aria-label="公園地圖">
+          <div id="world" class="world"></div>
+          <div class="hud">
+            <div class="hint">⌨️ 方向鍵 / WASD 移動・空白鍵互動　🖱️ 點地面走過去</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 商店 -->
+    <section id="screen-shop" class="screen">
+      <div class="card shop-card">
+        <div class="shop-head">
+          <h2>🛒 鼠鼠雜貨店</h2>
+          <p>用小遊戲賺來的鼠鼠幣，買特別的衣服、配件和家具吧！</p>
+        </div>
+        <nav id="shop-tabs" class="tabs"></nav>
+        <div id="shop-grid" class="shop-grid"></div>
+      </div>
+    </section>
+  </main>
+
+  <div id="toasts" class="toasts"></div>
+
+  <script src="assets/manifest.js"></script>
+  <script src="js/svg.js"></script>
+  <script src="js/pets.js"></script>
+  <script src="js/items.js"></script>
+  <script src="js/look.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/wardrobe.js"></script>
+  <script src="js/shop.js"></script>
+  <script src="js/home.js"></script>
+  <script src="js/games.js"></script>
+  <script src="js/games-more.js"></script>
+  <script src="js/outdoor.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
