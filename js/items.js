@@ -580,13 +580,19 @@ const BACKGROUNDS = [
 
 // ───────────────────────── 家具與房間 ─────────────────────────
 // w：在房間座標（1500x1000）中的寬度；use：鼠鼠會怎麼使用它
+// slot：使用時鼠鼠在圖片裡的位置（以圖片寬高的比例表示）
+//   px, py 腳底位置；pw 鼠鼠寬度；clip 只露出門洞內（ellipse）；
+//   front 圖片 y 比例以下的部分蓋在鼠鼠前面；ring 輪框蓋在前面；stripes 圓筒條紋流動；zzz 冒泡泡
 
 const FURNITURE = [
-  { id: 'wheel', name: '滾輪', img: 'f_wheel', w: 260, use: 'run' },
+  {
+    id: 'wheel', name: '滾輪', img: 'f_wheel', w: 260, use: 'run',
+    slot: { px: 0.4, py: 0.8, pw: 0.52, stripes: { cx: 0.43, cy: 0.47, rx: 0.3, ry: 0.38 }, ring: { cx: 0.66, cy: 0.46, rx: 0.3, ry: 0.42, inner: 0.9 } },
+  },
   { id: 'bowl', name: '食物碗', img: 'f_bowl', w: 170, use: 'eat' },
   { id: 'bottle', name: '水瓶', img: 'f_bottle', w: 130, use: 'drink' },
-  { id: 'house', name: '木頭小屋', img: 'f_house', w: 280, use: 'sleep' },
-  { id: 'bed', name: '軟軟小床', img: 'f_bed', w: 220, use: 'sleep' },
+  { id: 'house', name: '木頭小屋', img: 'f_house', w: 280, use: 'sleep', slot: { px: 0.375, py: 0.82, pw: 0.3, clip: { cx: 0.375, cy: 0.63, rx: 0.14, ry: 0.165 }, zzz: [0.6, 0.12] } },
+  { id: 'bed', name: '軟軟小床', img: 'f_bed', w: 220, use: 'sleep', slot: { px: 0.5, py: 0.7, pw: 0.5, front: 0.58, zzz: [0.75, 0.05] } },
   { id: 'plant', name: '向日葵盆栽', img: 'f_plant', w: 150 },
   { id: 'tunnel', name: '樹洞隧道', img: 'f_tunnel', w: 260, use: 'hide', price: 40 },
   { id: 'sandbath', name: '沙浴盆', img: 'f_sandbath', w: 220, use: 'roll', price: 40 },
@@ -594,11 +600,11 @@ const FURNITURE = [
   { id: 'rug', name: '圓地毯', img: 'f_rug', w: 380, flat: true, price: 30 },
   { id: 'lamp', name: '蘑菇燈', img: 'f_lamp', w: 140, price: 50 },
   { id: 'shelf', name: '玩具架', img: 'f_shelf', w: 220, price: 60 },
-  { id: 'hammock', name: '吊床', img: 'f_hammock', w: 260, use: 'sleep', price: 80 },
+  { id: 'hammock', name: '吊床', img: 'f_hammock', w: 260, use: 'sleep', price: 80, slot: { px: 0.47, py: 0.66, pw: 0.36, zzz: [0.62, 0.1] } },
   { id: 'slide', name: '溜滑梯', img: 'f_slide', w: 280, use: 'roll', price: 150 },
-  { id: 'cakehouse', name: '蛋糕屋', img: 'f_cakehouse', w: 300, use: 'sleep', price: 250 },
-  { id: 'hotair', name: '熱氣球床', img: 'f_hotair', w: 260, use: 'sleep', price: 280 },
-  { id: 'castle', name: '鼠鼠城堡', img: 'f_castle', w: 380, use: 'sleep', price: 400 },
+  { id: 'cakehouse', name: '蛋糕屋', img: 'f_cakehouse', w: 300, use: 'sleep', price: 250, slot: { px: 0.625, py: 0.88, pw: 0.2, clip: { cx: 0.625, cy: 0.73, rx: 0.075, ry: 0.15 }, zzz: [0.78, 0.4] } },
+  { id: 'hotair', name: '熱氣球床', img: 'f_hotair', w: 260, use: 'sleep', price: 280, slot: { px: 0.51, py: 0.94, pw: 0.26, front: 0.865, zzz: [0.7, 0.72] } },
+  { id: 'castle', name: '鼠鼠城堡', img: 'f_castle', w: 380, use: 'sleep', price: 400, slot: { px: 0.52, py: 0.9, pw: 0.16, clip: { cx: 0.52, cy: 0.79, rx: 0.07, ry: 0.11 }, zzz: [0.6, 0.55] } },
 ];
 
 // 加蓋樓層的價格（第 2 層起）

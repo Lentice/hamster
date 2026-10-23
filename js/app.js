@@ -1,9 +1,28 @@
 // 啟動
 
+// iPad / 手機：擋掉連點兩下放大、雙指縮放，避免遊戲畫面被放大後點不到按鈕
+let lastTouchEnd = 0;
+document.addEventListener('touchend', (e) => {
+  const now = Date.now();
+  if (now - lastTouchEnd < 350 && !e.target.closest('input, textarea')) {
+    e.preventDefault();
+    // 阻止放大的同時也吃掉了這次點擊，幫按鈕補發一次，連點才不會失靈
+    e.target.closest('button, a, [data-act]')?.click();
+  }
+  lastTouchEnd = now;
+}, { passive: false });
+['gesturestart', 'gesturechange'].forEach((type) => document.addEventListener(type, (e) => e.preventDefault(), { passive: false }));
+document.addEventListener('touchmove', (e) => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
+document.addEventListener('dblclick', (e) => e.preventDefault(), { passive: false });
+
 // 素材還沒產生或載入失敗時隱藏，不顯示破圖
 document.addEventListener('error', (e) => {
   if (e.target.tagName === 'IMG') e.target.classList.add('missing');
 }, true);
+
+const syncTopbar = () => document.documentElement.style.setProperty('--topbar-h', `${$('.topbar').offsetHeight}px`);
+new ResizeObserver(syncTopbar).observe($('.topbar'));
+syncTopbar();
 
 $$('.nav-btn').forEach((b) => b.addEventListener('click', () => { showScreen(b.dataset.screen); sfx.tab(); }));
 $('#mute').addEventListener('click', () => setMuted(!muted));

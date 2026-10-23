@@ -476,3 +476,98 @@ body { -webkit-text-size-adjust: 100%; padding-bottom: env(safe-area-inset-botto
 .prop-label { pointer-events: auto; cursor: pointer; }
 .bubble.tappable.show { pointer-events: auto; cursor: pointer; }
 .bubble.tappable { background: #FFF8D6; border-color: #F7D46A; }
+
+/* 家具裡的鼠鼠（滾輪、門洞、床） */
+.slot-layer { position: absolute; pointer-events: none; }
+.slot-layer > *, .slot-clip { position: absolute; inset: 0; }
+.slot-clip { overflow: hidden; }
+.slot-pet { position: absolute; inset: auto; }
+.slot-pet .pet-svg { width: 100%; display: block; }
+.slot-front { width: 100%; height: 100%; -webkit-user-drag: none; }
+.slot-stripes { width: 100%; height: 100%; }
+.stripe-move { animation: stripeMove .35s linear infinite; }
+@keyframes stripeMove { from { transform: translateX(0); } to { transform: translateX(12px); } }
+.slot-zzz { position: absolute; inset: auto; font-size: clamp(16px, 2.2vw, 28px); animation: zzz 2.4s ease-in-out infinite; }
+@keyframes zzz { 0% { transform: translate(0, 0) scale(.7); opacity: 0; } 30% { opacity: 1; } 100% { transform: translate(18px, -40px) scale(1.2); opacity: 0; } }
+
+/* 全部元素都不吃「雙擊放大」；需要拖曳的區域另外設成 none */
+* { touch-action: manipulation; }
+.room, .viewport, .game-canvas, .whack-grid { touch-action: none; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+input, textarea { -webkit-user-select: text; user-select: text; }
+
+/* ───────────── 手機 / 平板 UX ───────────── */
+
+/* 觸控裝置沒有 hover：取消會卡住的浮起效果 */
+@media (hover: none) {
+  .btn:hover, .nav-btn:hover, .tab:hover, .item:hover, .shop-item:hover, .inv-item:hover { transform: none; }
+  .item:hover { border-color: #F3E6E0; }
+  .item.selected:hover { border-color: var(--pink); }
+}
+.btn:active, .nav-btn:active, .tab:active, .item:active, .inv-item:active, .shop-item:active, .floor-btn:active { transform: scale(.96); }
+
+/* 小遊戲畫面依螢幕高度縮放，手機橫放也放得下 */
+.game-canvas { width: auto; height: auto; max-width: 100%; max-height: calc(100dvh - 190px); }
+.whack-grid { width: min(480px, 100%, calc(100dvh - 200px)); }
+.memory-grid { width: min(480px, 100%, calc((100dvh - 190px) * .75)); }
+.wheel-stage { width: min(420px, 80vw, calc(100dvh - 300px)); }
+.modal { max-height: calc(100dvh - 24px); }
+.modal-back { padding: 12px; }
+
+/* 公園地圖：盡量填滿可用高度 */
+.viewport { max-height: calc(100dvh - var(--topbar-h, 70px) - 56px); width: 100%; }
+
+@media (max-width: 860px) {
+  /* 換裝：鼠鼠預覽固定在上方，按鈕放旁邊，往下捲選衣服時也看得到 */
+  .stage-wrap {
+    position: sticky; top: calc(var(--topbar-h, 100px) + 6px); z-index: 20;
+    display: grid; grid-template-columns: min(44vw, 30dvh) 1fr; gap: 10px; align-items: center; padding: 10px;
+  }
+  .stage { grid-row: span 2; }
+  .name-row { margin: 0; flex-direction: column; align-items: stretch; gap: 4px; }
+  .name-row label { font-size: 13px; }
+  .name-row input { padding: 8px 10px; font-size: 16px; }
+  .actions { margin: 0; flex-direction: column; gap: 6px; }
+  .actions .btn { padding: 8px 10px; font-size: 14px; }
+  .closet { padding: 10px; }
+
+  .viewport { aspect-ratio: auto; height: calc(100dvh - var(--topbar-h, 100px) - 40px); min-height: 260px; }
+  .outdoor-card { padding: 6px; }
+  .home-card, .shop-card { padding: 10px; }
+  .home-head h2 { font-size: 18px; }
+  .home-tools .btn { padding: 8px 12px; font-size: 14px; }
+}
+
+/* 平板直放：換裝維持左右兩欄但比例調整 */
+@media (min-width: 700px) and (max-width: 1024px) {
+  .layout { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
+  .grid { grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); }
+}
+
+@media (max-width: 860px) {
+  .stage-wrap > * { min-width: 0; }
+  .actions .btn { width: 100%; white-space: nowrap; }
+}
+
+/* 手機橫放（畫面很矮）：頂部列不固定，換裝改成左右兩欄，小遊戲縮減周邊空間 */
+@media (max-height: 520px) and (orientation: landscape) {
+  .topbar { position: static; }
+  .layout { grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 10px; }
+  .stage-wrap { position: sticky; top: 6px; grid-template-columns: 1fr; padding: 8px; }
+  .stage { grid-row: auto; width: min(100%, calc(100dvh - 170px)); margin: 0 auto; }
+  .name-row { flex-direction: row; align-items: center; }
+  .actions { flex-direction: row; }
+  .actions .btn { width: auto; flex: 1; padding: 6px 4px; font-size: 12px; }
+  .viewport { height: calc(100dvh - 24px); }
+  .modal { padding: 10px 12px; }
+  .game-modal.playing { padding: 8px; }
+  .game-area { gap: 4px; }
+  .game-tip { display: none; }
+  .game-hud { font-size: 16px; padding: 2px 14px; }
+  .game-canvas { max-height: calc(100dvh - 90px); }
+  .whack-grid { width: min(480px, 100%, calc(100dvh - 80px)); padding: 10px; gap: 8px; }
+  .memory-grid { width: min(480px, 100%, calc((100dvh - 80px) * .75)); gap: 6px; }
+  .wheel-stage { width: min(420px, 60vw, calc(100dvh - 150px)); }
+  .big-btn { padding: 10px 24px; font-size: 18px; }
+}

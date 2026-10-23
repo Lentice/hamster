@@ -182,8 +182,26 @@
   window.addEventListener('keyup', onKey);
   window.addEventListener('blur', keysUp);
 
+  // 手指或滑鼠按住拖曳：目標跟著移動，鼠鼠一直走
+  let holding = false;
+  const toWorld = (e) => {
+    const r = viewport.getBoundingClientRect();
+    const s = r.width / viewW();
+    return { x: cam.x + (e.clientX - r.left) / s, y: cam.y + (e.clientY - r.top) / s };
+  };
+  viewport.addEventListener('pointermove', (e) => {
+    if (!holding || uiBlocked() || player.pendingAct) return;
+    const p = toWorld(e);
+    player.tx = p.x; player.ty = p.y;
+  });
+  const release = () => { holding = false; };
+  viewport.addEventListener('pointerup', release);
+  viewport.addEventListener('pointercancel', release);
+  viewport.addEventListener('pointerleave', release);
+
   viewport.addEventListener('pointerdown', (e) => {
     if (uiBlocked()) return;
+    holding = true;
     viewport.focus();
     const r = viewport.getBoundingClientRect();
     const s = r.width / viewW();

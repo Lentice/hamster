@@ -56,6 +56,7 @@
     pet.el = html(`<div class="room-pet"></div>`);
     room.appendChild(pet.el);
     renderPetLook();
+    refreshSlot();
     placePet();
   }
 
@@ -92,13 +93,51 @@
     const sp = byId(SPECIES, save.look.species);
     const w = PET_W * sp.scale;
     const h = (w * 340) / 400;
-    let y = pet.y;
-    if (pet.state === 'run' && pet.use) y = pet.use.y - sizeOf(pet.use).h * 0.12;
     pet.el.style.left = pct(pet.x - w / 2, RW);
-    pet.el.style.top = pct(y - h * 0.97, RH);
+    pet.el.style.top = pct(pet.y - h * 0.97, RH);
     pet.el.style.width = pct(w, RW);
-    pet.el.style.zIndex = Math.round(y + 2);
-    pet.el.classList.toggle('hidden', pet.state === 'hide');
+    pet.el.style.zIndex = Math.round(pet.y + 2);
+    pet.el.classList.toggle('hidden', pet.state === 'hide' || !!$('.slot-layer', room));
+  }
+
+  // 使用有 slot 的家具時，鼠鼠畫進家具的圖層：跑在滾輪圓筒裡、縮進門洞、窩進床裡
+  function refreshSlot() {
+    $('.slot-layer', room)?.remove();
+    const it = pet.use;
+    const f = it && furnitureOf(it);
+    if (!f?.slot || !['run', 'busy'].includes(pet.state) || !floor().items.includes(it)) return;
+    const s = f.slot;
+    const { w, h } = sizeOf(it);
+    const sp = byId(SPECIES, save.look.species);
+    const pw = s.pw * (0.8 + 0.2 * sp.scale);
+    const ph = (pw * w * 0.85) / h;
+    const P = (v) => `${(v * 100).toFixed(2)}%`;
+    const look = { ...save.look, expression: pet.expr || save.look.expression };
+    const layer = html('<div class="slot-layer"></div>');
+    Object.assign(layer.style, {
+      left: pct(it.x - w / 2, RW), top: pct(it.y - h, RH), width: pct(w, RW), height: pct(h, RH),
+      zIndex: Math.round(it.y) + 1, transform: it.flip ? 'scaleX(-1)' : '',
+    });
+    let inner = '';
+    if (s.stripes) {
+      const c = s.stripes;
+      const bars = Array.from({ length: 12 }, (_, i) => `<rect x="${i * 12 - 12}" y="0" width="5" height="100" fill="#fff" opacity=".45"/>`).join('');
+      inner += `<svg class="slot-stripes" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <defs><clipPath id="drum-clip"><ellipse cx="${c.cx * 100}" cy="${c.cy * 100}" rx="${c.rx * 100}" ry="${c.ry * 100}"/></clipPath></defs>
+        <g clip-path="url(#drum-clip)"><g class="stripe-move">${bars}</g></g></svg>`;
+    }
+    const petHtml = `<div class="slot-pet" style="left:${P(s.px - pw / 2)};top:${P(s.py - ph * 0.97)};width:${P(pw)}">${petSvg(look, pet.state === 'run' ? 'running' : '')}</div>`;
+    inner += s.clip
+      ? `<div class="slot-clip" style="clip-path:ellipse(${P(s.clip.rx)} ${P(s.clip.ry)} at ${P(s.clip.cx)} ${P(s.clip.cy)});-webkit-clip-path:ellipse(${P(s.clip.rx)} ${P(s.clip.ry)} at ${P(s.clip.cx)} ${P(s.clip.cy)})">${petHtml}</div>`
+      : petHtml;
+    // 前景：輪框或床緣蓋在鼠鼠前面
+    const mask = s.ring
+      ? `radial-gradient(ellipse ${P(s.ring.rx)} ${P(s.ring.ry)} at ${P(s.ring.cx)} ${P(s.ring.cy)}, transparent ${s.ring.inner * 100}%, #000 ${s.ring.inner * 100 + 3}%, #000 97%, transparent 100%)`
+      : s.front ? `linear-gradient(to bottom, transparent ${s.front * 100}%, #000 ${s.front * 100 + 4}%)` : null;
+    if (mask) inner += `<img class="slot-front" src="${assetUrl(f.img)}" alt="" draggable="false" style="mask-image:${mask};-webkit-mask-image:${mask}">`;
+    if (s.zzz && pet.expr === 'sleepy') inner += `<div class="slot-zzz" style="left:${P(s.zzz[0])};top:${P(s.zzz[1])}">💤</div>`;
+    layer.innerHTML = inner;
+    room.appendChild(layer);
   }
 
   function drawInventory() {
@@ -291,13 +330,17 @@
       drawSelBar();
       return;
     }
-    // 點地板：走過去；點到可用的家具：走過去並使用
+    // 點地板：走過去；點到可用的家具：走過去並使用；按住拖曳：一直跟著手指走
     const p = toRoom(e);
     const target = usableAt(p);
     stopUsing();
     if (target) walkTo(target.x + useSide(target), target.y + 30, target);
-    else walkTo(p.x, p.y);
+    else {
+      walkTo(p.x, p.y);
+      holding = true;
+    }
   });
+  let holding = false;
 
   // 點擊位置下有沒有可使用的家具（用家具的外框判斷）
   function usableAt(p) {
@@ -308,6 +351,12 @@
   }
 
   room.addEventListener('pointermove', (e) => {
+    if (holding && !drag && !editing) {
+      const p = toRoom(e);
+      [pet.tx, pet.ty] = clampFloor(p.x, p.y);
+      if (pet.state !== 'walk') { pet.use = null; setState('walk'); }
+      return;
+    }
     if (!drag) return;
     const p = toRoom(e);
     drag.it.x = Math.max(40, Math.min(RW - 40, p.x + drag.dx));
@@ -316,12 +365,14 @@
   });
 
   const endDrag = () => {
+    holding = false;
     if (!drag) return;
     drag = null;
     persist();
   };
   room.addEventListener('pointerup', endDrag);
   room.addEventListener('pointercancel', endDrag);
+  room.addEventListener('pointerleave', () => { holding = false; });
 
   // 鍵盤操控
   const onKey = (e) => {
@@ -350,7 +401,11 @@
     const changed = pet.state !== state || pet.expr !== expr;
     pet.state = state;
     pet.expr = expr;
-    if (changed && pet.el) renderPetLook();
+    if (changed && pet.el) {
+      renderPetLook();
+      refreshSlot();
+      placePet();
+    }
   }
 
   function walkTo(x, y, use = null) {
@@ -400,6 +455,7 @@
     }
     pet.use = it;
     pet.x = it.x + (furnitureOf(it).use === 'run' ? 0 : pet.x - it.x > 0 ? 40 : -40);
+    pet.state = null;
     setState(u.state, u.expr);
     if (u.act) petAct($('.pet-svg', pet.el), u.act, 900);
     pet.until = now + u.ms;
