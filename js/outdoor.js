@@ -1,6 +1,8 @@
 // 出門玩：可以走動的公園地圖。方向鍵 / WASD 或點地面移動，靠近攤位按空白鍵互動。
 // 世界座標 2400x1600，物件以底部中心 (x, y) 定位，依 y 排前後。
 
+const PARK = { hooks: { tick: [], enter: [], leave: [] } };
+
 (() => {
   const WW = 2800, WH = 1900;
   const PET_W = 150, SPEED = 320;
@@ -140,7 +142,8 @@
 
   function renderPlayer() {
     player.el.innerHTML = petSvg(save.look, player.moving ? 'walking' : '') +
-      `<div class="bubble tappable ${near ? 'show' : ''}">${promptText(near)}</div>`;
+      `<div class="bubble tappable ${near ? 'show' : ''}">${promptText(near)}</div><div class="bubble say"></div><div class="nametag"></div>`;
+    $('.nametag', player.el).textContent = save.look.name.trim() || '我';
   }
 
   // ───────────── 互動 ─────────────
@@ -200,7 +203,7 @@
   viewport.addEventListener('pointerleave', release);
 
   viewport.addEventListener('pointerdown', (e) => {
-    if (uiBlocked()) return;
+    if (uiBlocked() || e.target.closest('.park-ui')) return;
     holding = true;
     viewport.focus();
     const r = viewport.getBoundingClientRect();
@@ -337,6 +340,7 @@
     cam.x += (tx - cam.x) * Math.min(1, dt * 6);
     cam.y += (ty - cam.y) * Math.min(1, dt * 6);
     world.style.transform = `scale(${s}) translate(${-cam.x}px, ${-cam.y}px)`;
+    PARK.hooks.tick.forEach((f) => f(dt));
   }
 
   SCREENS.outdoor = {
@@ -353,6 +357,7 @@
       last = performance.now();
       raf = requestAnimationFrame(tick);
       viewport.focus();
+      PARK.hooks.enter.forEach((f) => f());
     },
     leave() {
       cancelAnimationFrame(raf);
@@ -360,6 +365,10 @@
       player.tx = null;
       player.pendingAct = null;
       if (near?.act === 'home' || near?.act === 'shop') { player.y = near.y + 90; }
+      PARK.hooks.leave.forEach((f) => f());
     },
   };
+
+  // 給多人連線（online.js）用的介面
+  Object.assign(PARK, { world, viewport, player, placeWalker, renderPlayer, near: () => near, PET_W });
 })();

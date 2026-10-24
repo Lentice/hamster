@@ -15,6 +15,7 @@ iPad / iPhone 用 Safari 開啟後按「分享 → 加入主畫面」，就能�
 | 🌳 出門玩 | 公園地圖，方向鍵 / WASD 或點地面移動。撿地上的瓜子賺幣，跟路過的鼠鼠聊天，走到攤位按空白鍵玩小遊戲 |
 | 🎮 小遊戲 | 接瓜子、滾輪衝刺、翻牌配對、打地鼠、跳跳跑酷、迷宮找瓜子，依分數獲得鼠鼠幣 |
 | 🛒 商店 | 用鼠鼠幣買特別的衣服、配件、背景、家具、房間 |
+| 🌐 一起玩 | 公園裡看到其他玩家的鼠鼠，聊天（快速短句或打字，會過濾髒話、網址和電話）、做表情動作。可以進公開公園，或開朋友房間分享代碼／邀請連結。點別的玩家可以封鎖（需要先設定 Firebase，見下方） |
 
 鼠鼠種類：黃金鼠、長毛鼠、布丁鼠、三線鼠、一線鼠、冬白鼠、紫倉鼠、老公公鼠、老婆婆鼠、熊熊鼠、三色天竺鼠、泰迪天竺鼠、阿比天竺鼠。每種的體型大小、身形比例、毛的外形（平滑／蓬蓬／刺刺）、耳朵都不同。
 
@@ -29,10 +30,35 @@ python -m http.server 8000
 # 打開 http://localhost:8000
 ```
 
+## 多人連線（Firebase）
+
+多人功能用 Firebase 匿名登入 + Realtime Database，免費方案就夠用。沒有設定時遊戲照常是單人模式。
+
+1. 到 [Firebase 主控台](https://console.firebase.google.com/) 建立專案（Google Analytics 可以關掉）
+2. **Build → Authentication → 開始使用 → Sign-in method**，啟用「匿名」
+3. **Build → Realtime Database → 建立資料庫**，位置選 `asia-southeast1`（新加坡），以「鎖定模式」開始
+4. 在 Realtime Database 的 **規則** 分頁，貼上 `firebase/database.rules.json` 的內容後發布
+5. **專案設定 → 一般 → 你的應用程式**，新增網頁應用程式（`</>`），把產生的 `firebaseConfig` 物件貼到 `js/net-config.js`：
+   ```js
+   window.FIREBASE_CONFIG = { apiKey: '...', authDomain: '...', databaseURL: 'https://....firebasedatabase.app', projectId: '...', appId: '...' };
+   ```
+6. Authentication → 設定 → 已授權網域，加入 `<帳號>.github.io`
+
+這些設定值會公開在網頁上是正常的，資料安全靠規則：只能改自己的鼠鼠、位置要在地圖內、名字和訊息有長度限制、聊天每 1.5 秒最多一則、不能列出所有房間，超過 10 分鐘的舊訊息會被清掉。
+
+本機測試可以用 Firebase 模擬器（需要 Java）：
+
+```bash
+cd firebase && npx firebase-tools@13.29.0 emulators:start --project demo-hamster --only auth,database
+# 載入規則
+curl -X PUT "http://127.0.0.1:9000/.settings/rules.json?ns=demo-hamster" -H "Authorization: Bearer owner" --data-binary @database.rules.json
+# 開兩個瀏覽器到 http://localhost:8000/?emu=1
+```
+
 ## 發布到 GitHub Pages
 
 1. 在 GitHub 建立 repository，推上這個資料夾（`.gitignore` 已排除原始大圖）
-   - 更新程式後，把 `index.html` 裡的 `?v=6` 版本號加一，玩家的瀏覽器才會抓新版
+   - 更新程式後，把 `index.html` 裡的 `?v=7` 版本號加一，玩家的瀏覽器才會抓新版
 2. **Settings → Pages → Source** 選 `Deploy from a branch`，Branch 選 `main`、資料夾 `/ (root)`
 3. 約一分鐘後就能在 `https://<帳號>.github.io/<repository>/` 遊玩
 
@@ -51,6 +77,10 @@ js/wardrobe.js        換裝畫面
 js/shop.js            商店
 js/home.js            我的家（佈置 + 鼠鼠 AI）
 js/outdoor.js         公園地圖
+js/net-config.js      Firebase 設定（多人連線）
+js/net.js             多人連線底層（登入、房間、位置、聊天）
+js/online.js          公園的多人介面（其他玩家、聊天、表情、房間、封鎖）
+firebase/             資料庫安全規則與模擬器設定
 js/games.js           小遊戲（接瓜子、滾輪、翻牌）
 js/games-more.js      小遊戲（打地鼠、跑酷、迷宮）
 assets/*.webp         點陣素材（由 Codex 生成後處理）

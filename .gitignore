@@ -3,3 +3,5 @@ assets/raw/
 art-test/
 .playwright-cli/
 __pycache__/
+firebase/*.log
+firebase/.firebase/
