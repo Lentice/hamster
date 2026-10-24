@@ -235,4 +235,44 @@ const EXPRESSIONS = [
       `<ellipse cx="128" cy="266" rx="18" ry="11" fill="#FF8FA3" opacity=".55"/><ellipse cx="272" cy="266" rx="18" ry="11" fill="#FF8FA3" opacity=".55"/>` +
       happyEye(165) + happyEye(235) + nose + `<path d="M193 256 Q200 262 207 256" fill="none" ${SW3}/>`,
   },
+  {
+    id: 'laugh', name: '哈哈大笑',
+    render: () => happyEye(165) + happyEye(235) + nose +
+      `<path d="M181 254 Q200 260 219 254 Q217 280 200 280 Q183 280 181 254 Z" fill="#E86A7A" ${SW3}/>
+       <path d="M188 271 Q200 263 212 271 Q208 279 200 279 Q192 279 188 271 Z" fill="#FFB3C7"/>` + blush(0.7),
+  },
+  {
+    id: 'puffangry', name: '氣鼓鼓',
+    render: (sp) => `<ellipse cx="132" cy="259" rx="27" ry="23" fill="${sp.fur}" ${SW3}/>
+      <ellipse cx="268" cy="259" rx="27" ry="23" fill="${sp.fur}" ${SW3}/>` +
+      eye(165, 228) + eye(235, 228) + nose + blush(0.85) +
+      `<path d="M150 204 L178 215 M250 204 L222 215 M190 266 Q200 257 210 266" fill="none" ${SW3}/>
+       <path d="M118 257 Q125 264 130 257 M270 257 Q275 264 282 257" fill="none" ${SW3}/>`,
+  },
+  {
+    id: 'yawn', name: '哈欠連連',
+    render: () => sleepEye(165) + sleepEye(235) + nose + blush(0.4) +
+      `<ellipse cx="200" cy="266" rx="13" ry="18" fill="#E86A7A" ${SW3}/>
+       <path d="M191 276 Q200 269 209 276" fill="none" stroke="#FFB3C7" stroke-width="5" stroke-linecap="round"/>
+       <path d="M145 209 Q154 202 164 204 M236 204 Q246 202 255 209" fill="none" ${SW3}/>`,
+  },
+  {
+    id: 'excited', name: '超級期待',
+    render: () => [165, 235].map((x) => `<g class="blink"><ellipse cx="${x}" cy="224" rx="15" ry="18" fill="#2E211D"/>
+      ${star(x + 3, 219, 8, '#FFF3DE', '', 0.35)}<circle cx="${x - 6}" cy="232" r="3.5" fill="#FFD54F"/>
+      <circle cx="${x + 7}" cy="232" r="2" fill="#fff"/></g>`).join('') + nose + openMouth + blush(0.75) +
+      `<path d="M147 201 Q160 194 174 199 M226 199 Q240 194 253 201" fill="none" ${SW3}/>`,
+  },
+  {
+    id: 'thinking', name: '想想看',
+    render: () => eye(165) + `<path d="M222 226 Q235 216 248 226 M223 202 Q238 195 250 205" fill="none" ${SW3}/>` +
+      nose + `<path d="M204 262 Q215 268 224 261" fill="none" ${SW3}/>` + blush(0.35) +
+      `<circle cx="278" cy="202" r="3" fill="${LINE}"/><circle cx="290" cy="190" r="4" fill="${LINE}"/>`,
+  },
+  {
+    id: 'nervous', name: '緊張兮兮',
+    render: () => eye(165) + eye(235) + nose + blush(0.45) +
+      `<path d="M151 207 Q164 199 178 209 M222 209 Q236 199 249 207 M185 265 L192 260 L200 265 L208 260 L216 265" fill="none" ${SW3}/>
+       <path d="M273 204 Q261 222 273 229 Q285 222 273 204 Z" fill="#BFE6FF" ${SW3}/>`,
+  },
 ];

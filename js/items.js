@@ -191,6 +191,60 @@ const CLOTHES = [
       <path d="M150 288 Q200 304 250 288" fill="none" stroke="#FFD54F" stroke-width="6" stroke-linecap="round"/>
       <circle cx="200" cy="300" r="8" fill="#7FD0F0" ${SW3}/>`,
   },
+  // 新服裝沿用身體裁切，突出身形的領口與裙襬另外繪製。
+  {
+    id: 'haori', name: '花花羽織', price: 140,
+    clipped: (p) => `${band('#FFF3DE', 284)}<path d="M20 284 H170 L186 440 H20 Z M230 284 H380 V440 H214 Z" fill="url(#${p}-haori)"/>`,
+    front: () => `<path d="M170 284 L186 370 M230 284 L214 370" fill="none" stroke="${LINE}" stroke-width="4"/>
+      <path d="M186 318 Q200 328 214 318" fill="none" stroke="#FF8FA3" stroke-width="4"/>`,
+    defs: (p) => `<pattern id="${p}-haori" width="36" height="36" patternUnits="userSpaceOnUse"><rect width="36" height="36" fill="#B8A4F0"/>${flower(10, 10, 4, '#FFF3DE', '#FF8FA3')}${flower(28, 28, 3, '#FFCDD9')}</pattern>`,
+  },
+  {
+    id: 'cheer', name: '元氣啦啦',
+    clipped: () => `${band('#FF8FA3', 286)}<path d="M146 288 L200 324 L254 288" fill="none" stroke="#FFF3DE" stroke-width="10"/><rect x="20" y="330" width="360" height="10" fill="#7FD0F0"/>`,
+    front: () => `<path d="M114 338 Q200 352 286 338 L310 375 Q200 392 90 375 Z" fill="#FFB3C7" ${SW}/>
+      <path d="M132 347 L122 378 M166 351 L162 383 M200 352 V385 M234 351 L238 383 M268 347 L278 378" fill="none" ${SW3}/>${star(200, 310, 9, '#FFD54F', SW3)}`,
+  },
+  {
+    id: 'frograin', name: '蛙蛙雨衣', price: 160,
+    back: () => `<path d="M78 264 Q66 120 200 116 Q334 120 322 264 Z" fill="#9EDCC8" ${SW}/>
+      ${[146, 254].map((x) => `<circle cx="${x}" cy="126" r="22" fill="#9EDCC8" ${SW}/><circle cx="${x}" cy="126" r="10" fill="#FFF3DE"/><circle cx="${x}" cy="128" r="5" fill="${LINE}"/>`).join('')}`,
+    clipped: () => `${band('#9EDCC8', 282)}<path d="M200 284 V450" fill="none" ${SW3}/><path d="M122 328 H162 V352 H122 Z M238 328 H278 V352 H238 Z" fill="#79C5AE" ${SW3}/>`,
+    front: () => `<path d="M156 284 L200 304 L244 284" fill="#C8EBCB" ${SW3}/>${[320, 342, 364].map((y) => `<circle cx="210" cy="${y}" r="4" fill="#FFD54F" ${SW3}/>`).join('')}`,
+  },
+  {
+    id: 'suspender', name: '吊帶短短',
+    clipped: () => `${band('#FFF3DE', 286)}<rect x="20" y="330" width="360" height="160" fill="#7FB3F0"/>
+      <path d="M160 286 L178 338 M240 286 L222 338" stroke="#7FB3F0" stroke-width="14"/>
+      <path d="M200 354 V440" fill="none" ${SW3}/><rect x="180" y="336" width="40" height="22" rx="6" fill="#5C8FE6" ${SW3}/>`,
+    front: () => `${collar()}<circle cx="176" cy="328" r="5" fill="#FFD54F" ${SW3}/><circle cx="224" cy="328" r="5" fill="#FFD54F" ${SW3}/>`,
+  },
+  {
+    id: 'cardigan', name: '暖暖開衫',
+    clipped: () => `${band('#F7C9A0', 284)}<path d="M168 284 L200 326 L232 284 Z" fill="#FFF3DE"/>
+      <path d="M200 326 V450" stroke="${LINE}" stroke-width="3"/>
+      ${[120, 140, 260, 280].map((x) => `<path d="M${x} 306 l-5 8 l5 8 l-5 8 l5 8 l-5 8 l5 8" fill="none" stroke="#E9AE85" stroke-width="3"/>`).join('')}`,
+    front: () => `<path d="M168 284 L200 326 L232 284" fill="none" ${SW3}/>${[338, 354, 370].map((y) => `<circle cx="209" cy="${y}" r="3.5" fill="#FFF3DE" ${SW3}/>`).join('')}`,
+  },
+  {
+    id: 'chefapron', name: '點心圍裙', price: 100,
+    clipped: () => `${band('#BFE6FF', 286)}<path d="M164 292 H236 L250 440 H150 Z" fill="#FFF3DE" ${SW3}/>
+      <path d="M178 292 V282 M222 292 V282 M100 330 H300" fill="none" stroke="#FF8FA3" stroke-width="7"/>
+      <rect x="178" y="334" width="44" height="28" rx="7" fill="#FFCDD9" ${SW3}/>`,
+    front: () => `${collar()}${heart(200, 316, 9, '#FF8FA3', SW3)}`,
+  },
+  {
+    id: 'wizardrobe', name: '星夜法袍', price: 240,
+    back: () => `<path d="M142 284 Q100 314 70 388 Q200 370 330 388 Q300 314 258 284 Z" fill="#9277CE" ${SW}/>`,
+    clipped: () => `${band('#B8A4F0', 284)}${[[148, 324], [252, 340], [185, 366], [226, 306]].map(([x, y]) => star(x, y, 7, '#FFF1A8', SW3)).join('')}`,
+    front: () => `<path d="M150 284 L200 310 L250 284" fill="#7E5FC4" ${SW3}/><circle cx="200" cy="310" r="7" fill="#FFD54F" ${SW3}/>`,
+  },
+  {
+    id: 'ballettutu', name: '糖糖芭蕾', price: 200,
+    clipped: () => `${band('#FFCDD9', 286)}<path d="M164 286 Q200 316 236 286" fill="none" stroke="#FFF3DE" stroke-width="7"/>`,
+    front: () => `<path d="M120 330 Q200 344 280 330 L326 368 Q300 386 280 373 Q260 390 240 378 Q200 396 160 378 Q140 390 120 373 Q100 386 74 368 Z" fill="#FFD6EC" ${SW}/>
+      <path d="M132 343 L112 367 M166 347 L156 375 M200 348 V380 M234 347 L244 375 M268 343 L288 367" stroke="#FFB3D9" stroke-width="3"/>${heart(200, 308, 10, '#FF8FA3', SW3)}`,
+  },
 ];
 
 // ───────────────────────── 帽子 ─────────────────────────
@@ -321,6 +375,12 @@ const HATS = [
   { id: 'r_pumpkin', name: '南瓜帽', price: 140, img: 'hat_pumpkin', place: { w: 170, bottom: 176 } },
   { id: 'r_unicorn', name: '獨角獸', price: 220, img: 'hat_unicorn', place: { w: 190, bottom: 182 } },
   { id: 'r_cloud', name: '彩虹雲朵帽', price: 200, img: 'hat_cloud', place: { w: 200, bottom: 178 } },
+  { id: 'r_tiara', name: '寶石小冠', price: 260, img: 'hat_tiara', place: { w: 160, bottom: 162 } },
+  { id: 'r_mushroom', name: '點點菇帽', img: 'hat_mushroom', place: { w: 190, bottom: 184 } },
+  { id: 'r_lemon', name: '檸檬帽帽', img: 'hat_lemon', place: { w: 175, bottom: 177 } },
+  { id: 'r_party', name: '派對尖帽', price: 80, img: 'hat_party', place: { w: 112, bottom: 164 } },
+  { id: 'r_sakura', name: '櫻花花冠', price: 160, img: 'hat_sakura', place: { w: 190, bottom: 174 } },
+  { id: 'r_wizard', name: '星星巫師', price: 220, img: 'hat_wizard', place: { w: 190, bottom: 174 } },
 ];
 
 // ───────────────────────── 眼鏡 ─────────────────────────
@@ -371,6 +431,24 @@ const GLASSES = [
     render: () => `<circle cx="235" cy="225" r="21" fill="#fff" fill-opacity=".2" stroke="#E8B830" stroke-width="5"/>
       <path d="M252 238 Q270 270 258 300" fill="none" stroke="#E8B830" stroke-width="2.5" stroke-dasharray="4 3"/>`,
   },
+  {
+    id: 'pinkheart', name: '粉心透鏡',
+    render: () => [165, 235].map((x) => heart(x, 225, 19, '#FFD6EC', `${SW3} fill-opacity=".2"`)).join('') +
+      `<path d="M187 222 Q200 216 213 222 M138 220 L126 214 M262 220 L274 214" fill="none" ${SW3}/>
+      <path d="M150 219 L155 214 M220 219 L225 214" stroke="#fff" stroke-width="3" stroke-linecap="round"/>`,
+  },
+  {
+    id: 'starvisor', name: '星光面罩', price: 180,
+    render: () => `<path d="M128 210 Q200 200 272 210 L264 240 Q200 253 136 240 Z" fill="#B8A4F0" fill-opacity=".35" ${SW}/>
+      <path d="M142 215 Q200 207 258 215" fill="none" stroke="#fff" stroke-width="3"/>
+      ${star(145, 211, 8, '#FFF1A8', SW3)}${star(257, 235, 7, '#FFF1A8', SW3)}`,
+  },
+  {
+    id: 'tortoise', name: '玳瑁圓圓', price: 100,
+    render: () => [165, 235].map((x) => `<circle cx="${x}" cy="225" r="23" fill="#FFF3DE" fill-opacity=".15" stroke="${LINE}" stroke-width="7"/>
+      <path d="M${x - 18} 212 Q${x - 12} 204 ${x - 5} 203 M${x + 18} 238 L${x + 22} 231" fill="none" stroke="#C98B5A" stroke-width="5" stroke-linecap="round"/>`).join('') +
+      `<path d="M188 224 Q200 216 212 224" fill="none" ${SW}/>`,
+  },
 ];
 
 // ───────────────────────── 頸飾 ─────────────────────────
@@ -418,6 +496,28 @@ const NECK = [
     id: 'medal', name: '金牌', price: 150,
     render: () => `<path d="M172 280 L194 320 M228 280 L206 320" stroke="#F0506A" stroke-width="9" stroke-linecap="round"/>
       <circle cx="200" cy="330" r="18" fill="#FFD54F" ${SW3}/>${star(200, 331, 10, '#FFF3B0')}`,
+  },
+  {
+    id: 'flowerlei', name: '花花項圈',
+    render: () => `<path d="M126 274 Q200 316 274 274" fill="none" stroke="#7CC4A8" stroke-width="6"/>` +
+      [0, 1, 2, 3, 4, 5, 6, 7].map((i) => {
+        const t = i / 7, x = 126 + t * 148, y = 274 + Math.sin(t * Math.PI) * 30;
+        return `<g stroke="${LINE}" stroke-width="2">${flower(x, y, 11, ['#FFB3C7', '#FFF3DE', '#C9B6F2', '#FFD54F'][i % 4], i % 4 === 3 ? '#FF8FA3' : '#FFE07A')}</g>`;
+      }).join(''),
+  },
+  {
+    id: 'heartchoker', name: '心心緞帶', price: 100,
+    render: () => `<path d="M140 284 Q200 308 260 284" fill="none" stroke="${LINE}" stroke-width="12" stroke-linecap="round"/>
+      <path d="M140 284 Q200 308 260 284" fill="none" stroke="#FF8FA3" stroke-width="7" stroke-linecap="round"/>
+      <path d="M200 300 L183 291 V309 Z M200 300 L217 291 V309 Z" fill="#FFB3C7" ${SW3}/>${heart(200, 311, 9, '#FFD54F', SW3)}`,
+  },
+  {
+    id: 'pomscarf', name: '絨球圍巾', price: 140,
+    render: () => `<path d="M128 280 Q200 310 272 280 L274 300 Q200 330 126 300 Z" fill="#B8A4F0" ${SW}/>
+      <path d="M164 308 L151 340 M236 308 L249 340" stroke="${LINE}" stroke-width="14" stroke-linecap="round"/>
+      <path d="M164 308 L151 340 M236 308 L249 340" stroke="#B8A4F0" stroke-width="9" stroke-linecap="round"/>
+      ${[150, 174, 200, 226, 250].map((x) => `<path d="M${x} 292 l-3 6 l3 6" fill="none" stroke="#E3D9F5" stroke-width="3"/>`).join('')}
+      <circle cx="150" cy="344" r="12" fill="#FFF3DE" ${SW3}/><circle cx="250" cy="344" r="12" fill="#FFF3DE" ${SW3}/>`,
   },
 ];
 
@@ -473,6 +573,12 @@ const HELD = [
   { id: 'r_icecream', name: '冰淇淋', price: 80, img: 'held_icecream', place: { w: 62, cx: 246, bottom: 334 } },
   { id: 'r_teddy', name: '小熊玩偶', price: 120, img: 'held_teddy', place: { w: 96, cx: 200, bottom: 346 } },
   { id: 'r_umbrella', name: '小雨傘', price: 100, img: 'held_umbrella', place: { w: 170, cx: 296, bottom: 318 } },
+  { id: 'r_boba', name: '珍珠奶茶', price: 80, img: 'held_boba', place: { w: 54, bottom: 344 } },
+  { id: 'r_donut', name: '粉紅甜甜圈', img: 'held_donut', place: { w: 86, bottom: 344 } },
+  { id: 'r_book', name: '小小繪本', img: 'held_book', place: { w: 80, bottom: 343 } },
+  { id: 'r_guitar', name: '烏克麗麗', price: 180, img: 'held_guitar', place: { w: 64, cx: 216, bottom: 357 } },
+  { id: 'r_camera', name: '拍拍相機', price: 120, img: 'held_camera', place: { w: 96, bottom: 340 } },
+  { id: 'r_fish', name: '魚魚抱枕', img: 'held_fish', place: { w: 100, bottom: 342 } },
 ];
 
 // ───────────────────────── 特效 ─────────────────────────
@@ -511,6 +617,27 @@ const EFFECTS = [
     id: 'snow', name: '下雪了', price: 80,
     render: () => [[50, 40], [130, 70], [210, 20], [290, 60], [360, 30], [70, 160], [340, 170], [30, 260], [370, 280], [110, 320]]
       .map(([x, y], i) => `<g class="fall" style="animation-delay:${i * 0.4}s"><circle cx="${x}" cy="${y}" r="${4 + (i % 3) * 2}" fill="#FFFFFF" stroke="#CFE6F5" stroke-width="1.5"/></g>`).join(''),
+  },
+  {
+    id: 'driftstars', name: '星星散步',
+    render: () => [[62, 100], [334, 88], [80, 240], [340, 260], [180, 44]].map(([x, y], i) =>
+      `<g class="float" style="animation-delay:${i * 0.45}s"><g class="twinkle" style="animation-delay:${i * 0.25}s;transform-origin:${x}px ${y}px">${star(x, y, 10 + i % 2 * 4, '#FFF1A8', SW3)}</g></g>`).join(''),
+  },
+  {
+    id: 'butterflies', name: '蝶蝶飛飛', price: 120,
+    render: () => [[68, 120], [330, 170], [100, 52], [322, 302]].map(([x, y], i) =>
+      `<g class="float" style="animation-delay:${i * 0.5}s"><g transform="translate(${x} ${y}) rotate(${i % 2 ? 18 : -18})">
+        <ellipse cx="-12" cy="-9" rx="13" ry="10" transform="rotate(-25 -12 -9)" fill="${i % 2 ? '#FFB3C7' : '#B8A4F0'}" ${SW3}/>
+        <ellipse cx="12" cy="-9" rx="13" ry="10" transform="rotate(25 12 -9)" fill="${i % 2 ? '#FFB3C7' : '#B8A4F0'}" ${SW3}/>
+        <ellipse cx="-9" cy="8" rx="8" ry="7" fill="${i % 2 ? '#FFD6E0' : '#D9CCF7'}" ${SW3}/>
+        <ellipse cx="9" cy="8" rx="8" ry="7" fill="${i % 2 ? '#FFD6E0' : '#D9CCF7'}" ${SW3}/>
+        <ellipse cx="0" cy="0" rx="3.5" ry="13" fill="${LINE}"/>
+        <path d="M-1 -12 Q-6 -24 -11 -26 M1 -12 Q6 -24 11 -26" fill="none" stroke="${LINE}" stroke-width="2.5" stroke-linecap="round"/></g></g>`).join(''),
+  },
+  {
+    id: 'confetti', name: '彩紙派對',
+    render: () => [[50, 50], [120, 88], [200, 32], [285, 72], [352, 40], [65, 220], [334, 240], [100, 310], [300, 330]].map(([x, y], i) =>
+      `<g class="fall" style="animation-delay:${i * 0.37}s"><rect x="${x}" y="${y}" width="7" height="13" rx="2" transform="rotate(${i * 29} ${x} ${y})" fill="${['#FF8FA3', '#9EDCC8', '#FFD54F', '#7FB3F0'][i % 4]}" stroke="${LINE}" stroke-width="1.5"/></g>`).join(''),
   },
 ];
 
@@ -576,6 +703,10 @@ const BACKGROUNDS = [
   { id: 'r_underwater', name: '海底世界', price: 200, render: photoBg('bg_underwater') },
   { id: 'r_space', name: '外太空', price: 200, render: photoBg('bg_space') },
   { id: 'r_castle', name: '童話城堡', price: 250, render: photoBg('bg_castle') },
+  { id: 'r_snowtown', name: '雪雪小鎮', price: 180, render: photoBg('bg_snowtown') },
+  { id: 'r_bakery', name: '奶油麵包屋', price: 200, render: photoBg('bg_bakery') },
+  { id: 'r_forest', name: '菇菇森林', render: photoBg('bg_forest') },
+  { id: 'r_festival', name: '燈火夏夜', price: 240, render: photoBg('bg_festival') },
 ];
 
 // ───────────────────────── 家具與房間 ─────────────────────────
@@ -605,6 +736,10 @@ const FURNITURE = [
   { id: 'cakehouse', name: '蛋糕屋', img: 'f_cakehouse', w: 300, use: 'sleep', price: 250, slot: { px: 0.625, py: 0.88, pw: 0.2, clip: { cx: 0.625, cy: 0.73, rx: 0.075, ry: 0.15 }, zzz: [0.78, 0.4] } },
   { id: 'hotair', name: '熱氣球床', img: 'f_hotair', w: 260, use: 'sleep', price: 280, slot: { px: 0.51, py: 0.94, pw: 0.26, front: 0.865, zzz: [0.7, 0.72] } },
   { id: 'castle', name: '鼠鼠城堡', img: 'f_castle', w: 380, use: 'sleep', price: 400, slot: { px: 0.52, py: 0.9, pw: 0.16, clip: { cx: 0.52, cy: 0.79, rx: 0.07, ry: 0.11 }, zzz: [0.6, 0.55] } },
+  { id: 'r_piano', name: '叮叮鋼琴', img: 'f_piano', w: 220, price: 180 },
+  { id: 'r_aquarium', name: '泡泡魚缸', img: 'f_aquarium', w: 220, price: 240 },
+  { id: 'r_swing', name: '搖搖鞦韆', img: 'f_swing', w: 240 },
+  { id: 'r_cushion', name: '草莓軟墊', img: 'f_cushion', w: 240, use: 'sleep', slot: { px: 0.5, py: 0.6, pw: 0.46, front: 0.62, zzz: [0.74, 0.1] } },
 ];
 
 // 加蓋樓層的價格（第 2 層起）
