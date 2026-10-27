@@ -119,6 +119,8 @@ const Net = (() => {
 
   return {
     on, available, isCode, newCode, join, leave, chat,
+    // Party uses the same authenticated connection and synchronized clock.
+    partyConnection: () => room && fb ? { fb, room, now, info: me } : null,
     get room() { return room; },
     get uid() { return fb?.uid; },
     move: (x, y) => patch({ x: Math.round(x), y: Math.round(y) }),

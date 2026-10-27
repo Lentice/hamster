@@ -99,6 +99,58 @@ const SPECIES = [
   },
 ];
 
+// 新夥伴仍沿用相同的臉部基準；尾巴放在身體後方，跟著 pet-body 一起動。
+SPECIES.push(
+  {
+    id: 'silverfox', name: '銀狐倉鼠', desc: '銀灰披風與雪白面罩',
+    rx: 112, ry: 105, scale: 0.87, shape: 'fluffy', ears: 'small',
+    fur: '#B3BCCB', belly: '#FFFFFF', ear: '#909CAD', inner: '#FFC4D0',
+    markings: ({ dy }) => up(dy, `<path d="M112 200 Q145 174 178 204 Q200 174 222 204 Q255 174 288 200 L300 278 H100 Z" fill="#FFFFFF"/><path d="M192 138 Q200 130 208 138 L204 180 H196 Z" fill="#778596"/>`),
+  },
+  {
+    id: 'panda', name: '熊貓倉鼠', desc: '黑耳朵和圓圓眼罩',
+    rx: 122, ry: 111, scale: 0.97, shape: 'smooth', ears: 'round',
+    fur: '#FFFDF7', belly: '#FFFFFF', ear: '#4E454C', inner: '#C99EAB',
+    markings: ({ dy }) => up(dy, `<ellipse cx="160" cy="225" rx="29" ry="35" fill="#65535C" transform="rotate(18 160 225)"/><ellipse cx="240" cy="225" rx="29" ry="35" fill="#65535C" transform="rotate(-18 240 225)"/><path d="M50 292 Q100 268 130 304 L132 390 H50 Z M350 292 Q300 268 270 304 L268 390 H350 Z" fill="#65535C"/>`),
+  },
+  {
+    id: 'taro', name: '芋頭鼠', desc: '胖胖芋泥配奶油瀏海',
+    rx: 128, ry: 101, scale: 0.9, shape: 'smooth', ears: 'small',
+    fur: '#BEACD4', belly: '#F5ECFF', ear: '#9F8AB9', inner: '#FFC3DA',
+    markings: ({ dy }) => up(dy, `<path d="M140 130 H260 L254 182 Q232 198 218 184 Q200 211 182 184 Q164 198 146 182 Z" fill="#E8DDF4"/>`),
+  },
+  {
+    id: 'chinchilla', name: '龍貓', desc: '蓬鬆銀毛與大圓耳',
+    rx: 126, ry: 117, scale: 0.98, shape: 'fluffy', ears: 'large',
+    fur: '#A5AAB8', belly: '#F5F3F6', ear: '#A5AAB8', inner: '#E8BFCC', tail: 'fluffy',
+    markings: ({ dy }) => up(dy, `<path d="M145 180 Q200 155 255 180" fill="none" stroke="#D8DCE6" stroke-width="12" stroke-linecap="round"/>`),
+  },
+  {
+    id: 'gerbil', name: '沙鼠', desc: '修長身形與小毛刷尾巴',
+    rx: 96, ry: 120, scale: 0.91, shape: 'smooth', ears: 'small',
+    fur: '#D7B58C', belly: '#FFF3DE', ear: '#C69B70', inner: '#FFC3B6', tail: 'tuft',
+    markings: ({ dy }) => up(dy, `<path d="M194 134 Q200 128 206 134 L204 192 H196 Z" fill="#B78F68"/>`),
+  },
+  {
+    id: 'degu', name: '八齒鼠', desc: '栗子毛與深色尾端',
+    rx: 108, ry: 115, scale: 0.95, shape: 'fluffy', ears: 'small',
+    fur: '#AC805F', belly: '#EBD1AF', ear: '#91694E', inner: '#EAB5A2', tail: 'tuft',
+    markings: ({ dy }) => up(dy, `<ellipse cx="156" cy="208" rx="23" ry="9" fill="#EBD1AF"/><ellipse cx="244" cy="208" rx="23" ry="9" fill="#EBD1AF"/><path d="M178 150 Q200 138 222 150" fill="none" stroke="#806149" stroke-width="6"/>`),
+  },
+  {
+    id: 'fancymouse', name: '小白鼠', desc: '粉紅大耳與彎彎長尾',
+    rx: 98, ry: 111, scale: 0.84, shape: 'smooth', ears: 'large',
+    fur: '#FFFDFB', belly: '#FFF1F3', ear: '#FFFDFB', inner: '#FFB4C6', tail: 'pink',
+  },
+  {
+    id: 'crested', name: '冠毛天竺鼠', desc: '奶茶斑紋與白色旋旋冠',
+    rx: 140, ry: 103, scale: 1.06, shape: 'smooth', ears: 'droop', pig: true,
+    fur: '#F1D0A6', belly: '#FFF8ED', ear: '#C58A61', inner: '#FFC5BC',
+    markings: ({ dy }) => up(dy, `<path d="M45 130 H156 Q150 210 88 251 H45 Z M355 135 H260 Q264 202 315 230 H355 Z" fill="#C58A61"/>`),
+    extra: ({ dy }) => up(dy, `<path d="M168 156 L174 137 L190 141 L200 124 L210 141 L226 137 L232 156 L217 168 L200 162 L183 168 Z" fill="#FFFDF7" ${SW3}/><path d="M184 149 L200 155 L197 139 M200 155 L216 148 M200 155 L210 162" fill="none" stroke="#DDCDBC" stroke-width="2"/>`),
+  },
+);
+
 // 物種的幾何資料（由 rx/ry 推算）
 for (const sp of SPECIES) {
   sp.cy = FEET_Y - sp.ry;
@@ -115,7 +167,7 @@ function renderEars(sp) {
     return `<g class="ear ear-l"><ellipse cx="${200 - x}" cy="${y}" rx="32" ry="19" transform="rotate(-28 ${200 - x} ${y})" fill="${sp.ear}" ${SW}/></g>
       <g class="ear ear-r"><ellipse cx="${200 + x}" cy="${y}" rx="32" ry="19" transform="rotate(28 ${200 + x} ${y})" fill="${sp.ear}" ${SW}/></g>`;
   }
-  const r = sp.ears === 'small' ? 22 : 28;
+  const r = sp.ears === 'large' ? 38 : sp.ears === 'small' ? 22 : 28;
   const x = rx * 0.58;
   const y = 160 + dy + (sp.ears === 'small' ? 4 : 0);
   return [[-1, 'l'], [1, 'r']].map(([s, k]) => `<g class="ear ear-${k}">
@@ -123,10 +175,19 @@ function renderEars(sp) {
     <circle cx="${200 + s * x}" cy="${y + 2}" r="${r * 0.55}" fill="${sp.inner}"/></g>`).join('');
 }
 
+function renderTail(sp) {
+  if (!sp.tail) return '';
+  if (sp.tail === 'fluffy') return `<path d="M${200 + sp.rx - 10} 336 C366 354 384 304 358 285 Q334 272 338 307 Q339 324 ${200 + sp.rx - 10} 315 Z" fill="${sp.fur}" ${SW}/>`;
+  const end = sp.tail === 'pink' ? '#F4ACBB' : sp.fur;
+  return `<path d="M${200 + sp.rx - 8} 337 C375 375 391 305 356 290 Q336 282 338 306" fill="none" stroke="${LINE}" stroke-width="12" stroke-linecap="round"/>
+    <path d="M${200 + sp.rx - 8} 337 C375 375 391 305 356 290 Q336 282 338 306" fill="none" stroke="${end}" stroke-width="6" stroke-linecap="round"/>
+    ${sp.tail === 'tuft' ? `<path d="M338 315 Q320 304 329 289 L339 296 L350 290 Q355 309 338 315 Z" fill="${sp.ear}" ${SW3}/>` : ''}`;
+}
+
 function renderBody(sp, clipId) {
   const belly = `<ellipse cx="200" cy="${sp.cy + sp.ry * 0.45}" rx="${sp.rx * 0.74}" ry="${sp.ry * 0.68}" fill="${sp.belly}"/>`;
   const muzzle = `<ellipse cx="200" cy="${252 + sp.dy}" rx="30" ry="18" fill="${sp.belly}" opacity=".9"/>`;
-  return `${renderEars(sp)}
+  return `${renderTail(sp)}${renderEars(sp)}
     <path d="${sp.path}" fill="${sp.fur}"/>
     <g clip-path="url(#${clipId})">${belly}${sp.markings ? sp.markings(sp) : ''}${muzzle}</g>
     <path d="${sp.path}" fill="none" ${SW}/>
@@ -274,5 +335,21 @@ const EXPRESSIONS = [
     render: () => eye(165) + eye(235) + nose + blush(0.45) +
       `<path d="M151 207 Q164 199 178 209 M222 209 Q236 199 249 207 M185 265 L192 260 L200 265 L208 260 L216 265" fill="none" ${SW3}/>
        <path d="M273 204 Q261 222 273 229 Q285 222 273 204 Z" fill="#BFE6FF" ${SW3}/>`,
+  },
+  {
+    id: 'determined', name: '幹勁滿滿',
+    render: () => eye(165) + eye(235) + nose + blush() + `<path d="M150 203 L178 212 M250 203 L222 212 M188 259 Q200 274 212 259" fill="none" ${SW3}/>` ,
+  },
+  {
+    id: 'pleading', name: '拜託拜託',
+    render: () => bigEye(165) + bigEye(235) + nose + blush(0.75) + `<path d="M149 203 Q165 211 179 202 M221 202 Q235 211 251 203 M193 263 Q200 255 207 263" fill="none" ${SW3}/><circle cx="154" cy="234" r="3" fill="#BFE6FF"/><circle cx="224" cy="234" r="3" fill="#BFE6FF"/>`,
+  },
+  {
+    id: 'whistle', name: '吹口哨',
+    render: () => happyEye(165) + happyEye(235) + nose + blush(0.4) + `<ellipse cx="206" cy="260" rx="7" ry="5" fill="#EFA2AE" ${SW3}/><path d="M266 237 V215 L281 212 V230" fill="none" stroke="#9E8AC6" stroke-width="3"/><ellipse cx="261" cy="238" rx="6" ry="4" fill="#9E8AC6"/><ellipse cx="276" cy="231" rx="6" ry="4" fill="#9E8AC6"/>`,
+  },
+  {
+    id: 'content', name: '幸福滿足',
+    render: () => sleepEye(165) + sleepEye(235) + nose + omega + blush(0.8) + `<path d="M144 207 Q161 201 176 207 M224 207 Q239 201 256 207" fill="none" ${SW3}/>${heart(278, 184, 9, '#FFB3C7', SW3)}`,
   },
 ];
