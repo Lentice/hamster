@@ -871,4 +871,32 @@ const CATEGORIES = [
   { id: 'background', name: '背景', icon: '🌈', items: BACKGROUNDS, view: '0 0 400 400' },
 ];
 
+// 新收藏用程式繪製，能和每種鼠鼠一起換裝、存圖。
+HELD.push(
+  {
+    id: 'box_rose', name: '玫瑰花', price: 60, boxOnly: true,
+    render: () => `<path d="M233 326 L261 255" stroke="#69AB88" stroke-width="6" stroke-linecap="round"/><path d="M244 297 Q218 273 240 278 Q251 280 244 297 M250 282 Q278 266 270 287 Q261 295 250 282" fill="#8CCBA0" ${SW3}/><g transform="translate(263 248)"><path d="M0 20 C-34 13 -28 -21 -10 -18 C2 -34 31 -17 24 1 C36 19 11 29 0 20" fill="#EF7C9C" ${SW3}/><path d="M-13 3 Q-14 -15 6 -10 Q23 -3 5 10 Q-8 14 -6 0 Q4 -8 9 1" fill="none" stroke="#B84E76" stroke-width="3"/></g>`,
+  },
+  {
+    id: 'box_daisy', name: '小雛菊', price: 60, boxOnly: true,
+    render: () => `<path d="M232 326 L262 252" stroke="#69AB88" stroke-width="6"/><path d="M245 295 Q217 266 238 277 Q250 280 245 295" fill="#9EDCC8" ${SW3}/>${flower(266, 242, 15, '#FFFFFF', '#FFD567')}`,
+  },
+  {
+    id: 'moon_bouquet', name: '星河藍色花束', price: 12, currency: 'moon', boxOnly: true,
+    render: () => `<path d="M217 282 L248 340 L283 279 Z" fill="#E1E5FF" stroke="#9E9DD0" stroke-width="3"/><path d="M227 276 L248 333 L268 273" fill="#F8FCFF" stroke="#BCCFEE" stroke-width="2"/>${[[231, 266, '#8CCEF5'], [267, 264, '#9DABEF'], [249, 246, '#6FAAE6'], [250, 277, '#B4E7FA']].map(([x, y, c]) => flower(x, y, 12, c, '#F5FBFF')).join('')}<path d="M245 319 Q216 302 225 321 Q233 331 245 319 Q269 300 267 320 Q260 333 245 319" fill="#A3B4ED" stroke="#7E8FCC" stroke-width="2"/>${star(289, 239, 9, '#F4FAFF', 'stroke="#9AADE3" stroke-width="2"')}${star(216, 244, 6, '#D6F0FF')}`,
+  },
+  {
+    id: 'moon_wand', name: '月光珍珠仙女棒', price: 12, currency: 'moon', boxOnly: true,
+    render: () => `<path d="M233 326 L278 239" stroke="#ACACD8" stroke-width="6" stroke-linecap="round"/><path d="M286 207 A24 24 0 1 0 299 246 A22 22 0 0 1 286 207" fill="#E7EDFF" stroke="#9DA9D5" stroke-width="3"/><circle cx="277" cy="240" r="7" fill="#FFF" stroke="#B6C8E2" stroke-width="2"/>${star(306, 210, 9, '#D1E9FF', 'stroke="#9DA9D5" stroke-width="2"')}`,
+  },
+);
+HATS.push({
+  id: 'box_ribbon', name: '奶油蝴蝶結', price: 60, boxOnly: true,
+  render: () => `<path d="M201 146 Q159 110 160 143 Q158 173 201 153 Q244 175 241 143 Q242 112 201 146" fill="#FFE5AC" ${SW3}/><ellipse cx="201" cy="149" rx="9" ry="11" fill="#FFCF8F" ${SW3}/>`,
+});
+NECK.push({
+  id: 'moon_shell', name: '夢幻貝殼珍珠項鍊', price: 12, currency: 'moon', boxOnly: true,
+  render: () => `<path d="M151 287 Q200 320 249 287" fill="none" stroke="#A8B9D8" stroke-width="5"/>${[154, 169, 184, 216, 231, 246].map((x) => `<circle cx="${x}" cy="${300 - Math.abs(200 - x) * .25}" r="6" fill="#F6FBFF" stroke="#B9CCE5" stroke-width="2"/>`).join('')}<path d="M200 325 Q163 307 183 297 Q191 281 200 294 Q211 281 219 297 Q239 309 200 325 Z" fill="#D8C9F5" stroke="#9C91C4" stroke-width="2.5"/><path d="M200 322 L185 300 M200 322 V296 M200 322 L216 300" stroke="#B1A0D8" stroke-width="2"/><circle cx="200" cy="323" r="5" fill="#FFFFFF"/>`,
+});
+
 const itemKey = (cat, id) => `${cat}:${id}`;

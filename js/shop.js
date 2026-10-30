@@ -2,7 +2,10 @@
 
 (() => {
   const SHOP_TABS = [
-    ...CATEGORIES.filter((c) => c.items.some((it) => it.price)).map((c) => ({ ...c, kind: 'look' })),
+    { id: 'blindbox', name: '普通盲盒', icon: '🎁', kind: 'box', boxType: 'normal' },
+    { id: 'rare', name: '月亮盲盒', icon: '☾', kind: 'box', boxType: 'moon' },
+    ...CATEGORIES.filter((c) => c.items.some((it) => it.price && !it.boxOnly && it.currency !== 'moon'))
+      .map((c) => ({ ...c, items: c.items.filter((it) => !it.boxOnly && it.currency !== 'moon'), kind: 'look' })),
     { id: 'furniture', name: '家具', icon: '🪑', items: FURNITURE, kind: 'furniture' },
     { id: 'rooms', name: '房間', icon: '🖼️', items: ROOMS, kind: 'room' },
   ];
@@ -26,12 +29,28 @@
     $('#shop-tabs').innerHTML = SHOP_TABS.map((t) => `
       <button class="tab ${t.id === current ? 'active' : ''}" data-tab="${t.id}"><span class="tab-icon">${t.icon}</span><span class="tab-name">${t.name}</span></button>`).join('');
     const tab = SHOP_TABS.find((t) => t.id === current);
-    $('#shop-grid').innerHTML = tab.items.filter((it) => it.price).map((item, i) => {
-      const owned = isOwned(tab.id, item);
-      return `<div class="shop-item ${owned ? 'owned' : ''}" data-id="${item.id}">
-        <div class="shop-thumb">${thumb(tab, item, i)}</div>
+    if (tab.kind === 'box') {
+      const box = BLIND_BOXES[tab.boxType];
+      const pool = boxPool(tab.boxType);
+      const all = boxItems(tab.boxType);
+      const icon = itemCurrencyIcon(box);
+      $('#shop-grid').innerHTML = `<div class="blindbox-intro">
+        <div class="blindbox-icon">${tab.icon}</div><h3>${box.title}・${box.name}</h3>
+        <p>每盒 ${icon} ${box.price} ${box.currencyName}，隨機獲得一件未擁有的${box.rarity}配飾。</p>
+        <p>不會重複！剩下 ${pool.length} / ${all.length} 件待收集。${pool.length ? `每件未擁有配飾的機率相同（1/${pool.length}）。` : '這一套已經全部收集完成囉！'}</p>
+        <button class="btn btn-pink" id="open-blind-box" ${!pool.length || save[box.wallet] < box.price ? 'disabled' : ''}>${!pool.length ? '✔ 已集齊' : `${icon} ${box.price} 開${box.name}`}</button>
+        ${pool.length && save[box.wallet] < box.price ? `<p class="warn">${box.currencyName}還差 ${box.price - save[box.wallet]} 枚，${tab.boxType === 'moon' ? '每天登入可領 12 枚月亮金幣喔！' : '去出門玩賺一些吧！'}</p>${tab.boxType === 'normal' ? '<button class="btn btn-blue" id="earn-coins">出門賺鼠鼠幣</button>' : ''}` : ''}
+        <h3>盲盒裡有什麼？</h3></div>` + all.map(({ cat, item }, i) => `<div class="shop-item ${isOwned(cat.id, item) ? 'owned' : ''}">
+          <div class="shop-thumb">${thumb(cat, item, i)}</div><div class="shop-name">${item.name}</div><div class="owned-tag">${isOwned(cat.id, item) ? '✔ 已擁有' : `${box.name}限定`}</div></div>`).join('');
+      return;
+    }
+    const entries = tab.items.filter((it) => it.price).map((item) => ({ cat: tab, item }));
+    $('#shop-grid').innerHTML = entries.map(({ cat, item }, i) => {
+      const owned = isOwned(cat.id, item);
+      return `<div class="shop-item ${owned ? 'owned' : ''}" data-id="${item.id}" data-cat="${cat.id}">
+        <div class="shop-thumb">${thumb(cat, item, i)}</div>
         <div class="shop-name">${item.name}</div>
-        ${owned ? '<div class="owned-tag">✔ 已擁有</div>' : `<button class="btn btn-pink btn-small buy-btn">🪙 ${item.price}</button>`}
+        ${owned ? '<div class="owned-tag">✔ 已擁有</div>' : `<button class="btn btn-pink btn-small buy-btn">${itemCurrencyIcon(item)} ${item.price}</button>`}
       </div>`;
     }).join('');
   }
@@ -45,13 +64,42 @@
   });
 
   $('#shop-grid').addEventListener('click', (e) => {
+    if (e.target.closest('#earn-coins')) { showScreen('outdoor'); return; }
+    if (e.target.closest('#open-blind-box')) {
+      const tab = SHOP_TABS.find((t) => t.id === current);
+      const type = tab.boxType;
+      const box = BLIND_BOXES[type];
+      const pool = boxPool(type);
+      if (!pool.length || save[box.wallet] < box.price) return;
+      const m = modal(`<div class="buy-box"><div class="blindbox-icon">${tab.icon}</div><h3>打開${box.name}</h3><p>花 ${itemCurrencyIcon(box)} ${box.price} ${box.currencyName}，獲得一件隨機${box.rarity}配飾。</p><p>不會重複，每件未擁有配飾的機率都是 1/${pool.length}。</p><div class="modal-actions"><button class="btn btn-pink" id="confirm-box">打開看看！</button><button class="btn btn-gray" id="cancel-box">先不要</button></div></div>`, { cls: 'small' });
+      $('#cancel-box', m.box).onclick = m.close;
+      $('#confirm-box', m.box).onclick = () => {
+        const button = $('#confirm-box', m.box);
+        if (button.disabled) return;
+        button.disabled = true;
+        const prize = openBlindBox(type);
+        m.close();
+        draw();
+        if (!prize) { toast(`目前無法開盒，請確認${box.currencyName}與收藏狀態。`); return; }
+        sfx.win();
+        const reveal = modal(`<div class="buy-box"><h3>✨ 開出了「${prize.item.name}」！</h3><div class="buy-thumb">${thumb(prize.cat, prize.item, 0)}</div><p>已經放進你的衣櫃囉！</p><div class="modal-actions"><button class="btn btn-pink" id="wear-prize">馬上戴上</button><button class="btn btn-gray" id="keep-shopping">繼續逛商店</button></div></div>`, { cls: 'small' });
+        $('#keep-shopping', reveal.box).onclick = reveal.close;
+        $('#wear-prize', reveal.box).onclick = () => {
+          save.look[prize.cat.id] = prize.item.id;
+          persist();
+          reveal.close();
+          showScreen('wardrobe');
+        };
+      };
+      return;
+    }
     const card = e.target.closest('.shop-item');
-    if (!card || card.classList.contains('owned')) return;
-    const tab = SHOP_TABS.find((t) => t.id === current);
+    if (!card?.dataset.id || card.classList.contains('owned')) return;
+    const tab = CATEGORIES.find((t) => t.id === card.dataset.cat) || SHOP_TABS.find((t) => t.id === current);
     const item = tab.items.find((x) => x.id === card.dataset.id);
     askBuy(tab.id, item, $('.shop-thumb', card).innerHTML, () => {
       draw();
-      if (tab.kind === 'look') {
+      if (CATEGORIES.some((cat) => cat.id === tab.id)) {
         save.look[tab.id] = item.id;
         persist();
         toast('已經幫鼠鼠換上囉！');
@@ -59,5 +107,15 @@
     });
   });
 
-  SCREENS.shop = { enter: draw };
+  SCREENS.shop = {
+    enter: draw,
+    openBox(type) {
+      current = type === 'moon' ? 'rare' : 'blindbox';
+      showScreen('shop');
+      draw();
+    },
+  };
+  saveListeners.push(() => {
+    if (currentScreen === 'shop') draw();
+  });
 })();

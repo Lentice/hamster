@@ -87,15 +87,23 @@ function modal(content, { cls = '', closable = true } = {}) {
 
 // 購買確認。成功時呼叫 onBought
 function askBuy(cat, item, thumbHtml, onBought) {
-  const enough = save.coins >= item.price;
+  if (item.boxOnly) {
+    const type = item.currency === 'moon' ? 'moon' : 'normal';
+    toast(`這是${BLIND_BOXES[type].name}配飾，到商店開盲盒就有機會獲得喔！`);
+    SCREENS.shop.openBox(type);
+    return;
+  }
+  const moon = item.currency === 'moon';
+  const balance = moon ? save.moonCoins : save.coins;
+  const enough = balance >= item.price;
   const m = modal(`
     <div class="buy-box">
       <div class="buy-thumb">${thumbHtml}</div>
       <h3>${item.name}</h3>
-      <p class="price-big">🪙 ${item.price}</p>
-      ${enough ? '<p>要買下來嗎？</p>' : `<p class="warn">鼠鼠幣還差 ${item.price - save.coins} 枚～<br>去「出門玩」玩小遊戲賺吧！</p>`}
+      <p class="price-big">${itemCurrencyIcon(item)} ${item.price}</p>
+      ${enough ? '<p>要買下來嗎？</p>' : `<p class="warn">${moon ? '月亮金幣' : '鼠鼠幣'}還差 ${item.price - balance} 枚～<br>${moon ? '每天登入可領 12 枚，慢慢收集吧！' : '去「出門玩」玩小遊戲賺吧！'}</p>`}
       <div class="modal-actions">
-        ${enough ? '<button class="btn btn-pink" data-act="buy">買下來！</button>' : '<button class="btn btn-blue" data-act="go">出門賺幣</button>'}
+        ${enough ? '<button class="btn btn-pink" data-act="buy">買下來！</button>' : moon ? '' : '<button class="btn btn-blue" data-act="go">出門賺幣</button>'}
         <button class="btn btn-gray" data-act="no">先不要</button>
       </div>
     </div>`, { cls: 'small' });
@@ -115,22 +123,25 @@ function askBuy(cat, item, thumbHtml, onBought) {
 // ───────────────────────── 金幣 ─────────────────────────
 
 let shownCoins = save.coins;
+let coinAnimation = 0;
 function updateCoins() {
+  $('#moon-count').textContent = save.moonCoins;
   const el = $('#coin-count');
   const target = save.coins;
+  cancelAnimationFrame(coinAnimation);
   if (target === shownCoins) { el.textContent = target; return; }
   const chip = $('#coins');
   chip.classList.remove('bump');
   void chip.offsetWidth;
   chip.classList.add('bump');
-  const from = shownCoins;
+  const from = Number(el.textContent) || 0;
   const start = performance.now();
   const step = (t) => {
     const k = Math.min(1, (t - start) / 400);
     el.textContent = Math.round(from + (target - from) * k);
-    if (k < 1) requestAnimationFrame(step);
+    if (k < 1) coinAnimation = requestAnimationFrame(step);
   };
-  requestAnimationFrame(step);
+  coinAnimation = requestAnimationFrame(step);
   shownCoins = target;
 }
 saveListeners.push(updateCoins);

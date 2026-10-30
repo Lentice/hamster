@@ -57,6 +57,18 @@ h2, h3 { margin: 0; }
   padding: 6px 14px; font-weight: bold; font-size: 18px; min-width: 90px; justify-content: center;
 }
 .coins.bump { animation: bump .4s; }
+.moon-wallet { background: #EDF0FC; border-color: #B9C2DB; color: #606C96; }
+.moon-icon { display: inline-flex; width: 1.35em; height: 1.35em; align-items: center; justify-content: center; vertical-align: middle; border-radius: 50%; color: #68789F; border: 2px solid #B4BFD6; background: linear-gradient(135deg, #FFFFFF, #D8DFED 65%, #F9FBFF); font-weight: bold; line-height: 1; }
+.blindbox-intro { grid-column: 1 / -1; text-align: center; padding: 20px; border: 2px solid #E2D6EE; border-radius: 18px; background: linear-gradient(135deg, #FFF4F7, #EFF3FF); }
+.blindbox-intro p { line-height: 1.7; }
+.blindbox-intro h3:last-child { margin-top: 24px; }
+.blindbox-icon { font-size: 64px; margin-bottom: 12px; }
+.daily-moon-note { line-height: 1.8; }
+button:disabled { cursor: default; opacity: .55; }
+@media (max-width: 520px) {
+  .top-right { gap: 4px; }
+  .top-right .coins { min-width: 60px; padding: 5px 7px; font-size: 15px; }
+}
 @keyframes bump { 40% { transform: scale(1.18); } }
 .icon-btn { border: none; background: #F3EAE4; border-radius: 50%; width: 40px; height: 40px; font-size: 18px; }
 

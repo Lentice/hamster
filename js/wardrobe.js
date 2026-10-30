@@ -58,7 +58,7 @@
       return `<button class="item ${look[cat.id] === item.id ? 'selected' : ''} ${owned ? '' : 'locked'}" data-id="${item.id}" title="${item.name}">
         <div class="thumb">${thumbFor(cat, item, i)}</div>
         <span class="item-name">${item.name}</span>
-        ${owned ? '' : `<span class="price-tag">🪙${item.price}</span>`}
+        ${owned ? '' : `<span class="price-tag">${item.boxOnly ? (item.currency === 'moon' ? '☾ 月亮盲盒' : '🎁 普通盲盒') : `${itemCurrencyIcon(item)} ${item.price}`}</span>`}
       </button>`;
     }).join('');
   }

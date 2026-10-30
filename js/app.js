@@ -27,6 +27,23 @@ syncTopbar();
 $$('.nav-btn').forEach((b) => b.addEventListener('click', () => { showScreen(b.dataset.screen); sfx.tab(); }));
 $('#mute').addEventListener('click', () => setMuted(!muted));
 setMuted(muted);
+function collectDailyMoonCoins() {
+  if (document.hidden) return;
+  if (claimDailyMoonCoins()) toast('☾ 每日登入禮！領到了 12 枚銀色月亮金幣！');
+}
+window.addEventListener('storage', (e) => {
+  if (e.key !== SAVE_KEY || !syncStoredSave()) return;
+  if (currentScreen) {
+    SCREENS[currentScreen]?.leave?.();
+    SCREENS[currentScreen]?.enter?.();
+  }
+});
+collectDailyMoonCoins();
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) collectDailyMoonCoins();
+});
+// 跨午夜仍開著遊戲時，也能領到新一天的登入禮。
+setInterval(collectDailyMoonCoins, 60000);
 updateCoins();
 
 let startScreen = 'wardrobe';
@@ -39,6 +56,6 @@ try {
     localStorage.setItem('hamster-welcomed', '1');
     modal(`<div class="game-intro"><div class="game-icon">🐹</div><h2>歡迎來到鼠鼠小屋！</h2>
       <p>👗 幫鼠鼠換上喜歡的衣服<br>🏠 佈置鼠鼠的家<br>🌳 出門散步、玩小遊戲賺鼠鼠幣<br>🛒 用鼠鼠幣買特別的衣服和家具</p>
-      <p>先送你 <b>🪙 ${START_COINS}</b> 鼠鼠幣當見面禮！</p></div>`, { cls: 'small' });
+      <p>先送你 <b>🪙 ${START_COINS}</b> 鼠鼠幣當見面禮！<br>每天登入再領 <b>☾ 12 枚月亮金幣</b>，開月亮盲盒抽夢幻稀有配飾。<br>普通盲盒可以開出玫瑰花等小驚喜喔！</p></div>`, { cls: 'small' });
   }
 } catch { /* 忽略 */ }
