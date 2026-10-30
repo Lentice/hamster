@@ -3,6 +3,7 @@
 const LINE = '#5A3E36';
 const SW = 'stroke="#5A3E36" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"';
 const SW3 = 'stroke="#5A3E36" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"';
+const HAMSTER_COIN_ICON = '<img class="hamster-coin" src="assets/coin_hamster.svg" alt="鼠鼠幣">';
 
 function heart(cx, cy, s, fill, extra = '') {
   return `<path d="M${cx} ${cy + s * 0.9} C${cx - s * 1.5} ${cy + s * 0.05} ${cx - s * 0.95} ${cy - s * 1.15} ${cx} ${cy - s * 0.35} C${cx + s * 0.95} ${cy - s * 1.15} ${cx + s * 1.5} ${cy + s * 0.05} ${cx} ${cy + s * 0.9} Z" fill="${fill}" ${extra}/>`;

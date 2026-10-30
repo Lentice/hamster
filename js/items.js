@@ -899,4 +899,35 @@ NECK.push({
   render: () => `<path d="M151 287 Q200 320 249 287" fill="none" stroke="#A8B9D8" stroke-width="5"/>${[154, 169, 184, 216, 231, 246].map((x) => `<circle cx="${x}" cy="${300 - Math.abs(200 - x) * .25}" r="6" fill="#F6FBFF" stroke="#B9CCE5" stroke-width="2"/>`).join('')}<path d="M200 325 Q163 307 183 297 Q191 281 200 294 Q211 281 219 297 Q239 309 200 325 Z" fill="#D8C9F5" stroke="#9C91C4" stroke-width="2.5"/><path d="M200 322 L185 300 M200 322 V296 M200 322 L216 300" stroke="#B1A0D8" stroke-width="2"/><circle cx="200" cy="323" r="5" fill="#FFFFFF"/>`,
 });
 
+HATS.push(
+  {
+    id: 'box_flowercrown', name: '小花花冠', price: 60, boxOnly: true,
+    render: () => `<path d="M142 157 Q200 129 258 157" fill="none" stroke="#8CB58A" stroke-width="7"/>${[[151, 150], [176, 139], [202, 136], [228, 141], [250, 153]].map(([x, y], i) => flower(x, y, 9, i % 2 ? '#FFF6C9' : '#FFD1DB', '#E8B458')).join('')}`,
+  },
+  {
+    id: 'moon_shellcrown', name: '人魚貝殼皇冠', price: 12, currency: 'moon', boxOnly: true,
+    render: () => `<path d="M149 153 Q200 172 251 153 L248 139 Q200 153 152 139 Z" fill="#C6DFF4" stroke="#929CC5" stroke-width="2.5"/><path d="M200 149 Q162 135 180 118 Q182 101 194 112 Q201 96 208 112 Q224 101 222 120 Q240 138 200 149Z" fill="#E5CEEF" stroke="#A69AC9" stroke-width="2.5"/><path d="M200 146 L185 121 M200 146 V115 M200 146 L217 121" fill="none" stroke="#B4A5D8" stroke-width="2"/>${[156, 174, 200, 226, 244].map((x) => `<circle cx="${x}" cy="${x === 200 ? 153 : 149}" r="5" fill="#FAFDFF" stroke="#AEC8E0" stroke-width="1.5"/>`).join('')}${star(263, 120, 7, '#D8E9FF')}`,
+  },
+);
+HELD.push(
+  {
+    id: 'box_acorn', name: '圓圓橡果', price: 60, boxOnly: true,
+    render: () => `<path d="M177 303 Q175 343 200 350 Q227 340 223 303" fill="#DDA56E" ${SW3}/><path d="M173 305 Q173 283 200 283 Q228 283 228 305Z" fill="#A47A58" ${SW3}/><path d="M199 284 Q195 271 207 271" fill="none" stroke="#805B42" stroke-width="5" stroke-linecap="round"/><path d="M184 299 L191 291 M198 300 L205 290 M213 299 L218 293" stroke="#C69A70" stroke-width="3"/><ellipse cx="189" cy="322" rx="4" ry="10" fill="#F2C792"/>`,
+  },
+  {
+    id: 'moon_pearlorb', name: '泡泡珍珠水晶球', price: 12, currency: 'moon', boxOnly: true,
+    render: () => `<circle cx="246" cy="287" r="30" fill="#E5F7FF" fill-opacity=".85" stroke="#9EB9DB" stroke-width="2.5"/><circle cx="247" cy="290" r="12" fill="#FFFDF7" stroke="#CCD4EB" stroke-width="2"/><path d="M231 267 Q219 275 222 286" fill="none" stroke="#FFF" stroke-width="5" stroke-linecap="round"/><path d="M222 315 L219 326 Q247 341 275 326 L271 315Z" fill="#BCA9DF" stroke="#968CBF" stroke-width="2.5"/>${star(280, 258, 9, '#D8E8FF', 'stroke="#A9A1CF" stroke-width="1.5"')}${star(215, 255, 6, '#FFF4C8')}`,
+  },
+);
+NECK.push(
+  {
+    id: 'box_peachbow', name: '蜜桃蝴蝶領結', price: 60, boxOnly: true,
+    render: () => `<path d="M201 298 Q165 275 170 302 Q169 325 201 305 Q235 328 232 302 Q237 275 201 298" fill="#FFC4B3" ${SW3}/><circle cx="201" cy="302" r="8" fill="#F4A396" ${SW3}/>`,
+  },
+  {
+    id: 'moon_stardrop', name: '極光星露項鍊', price: 12, currency: 'moon', boxOnly: true,
+    render: () => `<path d="M154 286 Q200 318 246 286" fill="none" stroke="#ACB8DA" stroke-width="3"/>${star(200, 305, 15, '#D9E8FF', 'stroke="#9E9BC8" stroke-width="2"')}<path d="M200 319 Q183 339 200 345 Q217 339 200 319Z" fill="#BDE6E8" stroke="#97B8D0" stroke-width="2"/><path d="M198 329 L195 337" stroke="#FFF" stroke-width="2.5" stroke-linecap="round"/>`,
+  },
+);
+
 const itemKey = (cat, id) => `${cat}:${id}`;

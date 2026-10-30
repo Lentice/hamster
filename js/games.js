@@ -52,7 +52,7 @@ function runGame(id, m) {
         <div class="game-icon">${record ? '🏆' : '🎉'}</div>
         <h2>${record ? '新紀錄！' : '完成！'}</h2>
         <p class="score">分數 <b>${score}</b></p>
-        <p class="reward">獲得 <b>🪙 ${coins}</b> 鼠鼠幣</p>
+        <p class="reward">獲得 <b>${HAMSTER_COIN_ICON} ${coins}</b> 鼠鼠幣</p>
         <div class="modal-actions">
           <button class="btn btn-pink" data-act="again">再玩一次</button>
           <button class="btn btn-gray" data-act="back">回公園</button>
@@ -257,7 +257,7 @@ function startMemory(area, ctl) {
   area.innerHTML = `${hudHtml('<span>👣 <b class="h-moves">0</b></span>')}
     <div class="memory-grid">${deck.map((c, k) => `<button class="mcard" data-k="${k}">
       <span class="mback"><img src="${assetUrl('g_card_back')}" alt=""></span>
-      <span class="mface"><img src="${assetUrl(c.f)}" alt=""></span></button>`).join('')}</div>`;
+      <span class="mface"><img src="${c.f === 'g_coin' ? 'assets/coin_hamster.svg' : assetUrl(c.f)}" alt=""></span></button>`).join('')}</div>`;
   let open = [], moves = 0, matched = 0, lock = false;
   const start = performance.now();
   const timer = setInterval(() => { $('.h-time', area).textContent = Math.floor((performance.now() - start) / 1000); }, 250);

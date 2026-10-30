@@ -97,10 +97,10 @@ function buy(cat, item) {
 const DAILY_MOON_COINS = 12;
 const NORMAL_BOX_PRICE = 60;
 const BLIND_BOXES = {
-  normal: { name: '普通盲盒', title: '花園小驚喜', rarity: '普通', price: NORMAL_BOX_PRICE, wallet: 'coins', currency: 'coins', currencyName: '鼠鼠幣' },
-  moon: { name: '月亮盲盒', title: '月光夢幻收藏', rarity: '稀有', price: 12, wallet: 'moonCoins', currency: 'moon', currencyName: '月亮金幣' },
+  normal: { name: '普通盲盒', title: '花園小驚喜', rarity: '普通', price: NORMAL_BOX_PRICE, wallet: 'coins', currency: 'coins', currencyName: '鼠鼠幣', bonusCoins: [30, 60, 120] },
+  moon: { name: '月亮盲盒', title: '月光夢幻收藏', rarity: '稀有', price: 12, wallet: 'moonCoins', currency: 'moon', currencyName: '月亮金幣', bonusCoins: [60, 120, 240] },
 };
-const itemCurrencyIcon = (item) => item.currency === 'moon' ? '<span class="moon-icon" aria-label="月亮金幣">☾</span>' : '🪙';
+const itemCurrencyIcon = (item) => item.currency === 'moon' ? '<span class="moon-icon" aria-label="月亮金幣">☾</span>' : HAMSTER_COIN_ICON;
 
 function claimDailyMoonCoins(now = new Date()) {
   syncStoredSave();
@@ -132,8 +132,14 @@ function openBlindBox(type) {
   const prize = pool[Math.floor(Math.random() * pool.length)];
   save[box.wallet] -= box.price;
   save.owned[itemKey(prize.cat.id, prize.item.id)] = true;
+  // 配飾保底，額外金幣不佔收藏名額；與配飾分開抽取。
+  const bonusRoll = Math.random();
+  const bonusCoins = bonusRoll < 0.05 ? box.bonusCoins[2]
+    : bonusRoll < 0.20 ? box.bonusCoins[1]
+      : bonusRoll < 0.50 ? box.bonusCoins[0] : 0;
+  save.coins += bonusCoins;
   persist();
-  return prize;
+  return { ...prize, bonusCoins };
 }
 
 const normalBoxPool = () => boxPool('normal');

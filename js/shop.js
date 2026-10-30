@@ -37,6 +37,7 @@
       $('#shop-grid').innerHTML = `<div class="blindbox-intro">
         <div class="blindbox-icon">${tab.icon}</div><h3>${box.title}・${box.name}</h3>
         <p>每盒 ${icon} ${box.price} ${box.currencyName}，隨機獲得一件未擁有的${box.rarity}配飾。</p>
+        <p>🍀 另外有 50% 機會附贈一袋鼠鼠幣！<br>${HAMSTER_COIN_ICON} ${box.bonusCoins[0]} 枚（30%）・${box.bonusCoins[1]} 枚（15%）・${box.bonusCoins[2]} 枚（5%）<br>配飾一定有，金幣是額外的小驚喜。</p>
         <p>不會重複！剩下 ${pool.length} / ${all.length} 件待收集。${pool.length ? `每件未擁有配飾的機率相同（1/${pool.length}）。` : '這一套已經全部收集完成囉！'}</p>
         <button class="btn btn-pink" id="open-blind-box" ${!pool.length || save[box.wallet] < box.price ? 'disabled' : ''}>${!pool.length ? '✔ 已集齊' : `${icon} ${box.price} 開${box.name}`}</button>
         ${pool.length && save[box.wallet] < box.price ? `<p class="warn">${box.currencyName}還差 ${box.price - save[box.wallet]} 枚，${tab.boxType === 'moon' ? '每天登入可領 12 枚月亮金幣喔！' : '去出門玩賺一些吧！'}</p>${tab.boxType === 'normal' ? '<button class="btn btn-blue" id="earn-coins">出門賺鼠鼠幣</button>' : ''}` : ''}
@@ -82,7 +83,8 @@
         draw();
         if (!prize) { toast(`目前無法開盒，請確認${box.currencyName}與收藏狀態。`); return; }
         sfx.win();
-        const reveal = modal(`<div class="buy-box"><h3>✨ 開出了「${prize.item.name}」！</h3><div class="buy-thumb">${thumb(prize.cat, prize.item, 0)}</div><p>已經放進你的衣櫃囉！</p><div class="modal-actions"><button class="btn btn-pink" id="wear-prize">馬上戴上</button><button class="btn btn-gray" id="keep-shopping">繼續逛商店</button></div></div>`, { cls: 'small' });
+        const bonus = prize.bonusCoins ? `<div class="bonus-prize"><div class="reward-coins">${HAMSTER_COIN_ICON.repeat(3)}</div><h3>🍀 還有金幣小驚喜！</h3><p>額外獲得 <b>${HAMSTER_COIN_ICON} ${prize.bonusCoins} 枚鼠鼠幣</b><br>已經放進你的錢包囉！</p></div>` : '';
+        const reveal = modal(`<div class="buy-box"><h3>✨ 開出了「${prize.item.name}」！</h3><div class="buy-thumb">${thumb(prize.cat, prize.item, 0)}</div><p>已經放進你的衣櫃囉！</p>${bonus}<div class="modal-actions"><button class="btn btn-pink" id="wear-prize">馬上戴上</button><button class="btn btn-gray" id="keep-shopping">繼續逛商店</button></div></div>`, { cls: 'small' });
         $('#keep-shopping', reveal.box).onclick = reveal.close;
         $('#wear-prize', reveal.box).onclick = () => {
           save.look[prize.cat.id] = prize.item.id;

@@ -11,6 +11,8 @@ function boot(saved, sharedData) {
     assetUrl: (id) => `assets/${id}.webp`,
   });
   vm.runInContext(source, context);
+  // 一般測試固定為無額外金幣，驚喜獎勵另測各個機率邊界。
+  vm.runInContext('Math.random = () => 0.99', context);
   return { run: (code) => vm.runInContext(code, context), data };
 }
 
@@ -43,15 +45,16 @@ assert.equal(run("buy('held', HELD.find(it => it.id === 'box_rose'))"), false);
 run('save.coins = 59');
 assert.equal(run('openNormalBox()'), null);
 assert.equal(run('save.coins'), 59);
-run('save.coins = 180');
+const normalCount = run('boxItems("normal").length');
+run(`save.coins = ${normalCount * 60}`);
 const won = new Set();
-for (let i = 0; i < 3; i++) {
+for (let i = 0; i < normalCount; i++) {
   const prize = run('openNormalBox()');
   assert.ok(prize);
   won.add(prize.item.id);
-  assert.equal(run(`isOwned('${prize.cat.id}', ${prize.cat.id === 'hat' ? 'HATS' : 'HELD'}.find(it => it.id === '${prize.item.id}'))`), true);
+  assert.equal(run(`isOwned('${prize.cat.id}', CATEGORIES.find(cat => cat.id === '${prize.cat.id}').items.find(it => it.id === '${prize.item.id}'))`), true);
 }
-assert.equal(won.size, 3);
+assert.equal(won.size, normalCount);
 assert.equal(run('save.coins'), 0);
 run('save.coins = 100; persist()');
 assert.equal(run('openNormalBox()'), null);
@@ -63,17 +66,18 @@ assert.equal(reloaded.run('claimDailyMoonCoins(new Date(2026, 9, 31))'), false);
 
 // 月亮與普通獎池互不混入，稀有集齊後不再扣款。
 const moon = boot();
-moon.run('save.moonCoins = 36');
+const rareCount = moon.run('boxItems("moon").length');
+moon.run(`save.moonCoins = ${rareCount * 12}`);
 const rareWon = new Set();
-for (let i = 0; i < 3; i++) {
+for (let i = 0; i < rareCount; i++) {
   const prize = moon.run("openBlindBox('moon')");
   assert.equal(prize.item.currency, 'moon');
   rareWon.add(prize.item.id);
 }
-assert.equal(rareWon.size, 3);
+assert.equal(rareWon.size, rareCount);
 assert.equal(moon.run('save.coins'), 100);
 assert.equal(moon.run('save.moonCoins'), 0);
-assert.equal(moon.run("boxPool('normal').length"), 3);
+assert.equal(moon.run("boxPool('normal').length"), normalCount);
 moon.run('save.moonCoins = 12');
 assert.equal(moon.run("openBlindBox('moon')"), null);
 assert.equal(moon.run('save.moonCoins'), 12);
@@ -104,4 +108,20 @@ firstTab.run('addCoins(10)');
 assert.equal(firstTab.run('save.look.name'), '保留收藏');
 assert.equal(firstTab.run('Object.keys(save.owned).length'), 3);
 assert.equal(firstTab.run('save.coins'), 70);
+for (const [roll, amount] of [[0, 120], [0.049, 120], [0.05, 60], [0.199, 60], [0.20, 30], [0.499, 30], [0.50, 0], [0.999, 0]]) {
+  const bonusGame = boot();
+  bonusGame.run(`Math.random = () => ${roll}`);
+  const prize = bonusGame.run('openNormalBox()');
+  assert.equal(prize.bonusCoins, amount);
+  assert.equal(bonusGame.run('save.coins'), 40 + amount);
+  assert.equal(bonusGame.run('Object.keys(save.owned).length'), 1);
+  const persisted = JSON.parse(bonusGame.data.get('hamster-house-v2'));
+  assert.equal(persisted.coins, 40 + amount);
+}
+const moonBonus = boot();
+moonBonus.run('save.moonCoins = 12; Math.random = () => 0.01');
+assert.equal(moonBonus.run('openBlindBox("moon").bonusCoins'), 240);
+assert.equal(moonBonus.run('save.coins'), 340);
+assert.equal(moonBonus.run('save.moonCoins'), 0);
+assert.equal(moonBonus.run('Object.keys(save.owned).length'), 1);
 console.log('Economy tests passed: migration, daily rewards, both currencies, blind boxes, reload.');

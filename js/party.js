@@ -271,7 +271,7 @@ const Party = (() => {
     try { paid = localStorage.getItem(receipt) === rewarded; if (!paid) localStorage.setItem(receipt, rewarded); } catch { /* session guard still applies */ }
     if (!paid) { addCoins(coins); sfx.win(); }
     const box = $('.party-results', dialog.box); box.hidden = false;
-    const h = document.createElement('h3'); h.textContent = `第 ${rank} 名 · 獲得 🪙 ${paid ? 0 : coins} 鼠鼠幣`; box.append(h);
+    const h = document.createElement('h3'); h.innerHTML = `第 ${rank} 名 · 獲得 ${HAMSTER_COIN_ICON} ${paid ? 0 : coins} 鼠鼠幣`; box.append(h);
     const list = document.createElement('ol');
     for (const [uid, p] of ranks) { const li = document.createElement('li'); li.textContent = `${text(p.name)} · ${score(uid, p)}${p.done ? `（${(p.done / 1000).toFixed(2)} 秒）` : ''}${p.active ? '' : '（已離開）'}`; list.append(li); }
     box.append(list);

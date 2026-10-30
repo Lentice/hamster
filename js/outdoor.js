@@ -282,7 +282,7 @@ const PARK = { hooks: { tick: [], enter: [], leave: [] } };
         const n = s.gold ? 5 : 1;
         addCoins(n);
         sfx.coin();
-        floatText(world, s.x, s.y - 60, `+${n} 🪙`, 'coin-pop');
+        floatText(world, s.x, s.y - 60, `+${n} ${HAMSTER_COIN_ICON}`, 'coin-pop');
         s.el.remove();
         seeds.splice(i, 1);
         setTimeout(() => { if (built) spawnSeed(); }, 6000 + Math.random() * 6000);

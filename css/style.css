@@ -57,6 +57,11 @@ h2, h3 { margin: 0; }
   padding: 6px 14px; font-weight: bold; font-size: 18px; min-width: 90px; justify-content: center;
 }
 .coins.bump { animation: bump .4s; }
+.hamster-coin { display: inline-block; width: 1.65em; height: 1.65em; vertical-align: middle; object-fit: contain; flex-shrink: 0; }
+.coins .hamster-coin { width: 30px; height: 30px; margin: -4px 0; }
+.reward-coins { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; }
+.reward-coins .hamster-coin { width: 56px; height: 56px; }
+.bonus-prize { margin: 14px 0; padding: 14px; border: 2px solid #F6D687; border-radius: 18px; background: #FFF8DB; }
 .moon-wallet { background: #EDF0FC; border-color: #B9C2DB; color: #606C96; }
 .moon-icon { display: inline-flex; width: 1.35em; height: 1.35em; align-items: center; justify-content: center; vertical-align: middle; border-radius: 50%; color: #68789F; border: 2px solid #B4BFD6; background: linear-gradient(135deg, #FFFFFF, #D8DFED 65%, #F9FBFF); font-weight: bold; line-height: 1; }
 .blindbox-intro { grid-column: 1 / -1; text-align: center; padding: 20px; border: 2px solid #E2D6EE; border-radius: 18px; background: linear-gradient(135deg, #FFF4F7, #EFF3FF); }
@@ -256,11 +261,11 @@ main { max-width: 1180px; margin: 16px auto; padding: 0 16px 32px; }
   position: relative; flex: 0 0 104px; display: flex; flex-direction: column; align-items: center; gap: 4px;
   padding: 8px; border-radius: 16px; border: 3px solid #F3E6E0; background: #FFFDFB; font-size: 13px; font-weight: bold;
 }
-.inv-item img { width: 80px; height: 70px; object-fit: contain; }
+.inv-item img:not(.hamster-coin) { width: 80px; height: 70px; object-fit: contain; }
 .inv-item.wide { flex-basis: 150px; }
-.inv-item.wide img { width: 130px; height: 86px; object-fit: cover; border-radius: 10px; }
+.inv-item.wide img:not(.hamster-coin) { width: 130px; height: 86px; object-fit: cover; border-radius: 10px; }
 .inv-item.selected { border-color: var(--pink); background: var(--pink-light); }
-.inv-item.locked img { filter: saturate(.5); }
+.inv-item.locked img:not(.hamster-coin) { filter: saturate(.5); }
 .inv-item:hover { border-color: #FFC4D2; }
 
 /* ───────────── 出門玩 ───────────── */

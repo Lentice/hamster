@@ -42,7 +42,7 @@
   function drawFloors() {
     const n = house.floors.length;
     const price = FLOOR_PRICES[n];
-    $('#floors').innerHTML = (price ? `<button class="floor-btn add" data-act="build">＋ 加蓋<br><small>🪙${price}</small></button>` : '') +
+    $('#floors').innerHTML = (price ? `<button class="floor-btn add" data-act="build">＋ 加蓋<br><small>${HAMSTER_COIN_ICON}${price}</small></button>` : '') +
       house.floors.map((f, i) => i).reverse().map((i) => `
         <button class="floor-btn ${i === house.petFloor ? 'active' : ''}" data-floor="${i}">${floorName(i)}${i === house.petFloor ? '<span>🐹</span>' : ''}</button>`).join('');
   }
@@ -146,13 +146,13 @@
       inventory.innerHTML = FURNITURE.map((f) => {
         const owned = isOwned('furniture', f);
         return `<button class="inv-item ${owned ? '' : 'locked'}" data-id="${f.id}">
-          <img src="${assetUrl(f.img)}" alt="" loading="lazy"><span>${f.name}</span>${owned ? '' : `<em class="price-tag">🪙${f.price}</em>`}</button>`;
+          <img src="${assetUrl(f.img)}" alt="" loading="lazy"><span>${f.name}</span>${owned ? '' : `<em class="price-tag">${HAMSTER_COIN_ICON}${f.price}</em>`}</button>`;
       }).join('');
     } else {
       inventory.innerHTML = ROOMS.map((r) => {
         const owned = isOwned('rooms', r);
         return `<button class="inv-item wide ${floor().bg === r.id ? 'selected' : ''} ${owned ? '' : 'locked'}" data-id="${r.id}">
-          <img src="${assetUrl(r.img)}" alt="" loading="lazy"><span>${r.name}</span>${owned ? '' : `<em class="price-tag">🪙${r.price}</em>`}</button>`;
+          <img src="${assetUrl(r.img)}" alt="" loading="lazy"><span>${r.name}</span>${owned ? '' : `<em class="price-tag">${HAMSTER_COIN_ICON}${r.price}</em>`}</button>`;
       }).join('');
     }
   }
