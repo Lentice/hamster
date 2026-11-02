@@ -110,9 +110,12 @@ function startWhack(area, ctl) {
 // ───────────────────────── 跳跳跑酷 ─────────────────────────
 
 async function startRunner(area, ctl) {
-  const W = 800, H = 400, GROUND = 340, MAX_TIME = 60;
+  // 直式手機用比較方的畫布，畫面才夠大；下方有大大的跳躍鍵，手指不會擋到畫面
+  const tall = innerHeight > innerWidth;
+  const W = tall ? 620 : 800, H = tall ? 560 : 400, GROUND = H - 60, MAX_TIME = 60;
   area.innerHTML = `${hudHtml('<span>🌻 <b class="h-seeds">0</b></span>')}<canvas class="game-canvas runner" width="${W}" height="${H}"></canvas>
-    <p class="game-tip">空白鍵 / ↑ / W / 點畫面 跳躍，在空中可以再跳一次</p>`;
+    ${tall ? '<button class="runner-jump" type="button">⬆️ 跳！</button>' : ''}
+    <p class="game-tip">${tall ? '點畫面任何地方都能跳，在空中可以再跳一次' : '空白鍵 / ↑ / W / 點畫面 跳躍，在空中可以再跳一次'}</p>`;
   const cv = $('canvas', area);
   const cx = cv.getContext('2d');
   const [petImg, hurtImg, rock, mush, bush, seed] = await Promise.all([
@@ -138,7 +141,8 @@ async function startRunner(area, ctl) {
   };
   window.addEventListener('keydown', onKey);
   ctl.onStop(() => window.removeEventListener('keydown', onKey));
-  cv.addEventListener('pointerdown', (e) => { e.preventDefault(); jump(); });
+  // 整個遊戲區都可以點來跳（不用點在畫面上）
+  area.addEventListener('pointerdown', (e) => { e.preventDefault(); jump(); });
 
   const imgH = (img, w) => (img ? (w * img.height) / img.width : w * 0.7);
   const drawImg = (img, x, bottom, w, fallback) => {

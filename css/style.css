@@ -870,3 +870,9 @@ input, textarea { -webkit-user-select: text; user-select: text; }
   .diy-preview { width: 120px; }
 }
 .seat-cover { position: absolute; pointer-events: none; -webkit-user-drag: none; transform-origin: 50% 100%; }
+
+/* 跳跳跑酷：直式手機的大跳躍鍵；釣魚顯示游標 */
+.runner-jump { width: min(100%, 420px); padding: 18px; border: none; border-radius: 22px; background: var(--pink); color: #fff;
+  font: inherit; font-size: 24px; font-weight: bold; box-shadow: 0 5px 0 #E0507A; touch-action: none; }
+.runner-jump:active { transform: translateY(3px); box-shadow: 0 2px 0 #E0507A; }
+.fish-canvas { cursor: pointer; }

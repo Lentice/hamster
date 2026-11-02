@@ -236,7 +236,7 @@ async function startFish(area, ctl) {
     { e: '👑', pts: 5, w: 1, speed: 170, size: 40, gold: true },
     { e: '🥾', pts: -2, w: 2, speed: 50, size: 40 },
   ];
-  area.innerHTML = `${hudHtml()}<canvas class="game-canvas" width="${W}" height="${H}"></canvas>
+  area.innerHTML = `${hudHtml()}<canvas class="game-canvas fish-canvas" width="${W}" height="${H}"></canvas>
     <p class="game-tip">⌨️ ← → 移動、空白鍵放魚鉤　👆 點水面就在那裡釣</p>`;
   const cv = $('canvas', area), cx = cv.getContext('2d');
   const petImg = await svgToImage(petSvg({ ...save.look, background: 'none', effect: 'none' }));
@@ -263,6 +263,10 @@ async function startFish(area, ctl) {
     me.tx = p.x;
     hook.autoCast = true;
   });
+  // 滑鼠移動時在碼頭上標出鼠鼠會走到哪裡
+  let hoverX = null;
+  cv.addEventListener('pointermove', (e) => { if (e.pointerType === 'mouse') hoverX = canvasPoint(cv, e).x; });
+  cv.addEventListener('pointerleave', () => { hoverX = null; });
   const onKey = (e) => {
     if (gamePaused() && e.type === 'keydown') return; // 「確定離開？」開著時暫停
     if (['ArrowLeft', 'ArrowRight', 'a', 'd', 'A', 'D'].includes(e.key)) { keys[e.key.toLowerCase().replace('arrow', '')] = e.type === 'keydown'; e.preventDefault(); me.tx = null; }
@@ -346,6 +350,19 @@ async function startFish(area, ctl) {
       cx.beginPath(); cx.moveTo(rodX, rodY); cx.lineTo(me.x, hook.y); cx.stroke();
       cx.font = '26px serif'; cx.fillText('🪝', me.x, hook.y + 6);
       if (hook.fish) { cx.font = `${hook.fish.k.size}px serif`; cx.fillText(hook.fish.k.gold ? '🐟' : hook.fish.k.e, me.x, hook.y + 30); }
+    }
+    // 目的地標記：要走去的位置（點了之後）或滑鼠指著的位置
+    const markX = me.tx ?? (hook.state === 'idle' ? hoverX : null);
+    if (markX != null) {
+      const mx = Math.max(60, Math.min(W - 60, markX));
+      cx.save();
+      cx.globalAlpha = me.tx != null ? 0.95 : 0.6;
+      cx.strokeStyle = '#FF6F91'; cx.lineWidth = 3; cx.setLineDash([8, 8]);
+      cx.beginPath(); cx.moveTo(mx, WATER - 10); cx.lineTo(mx, H - 10); cx.stroke();
+      cx.setLineDash([]);
+      cx.fillStyle = '#FF6F91';
+      cx.beginPath(); cx.moveTo(mx, WATER - 36); cx.lineTo(mx - 12, WATER - 56); cx.lineTo(mx + 12, WATER - 56); cx.closePath(); cx.fill();
+      cx.restore();
     }
     const pw = 120, ph = pw * (petImg.height / petImg.width);
     cx.drawImage(petImg, me.x - pw / 2, WATER - 30 - ph, pw, ph);
