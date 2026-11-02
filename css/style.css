@@ -922,3 +922,8 @@ button.diy-preview { position: relative; padding: 0; font: inherit; cursor: zoom
 .game-hud .h-best { color: var(--soft); font-size: .9em; }
 .game-hud > span { white-space: nowrap; }
 @media (max-width: 480px) { .game-hud { gap: 10px; font-size: 16px; padding: 4px 14px; flex-wrap: wrap; justify-content: center; } }
+
+/* 商店收集進度 */
+.collect-bar { grid-column: 1 / -1; display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--soft); }
+.collect-bar b { color: var(--pink-deep); }
+.collect-bar i { flex: 1; height: 10px; border-radius: 999px; background: linear-gradient(90deg, var(--pink) var(--p), #F3E6E0 var(--p)); }

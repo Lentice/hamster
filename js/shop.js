@@ -46,7 +46,10 @@
       return;
     }
     const entries = byPrice(tab.items.filter((it) => it.price)).map((item) => ({ cat: tab, item }));
-    $('#shop-grid').innerHTML = entries.map(({ cat, item }, i) => {
+    // 收集進度（只算商店賣的東西）
+    const got = entries.filter(({ cat, item }) => isOwned(cat.id, item)).length;
+    const progress = `<div class="collect-bar"><span>已收集 <b>${got}</b> / ${entries.length}</span><i style="--p:${entries.length ? (got / entries.length) * 100 : 0}%"></i></div>`;
+    $('#shop-grid').innerHTML = progress + entries.map(({ cat, item }, i) => {
       const owned = isOwned(cat.id, item);
       return `<div class="shop-item ${owned ? 'owned' : ''}" data-id="${item.id}" data-cat="${cat.id}">
         <div class="shop-thumb">${thumb(cat, item, i)}</div>
