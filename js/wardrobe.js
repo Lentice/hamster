@@ -112,16 +112,25 @@
     if (!btn) return;
     const cat = CATEGORIES.find((c) => c.id === currentCat);
     const item = cat.items.find((x) => x.id === btn.dataset.id);
-    const wear = () => {
+    // full：剛買的要整個格子重畫（拿掉價格、更新篩選數字）；換穿已有的只要換選取框，手機上比較順
+    const wear = (full) => {
       wake();
       look[cat.id] = item.id;
-      redraw();
+      drawStage();
+      if (full) drawGrid();
+      else {
+        $$('.item.selected', grid).forEach((el) => el.classList.remove('selected'));
+        btn.classList.add('selected');
+        const key = itemKey(cat.id, item.id);
+        if (save.fresh?.[key]) { delete save.fresh[key]; $('.fresh-tag', btn)?.remove(); }
+      }
+      persist();
       petAct(stagePet(), ['spin', 'dance', 'hop'][Math.floor(Math.random() * 3)], 900);
       burst(item.price ? 10 : 5);
       sfx.pop();
     };
-    if (isOwned(cat.id, item)) wear();
-    else askBuy(cat.id, item, $('.thumb', btn).innerHTML, wear);
+    if (isOwned(cat.id, item)) wear(false);
+    else askBuy(cat.id, item, $('.thumb', btn).innerHTML, () => wear(true));
   });
 
   stage.addEventListener('click', (e) => {
