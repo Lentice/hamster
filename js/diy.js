@@ -109,7 +109,7 @@ function openDiyEditor(type, designId, onDone) {
   const N = t.cols * t.rows;
   let px = existing ? existing.px.padEnd(N, '0').slice(0, N).split('') : Array(N).fill(type === 'clothes' ? '0' : '1');
   let color = 4, tool = 'pen', mirror = true, size = 1;
-  const undo = [];
+  const undo = [], redo = [];
   const sp = byId(SPECIES, save.look.species);
   const [bx, by, bw, bh] = t.box;
   const cw = bw / t.cols, ch = bh / t.rows;
@@ -150,6 +150,7 @@ function openDiyEditor(type, designId, onDone) {
         <button class="btn btn-small diy-size" data-size="1">● 細</button>
         <button class="btn btn-small diy-mirror on">🪞 左右對稱</button>
         <button class="btn btn-small" data-act="undo">↶ 復原</button>
+        <button class="btn btn-small" data-act="redo">↷ 重做</button>
         <button class="btn btn-small" data-act="clear">🗑️ 清空</button>
       </div>
       <div class="modal-actions">
@@ -159,6 +160,15 @@ function openDiyEditor(type, designId, onDone) {
     </div>`, { cls: 'diy-modal', fullscreen: true, beforeClose: (close) => { if (!undo.length) return true; confirmQuit(close, '還沒儲存，確定不要這件作品了嗎？', ['繼續畫', '不要了']); return false; } });
 
   const svg = $('.diy-canvas', m.box);
+  // 桌機快捷鍵：Ctrl+Z 復原、Ctrl+Y／Ctrl+Shift+Z 重做（打名字時不攔）
+  const onKey = (e) => {
+    if (!(e.ctrlKey || e.metaKey) || e.target.matches('input, textarea') || m.root !== $$('.modal-back').at(-1)) return;
+    const k = e.key.toLowerCase();
+    const act = k === 'z' ? (e.shiftKey ? 'redo' : 'undo') : k === 'y' ? 'redo' : null;
+    if (act) { e.preventDefault(); $(`[data-act=${act}]`, m.box).click(); }
+  };
+  window.addEventListener('keydown', onKey);
+  m.root.addEventListener('closed', () => window.removeEventListener('keydown', onKey));
   const rects = $$('.diy-cells rect', m.box);
   const nameInput = $('.diy-name input', m.box);
   nameInput.value = existing?.name || '';
@@ -245,6 +255,7 @@ function openDiyEditor(type, designId, onDone) {
     }
     undo.push(px.join(''));
     if (undo.length > 40) undo.shift();
+    redo.length = 0;
     if (tool === 'fill') { fill(c[0], c[1], DIY_CHARS[color]); preview(); sfx.pop(); return; }
     drawing = true;
     lastCell = null;
@@ -286,11 +297,19 @@ function openDiyEditor(type, designId, onDone) {
       b.classList.toggle('on', mirror);
     } else if (b.dataset.act === 'undo') {
       if (!undo.length) return;
+      redo.push(px.join(''));
       px = undo.pop().split('');
+      rects.forEach((_, i) => paint(i));
+      preview();
+    } else if (b.dataset.act === 'redo') {
+      if (!redo.length) return;
+      undo.push(px.join(''));
+      px = redo.pop().split('');
       rects.forEach((_, i) => paint(i));
       preview();
     } else if (b.dataset.act === 'clear') {
       undo.push(px.join(''));
+      redo.length = 0;
       px = Array(N).fill('0');
       rects.forEach((_, i) => paint(i));
       preview();
