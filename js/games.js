@@ -218,7 +218,7 @@ function startWheel(area, ctl) {
       <div class="speed-bar"><i></i></div>
     </div>
     <div class="wheel-btns"><button class="btn btn-blue big-btn" data-side="l">⬅ 左腳</button><button class="btn btn-pink big-btn" data-side="r">右腳 ➡</button></div>
-    <p class="game-tip">交替按 ← → 鍵或兩個按鈕！同一邊連按沒有用喔</p>`;
+    <p class="game-tip"><span class="tc">左右兩個按鈕交替按！同一邊連按沒有用喔</span><span class="kb">交替按 ← → 鍵或兩個按鈕！同一邊連按沒有用喔</span></p>`;
   let speed = 0, dist = 0, time = DURATION, lastSide = null, angle = 0, last = performance.now(), started = false;
   const wheelImg = $('.wheel-rot', area);
   const petEl = $('.wheel-pet .pet-svg', area);

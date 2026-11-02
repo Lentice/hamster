@@ -879,3 +879,7 @@ input, textarea { -webkit-user-select: text; user-select: text; }
 
 /* 觸控裝置不顯示打地鼠的鍵盤字母 */
 @media (pointer: coarse) { .hole-key { display: none; } }
+
+/* 遊戲提示：觸控裝置只顯示觸控說明，有滑鼠鍵盤時只顯示鍵盤說明 */
+.game-tip .tc { display: none; }
+@media (pointer: coarse) { .game-tip .tc { display: inline; } .game-tip .kb { display: none; } }

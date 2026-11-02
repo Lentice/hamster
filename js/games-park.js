@@ -30,7 +30,7 @@ async function startStack(area, ctl) {
   const CAKES = [['#FFD1DC', '#FF8FA3'], ['#FFF1B8', '#F2C94C'], ['#CDEFD9', '#7CC8A0'], ['#D9E4FF', '#8FA8E8'], ['#F3D9FF', '#C08FE0'], ['#FFE0C7', '#F0A070']];
   area.innerHTML = `<div class="game-hud"><span>🎂 <b class="h-score">0</b> 層</span><span>✨ 完美 <b class="h-perfect">0</b></span></div>
     <canvas class="game-canvas stack-canvas" width="${W}" height="${H}"></canvas>
-    <p class="game-tip">⌨️ 空白鍵 / Enter　👆 點畫面放下蛋糕</p>`;
+    <p class="game-tip"><span class="tc">👆 點畫面放下蛋糕</span><span class="kb">⌨️ 空白鍵 / Enter　🖱️ 點畫面放下蛋糕</span></p>`;
   const cv = $('canvas', area), cx = cv.getContext('2d');
   const petImg = await svgToImage(petSvg({ ...save.look, background: 'none', effect: 'none' }));
   if (ctl.isStopped()) return;
@@ -54,7 +54,7 @@ async function startStack(area, ctl) {
       sfx.bad();
       crumbs.push({ x: cur.x, w: cur.w, y: layers.length, vy: 0, c: layers.length });
       cur = null;
-      setTimeout(() => ctl.finish(score(), Math.min(90, score() * 2)), 1000);
+      setTimeout(() => ctl.finish(score(), Math.min(150, score() * 4)), 1000);
       return;
     }
     if (Math.abs(x - top.x) <= 10) {
@@ -159,7 +159,7 @@ function startMusic(area, ctl) {
   area.innerHTML = `<div class="game-hud"><span>🎵 第 <b class="h-score">1</b> 關</span></div>
     <div class="music-stage"><div class="music-pet">${petSvg({ ...save.look, background: 'none' })}</div><p class="music-say">仔細聽喔～</p></div>
     <div class="music-pads">${PADS.map((p, i) => `<button class="music-pad" data-i="${i}" style="--c:${p.color}" disabled><span>${p.icon}</span><kbd>${i + 1}</kbd></button>`).join('')}</div>
-    <p class="game-tip">🖱️ 點按鈕　⌨️ 1 2 3 4 或 ← ↑ ↓ →</p>`;
+    <p class="game-tip"><span class="tc">👆 照順序點按鈕</span><span class="kb">🖱️ 點按鈕　⌨️ 1 2 3 4 或 ← ↑ ↓ →</span></p>`;
   const pads = $$('.music-pad', area), say = $('.music-say', area), pet = $('.music-pet', area);
   const seq = [];
   let pos = 0, listening = false, round = 0;
@@ -198,7 +198,7 @@ function startMusic(area, ctl) {
       say.textContent = '啊，彈錯了～';
       pads.forEach((p) => { p.disabled = true; });
       const score = round - 1;
-      later(() => ctl.finish(score, Math.min(90, score * 5)), 1100);
+      later(() => ctl.finish(score, Math.min(150, score * 8)), 1100);
       return;
     }
     light(i, 220);
@@ -237,7 +237,7 @@ async function startFish(area, ctl) {
     { e: '🥾', pts: -2, w: 2, speed: 50, size: 40 },
   ];
   area.innerHTML = `${hudHtml()}<canvas class="game-canvas fish-canvas" width="${W}" height="${H}"></canvas>
-    <p class="game-tip">⌨️ ← → 移動、空白鍵放魚鉤　👆 點水面就在那裡釣</p>`;
+    <p class="game-tip"><span class="tc">👆 點水面，鼠鼠就走過去在那裡釣</span><span class="kb">⌨️ ← → 移動、空白鍵放魚鉤　🖱️ 點水面就在那裡釣</span></p>`;
   const cv = $('canvas', area), cx = cv.getContext('2d');
   const petImg = await svgToImage(petSvg({ ...save.look, background: 'none', effect: 'none' }));
   if (ctl.isStopped()) return;
@@ -370,7 +370,7 @@ async function startFish(area, ctl) {
     cx.beginPath(); cx.moveTo(me.x + 20, WATER - 60); cx.lineTo(rodX, rodY); cx.stroke();
     if (hook.state === 'idle') { cx.font = '22px serif'; cx.fillText('🪝', rodX, rodY + 18); }
 
-    if (time <= 0) { ctl.finish(score, Math.min(90, score * 2)); return; }
+    if (time <= 0) { ctl.finish(score, Math.min(150, score * 3)); return; }
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
@@ -387,7 +387,7 @@ function startBubble(area, ctl) {
     { id: 'purple', name: '薰衣草', c: '#C3A3F0' },
   ];
   area.innerHTML = `${hudHtml('<span class="bubble-target">戳 <i></i> <b class="h-target"></b></span>')}<canvas class="game-canvas bubble-canvas" width="${W}" height="${H}"></canvas>
-    <p class="game-tip">🖱️ 👆 點泡泡　🌈 彩虹泡泡 +3</p>`;
+    <p class="game-tip">👆 點泡泡　🌈 彩虹泡泡 +3</p>`;
   const cv = $('canvas', area), cx = cv.getContext('2d');
   let bubbles = [], pops = [], score = 0, time = DURATION, last = performance.now(), spawn = 0, target = null, switchAt = 0;
   function newTarget() {
@@ -463,7 +463,7 @@ function startBubble(area, ctl) {
       cx.globalAlpha = 1;
     }
     pops = pops.filter((p) => p.t < 0.35);
-    if (time <= 0) { ctl.finish(score, Math.min(90, score)); return; }
+    if (time <= 0) { ctl.finish(score, Math.min(150, score * 2)); return; }
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
