@@ -58,6 +58,7 @@
     renderPetLook();
     refreshSlot();
     placePet();
+    applyFx();
   }
 
   function furnitureEl(it) {
@@ -96,7 +97,7 @@
     pet.el.style.left = pct(pet.x - w / 2, RW);
     pet.el.style.top = pct(pet.y - h * 0.97, RH);
     pet.el.style.width = pct(w, RW);
-    pet.el.style.zIndex = Math.round(pet.y + 2);
+    pet.el.style.zIndex = pet.seat ? Math.round(pet.seat.y + 3) : Math.round(pet.y + 2);
     pet.el.classList.toggle('hidden', pet.state === 'hide' || !!$('.slot-layer', room));
   }
 
@@ -138,6 +139,7 @@
     if (s.zzz && pet.expr === 'sleepy') inner += `<div class="slot-zzz" style="left:${P(s.zzz[0])};top:${P(s.zzz[1])}">💤</div>`;
     layer.innerHTML = inner;
     room.appendChild(layer);
+    if (fxState?.fx.furn) layer.classList.add(`fa-${fxState.fx.furn}`);
   }
 
   function drawInventory() {
@@ -172,6 +174,8 @@
     const at = ladder || viaLadder;
     pet.x = at ? Math.min(FLOOR.x1, at.x + 90) : 750;
     pet.y = at ? Math.min(FLOOR.y1, Math.max(FLOOR.y0, at.y + 20)) : 820;
+    stopFx();
+    pet.seat = null;
     pet.state = 'idle';
     pet.use = null;
     pet.expr = null;
@@ -361,7 +365,7 @@
     if (holding && !drag && !editing) {
       const p = toRoom(e);
       [pet.tx, pet.ty] = clampFloor(p.x, p.y);
-      if (pet.state !== 'walk') { pet.use = null; setState('walk'); }
+      if (pet.state !== 'walk') { leaveSeat(); stopFx(); pet.use = null; setState('walk'); }
       return;
     }
     if (!drag) return;
@@ -422,6 +426,8 @@
   }
 
   function stopUsing() {
+    leaveSeat();
+    stopFx();
     pet.use = null;
     pet.useEnds = false;
     if (pet.state !== 'idle') setState('idle');
@@ -437,7 +443,112 @@
     hide: { ms: 3000, expr: null, state: 'hide', verb: '鑽' },
     roll: { ms: 2600, expr: 'smile', state: 'busy', act: 'spin', verb: '玩' },
     climb: { verb: '爬' },
+    light: { ms: 3500, expr: 'sparkle', state: 'busy', verb: '開' },
+    play: { ms: 4500, expr: 'laugh', state: 'busy', verb: '玩' },
+    music: { ms: 5000, expr: 'happy', state: 'busy', verb: '彈' },
+    watch: { ms: 5000, expr: 'stars', state: 'busy', verb: '看' },
+    sniff: { ms: 3000, expr: 'content', state: 'busy', verb: '聞' },
+    swing: { ms: 5500, expr: 'excited', state: 'busy', verb: '盪' },
+    bounce: { ms: 4500, expr: 'excited', state: 'busy', verb: '跳' },
+    ride: { ms: 5500, expr: 'laugh', state: 'busy', verb: '玩' },
+    read: { ms: 5000, expr: 'thinking', state: 'busy', verb: '讀' },
+    paint: { ms: 5000, expr: 'determined', state: 'busy', verb: '畫' },
+    dress: { ms: 4000, expr: 'love', state: 'busy', verb: '用' },
+    warm: { ms: 6000, expr: 'content', state: 'busy', verb: '靠近' },
+    bath: { ms: 5500, expr: 'smile', state: 'busy', verb: '泡' },
+    sit: { ms: 5000, expr: 'content', state: 'busy', verb: '坐' },
   };
+
+  // ───────────── 使用家具的動畫：家具動起來、飄出小東西、鼠鼠跟著動 ─────────────
+  // fx.furn 家具動畫、fx.pet 鼠鼠循環動畫、fx.act 每隔一陣子做一次的小動作、
+  // fx.particles 飄出的表情符號（from 是相對家具圖片的位置）、fx.seat 鼠鼠坐上去時的腳底位置
+  const DEFAULT_FX = {
+    run: { furn: 'jiggle', particles: ['💨', '✨'], from: [0.2, 0.75], spread: 0.1 },
+    eat: { furn: 'wobble', particles: ['🌻', '😋', '✨'], act: 'nibble' },
+    drink: { particles: ['💧', '💦'], from: [0.5, 0.6], act: 'nibble' },
+    sleep: { furn: 'breathe', particles: ['💤'], from: [0.72, 0.15], spread: 0.08, rate: 1000 },
+    hide: { furn: 'shake', particles: ['🍂', '💨', '🌿'] },
+    roll: { furn: 'shake', particles: ['✨', '💫'], act: 'spin' },
+    light: { furn: 'glow', particles: ['✨', '⭐'], from: [0.5, 0.2] },
+    play: { furn: 'wobble', particles: ['⭐', '🎈', '✨'], act: 'hop' },
+    music: { furn: 'bop', particles: ['🎵', '🎶'], pet: 'bop' },
+    watch: { particles: ['✨'], act: 'look' },
+    sniff: { furn: 'sway', particles: ['🌸', '🍃'], act: 'look' },
+    swing: { furn: 'swing', pet: 'swing' },
+    bounce: { furn: 'squash', pet: 'jump', particles: ['✨'] },
+    ride: { furn: 'rock', pet: 'rock', particles: ['⭐'] },
+    read: { particles: ['📖', '💡', '✨'], act: 'look' },
+    paint: { furn: 'wobble', particles: ['🎨', '✨', '🖌️'], act: 'wave' },
+    dress: { furn: 'glow', particles: ['✨', '💖'], act: 'spin' },
+    warm: { furn: 'flicker', particles: ['🔥', '✨'], from: [0.5, 0.55], spread: 0.3 },
+    bath: { furn: 'wobble', particles: ['🫧', '🫧', '✨'], from: [0.5, 0.35], pet: 'bob' },
+    sit: { furn: 'breathe', particles: ['💗'], rate: 1100, pet: 'bob' },
+  };
+  let fxState = null;
+  const fxOf = (f) => ({ ...(DEFAULT_FX[f.use] || {}), ...(f.fx || {}) });
+
+  function startFx(it) {
+    stopFx();
+    const f = furnitureOf(it), fx = fxOf(f);
+    if (f.slot?.zzz) delete fx.particles;
+    fxState = { it, fx, timers: [] };
+    if (fx.particles) {
+      spawnParticle(it, fx);
+      fxState.timers.push(setInterval(() => spawnParticle(it, fx), fx.rate || 480));
+    }
+    if (fx.act) fxState.timers.push(setInterval(() => petAct($('.pet-svg', pet.el), fx.act, 900), 1300));
+    applyFx();
+  }
+  function applyFx() {
+    if (!fxState) return;
+    const { it, fx } = fxState;
+    if (fx.furn) {
+      $$(`.furniture[data-uid="${it.uid}"]`, room).forEach((el) => el.classList.add(`fa-${fx.furn}`));
+      $('.slot-layer', room)?.classList.add(`fa-${fx.furn}`);
+    }
+    if (fx.pet && pet.el) pet.el.classList.add(`pa-${fx.pet}`);
+    // 坐進家具裡（浴缸、球池）：家具前緣再畫一次蓋在鼠鼠前面
+    if (fx.cover && pet.seat === it && !$('.seat-cover', room)) {
+      const { w, h } = sizeOf(it);
+      const mask = `linear-gradient(to bottom, transparent ${fx.cover * 100}%, #000 ${fx.cover * 100 + 3}%)`;
+      const c = html(`<img class="seat-cover" src="${assetUrl(furnitureOf(it).img)}" alt="" draggable="false">`);
+      Object.assign(c.style, {
+        left: pct(it.x - w / 2, RW), top: pct(it.y - h, RH), width: pct(w, RW), zIndex: Math.round(it.y) + 4,
+        transform: it.flip ? 'scaleX(-1)' : '', maskImage: mask, webkitMaskImage: mask,
+      });
+      if (fx.furn) c.classList.add(`fa-${fx.furn}`);
+      room.appendChild(c);
+    }
+  }
+  function stopFx() {
+    if (!fxState) return;
+    fxState.timers.forEach(clearInterval);
+    fxState = null;
+    $('.seat-cover', room)?.remove();
+    $$('.furniture, .slot-layer, .room-pet', room).forEach((el) => {
+      [...el.classList].filter((c) => c.startsWith('fa-') || c.startsWith('pa-')).forEach((c) => el.classList.remove(c));
+    });
+  }
+  function spawnParticle(it, fx) {
+    if (document.hidden || currentScreen !== 'home' || !floor().items.includes(it)) return;
+    const { w, h } = sizeOf(it);
+    const [ox, oy] = fx.from || [0.5, 0.25];
+    const x = it.x + ((it.flip ? 1 - ox : ox) - 0.5) * w + (Math.random() - 0.5) * w * (fx.spread ?? 0.5);
+    const y = it.y - h * (1 - oy);
+    const p = html(`<span class="f-particle">${fx.particles[Math.floor(Math.random() * fx.particles.length)]}</span>`);
+    p.style.left = pct(x, RW);
+    p.style.top = pct(y, RH);
+    p.style.setProperty('--dx', `${Math.round((Math.random() - 0.5) * 70)}px`);
+    room.appendChild(p);
+    setTimeout(() => p.remove(), 1900);
+  }
+  function leaveSeat() {
+    if (!pet.seat) return;
+    pet.y = Math.min(FLOOR.y1, pet.seat.y + 30);
+    pet.tx = pet.x;
+    pet.ty = pet.y;
+    pet.seat = null;
+  }
   const useSide = (it) => (['run', 'climb'].includes(furnitureOf(it).use) ? 0 : (Math.random() < 0.5 ? -1 : 1) * sizeOf(it).w * 0.15);
 
   function think(now) {
@@ -461,12 +572,19 @@
       return;
     }
     pet.use = it;
-    pet.x = it.x + (furnitureOf(it).use === 'run' ? 0 : pet.x - it.x > 0 ? 40 : -40);
+    const seat = fxOf(furnitureOf(it)).seat;
+    if (seat && !furnitureOf(it).slot) {
+      const { w, h } = sizeOf(it);
+      pet.seat = it;
+      pet.x = it.x + ((it.flip ? 1 - seat[0] : seat[0]) - 0.5) * w;
+      pet.y = it.y - (1 - seat[1]) * h;
+    } else pet.x = it.x + (furnitureOf(it).use === 'run' ? 0 : pet.x - it.x > 0 ? 40 : -40);
     pet.state = null;
     setState(u.state, u.expr);
     if (u.act) petAct($('.pet-svg', pet.el), u.act, 900);
     pet.until = now + u.ms;
     pet.useEnds = true;
+    startFx(it);
     placePet();
   }
 
@@ -506,7 +624,7 @@
     if (vx || vy) {
       const len = Math.hypot(vx, vy);
       [pet.x, pet.y] = clampFloor(pet.x + (vx / len) * CTRL_SPEED * dt, pet.y + (vy / len) * CTRL_SPEED * dt);
-      if (pet.state !== 'walk') { pet.use = null; pet.useEnds = false; setState('walk'); }
+      if (pet.state !== 'walk') { leaveSeat(); stopFx(); pet.use = null; pet.useEnds = false; setState('walk'); }
       pet.tx = pet.x; pet.ty = pet.y;
       placePet();
     } else if (pet.state === 'walk') {
@@ -525,6 +643,8 @@
     } else if (pet.useEnds && t >= pet.until) {
       // 用完家具：從隧道另一頭出來
       if (pet.state === 'hide' && pet.use) pet.x = Math.min(FLOOR.x1, pet.use.x + sizeOf(pet.use).w * 0.45);
+      leaveSeat();
+      stopFx();
       pet.useEnds = false;
       pet.use = null;
       setState('idle');
@@ -557,6 +677,10 @@
     },
     leave() {
       cancelAnimationFrame(raf);
+      stopFx();
+      leaveSeat();
+      pet.use = null;
+      pet.useEnds = false;
       Object.keys(keys).forEach((k) => { keys[k] = false; });
     },
   };

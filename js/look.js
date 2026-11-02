@@ -68,7 +68,7 @@ function petSvg(look, cls = '') {
 
 function randomLook() {
   const pick = (list) => list[Math.floor(Math.random() * list.length)].id;
-  const free = (list) => list.filter((x) => !x.price);
+  const free = (list) => list.filter((x) => !x.price && !x.diy);
   return {
     ...DEFAULT_LOOK,
     species: pick(SPECIES),

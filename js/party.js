@@ -126,7 +126,7 @@ const Party = (() => {
     if (dialog || !joined || !data) return;
     roster.clear();
     const g = GAMES[data.meta.kind];
-    dialog = modal(`<div class="party-game"><h2>${g.icon} ${g.name}</h2><p class="party-status" role="status"></p><p class="party-tip"></p><div class="party-board"></div><div class="party-controls"></div><div class="party-results" hidden></div><p class="party-note">關閉即可離開，朋友們仍可繼續玩。</p></div>`, { cls: 'party-modal' });
+    dialog = modal(`<div class="party-game"><h2>${g.icon} ${g.name}</h2><p class="party-status" role="status"></p><p class="party-tip"></p><div class="party-board"></div><div class="party-controls"></div><div class="party-results" hidden></div><p class="party-note">按右上角 ✕ 可以離開，朋友們仍可繼續玩。</p></div>`, { cls: 'party-modal party-full', fullscreen: true });
     $('.party-tip', dialog.box).textContent = g.tip;
     const board = $('.party-board', dialog.box), controls = $('.party-controls', dialog.box);
     board.classList.toggle('seed-arena', data.meta.kind === 'seeds');
@@ -239,7 +239,7 @@ const Party = (() => {
       let row = roster.get(uid);
       if (!row) {
         row = html('<div class="party-racer"><div class="party-track"><div class="party-avatar"></div></div><span class="party-label"></span><b class="party-score"></b></div>');
-        $('.party-avatar', row).innerHTML = petSvg(safeLook(p.look));
+        $('.party-avatar', row).innerHTML = petSvg(uid === conn.fb.uid ? safeLook(p.look) : stripDiy(safeLook(p.look)));
         row.classList.toggle('mine', uid === conn.fb.uid);
         roster.set(uid, row); board.append(row);
       }

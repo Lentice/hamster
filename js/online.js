@@ -55,7 +55,7 @@
     const look = { ...DEFAULT_LOOK };
     LOOK_KEYS.forEach((k) => { if (typeof v.look?.[k] === 'string') look[k] = v.look[k]; });
     const num = (n, max) => Math.max(0, Math.min(max, Number(n) || 0));
-    return { name: cap(clean(v.name || ''), 12) || '鼠鼠', look, x: num(v.x, 2800), y: num(v.y, 1900), emo: String(v.emo || '') };
+    return { name: cap(clean(v.name || ''), 12) || '鼠鼠', look: stripDiy(look), x: num(v.x, 2800), y: num(v.y, 1900), emo: String(v.emo || '') };
   }
 
   // ───────────── 介面 ─────────────

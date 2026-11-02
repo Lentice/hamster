@@ -720,3 +720,153 @@ input, textarea { -webkit-user-select: text; user-select: text; }
   .party-board:not(.seed-arena) .party-label { font-size: 10px; }
   .party-board:not(.seed-arena) .party-score { font-size: 11px; }
 }
+
+/* ───────────── 全螢幕小遊戲 ───────────── */
+
+.modal-back.full { padding: 0; background: #FFF6EE; }
+.modal.fullscreen {
+  width: 100vw; width: 100dvw; height: 100vh; height: 100dvh; max-height: none; max-width: none;
+  border: none; border-radius: 0; box-shadow: none; animation: fadeIn .2s;
+  display: flex; flex-direction: column; align-items: center;
+  padding: max(56px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+}
+.modal.fullscreen > :not(.modal-x) { width: min(900px, 100%); margin-block: auto; }
+.modal.fullscreen .modal-x {
+  position: fixed; top: max(10px, env(safe-area-inset-top)); right: max(10px, env(safe-area-inset-right));
+  width: 48px; height: 48px; font-size: 22px; font-weight: bold; background: var(--pink-deep); color: #fff;
+  border: 3px solid #fff; box-shadow: 0 3px 0 #E0507A, 0 2px 10px rgba(90, 62, 54, .25); z-index: 20; cursor: pointer;
+}
+.modal.fullscreen .modal-x:active { transform: translateY(2px); box-shadow: 0 1px 0 #E0507A; }
+.modal-back.full .modal.fullscreen { background: linear-gradient(#FFF8F0, #FFF0F5); }
+.modal.fullscreen.playing { padding-top: max(60px, env(safe-area-inset-top)); }
+.modal.fullscreen .game-canvas { max-height: calc(100dvh - 150px); }
+.modal.fullscreen .whack-grid { width: min(560px, 100%, calc(100dvh - 170px)); }
+.modal.fullscreen .memory-grid { width: min(560px, 100%, calc((100dvh - 160px) * .75)); }
+.modal.fullscreen .wheel-stage { width: min(480px, 86vw, calc(100dvh - 260px)); }
+.quit-box h3 { margin: 6px 0; }
+.modal-back:has(.quit-box) { z-index: 120; }
+@media (max-height: 520px) and (orientation: landscape) {
+  .modal.fullscreen, .modal.fullscreen.playing { padding-top: 8px; padding-right: 64px; }
+  .modal.fullscreen .game-canvas { max-height: calc(100dvh - 60px); }
+}
+
+/* 新攤位小遊戲 */
+.music-stage { display: flex; align-items: center; gap: 14px; }
+.music-pet { width: min(160px, 28dvh); }
+.music-pet .pet-svg { width: 100%; }
+.music-pet.bop { animation: musicBop .25s; }
+@keyframes musicBop { 50% { transform: translateY(-10px) rotate(-4deg); } }
+.music-say { font-size: 22px; font-weight: bold; color: var(--pink-deep); min-width: 7em; }
+.music-pads { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; width: min(560px, 100%); }
+.music-pad {
+  position: relative; aspect-ratio: 1; border-radius: 24px; border: 4px solid var(--line); background: var(--c);
+  box-shadow: 0 6px 0 var(--line); font-size: clamp(30px, 8vw, 52px); touch-action: manipulation; filter: saturate(.75) brightness(1.02);
+  transition: transform .08s, filter .08s;
+}
+.music-pad kbd { position: absolute; right: 8px; bottom: 6px; font-size: 13px; background: #fff; border-radius: 6px; padding: 0 5px; }
+.music-pad.lit { filter: saturate(1.4) brightness(1.15); transform: translateY(4px) scale(1.04); box-shadow: 0 2px 0 var(--line), 0 0 26px var(--c); }
+.music-pad.wrong { animation: wiggle .4s; filter: grayscale(.6); }
+.music-pad:disabled { cursor: default; }
+.bubble-target { display: inline-flex; align-items: center; gap: 6px; }
+.bubble-target i { display: inline-block; width: 22px; height: 22px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 0 0 2px var(--line); }
+.bubble-target.flash { animation: bump .5s; }
+.bubble-canvas, .stack-canvas { cursor: pointer; }
+@media (max-height: 520px) and (orientation: landscape) {
+  .music-stage { display: none; }
+  .music-pads { width: min(460px, 100%, calc((100dvh - 80px) * 4)); }
+}
+
+/* ───────────── 家具使用動畫 ─────────────
+   用 rotate / translate / scale 個別屬性，才不會蓋掉翻轉用的 transform: scaleX(-1) */
+.furniture, .slot-layer { transform-origin: 50% 100%; }
+.fa-jiggle { animation: faJiggle .18s linear infinite; }
+@keyframes faJiggle { 50% { translate: 2px 0; } }
+.fa-wobble { animation: faWobble 1.1s ease-in-out infinite; }
+@keyframes faWobble { 25% { rotate: -2.5deg; } 75% { rotate: 2.5deg; } }
+.fa-shake { animation: faShake .3s linear infinite; }
+@keyframes faShake { 25% { translate: -3px 0; } 75% { translate: 3px 1px; } }
+.fa-breathe { animation: faBreathe 2.6s ease-in-out infinite; }
+@keyframes faBreathe { 50% { scale: 1.03 .97; } }
+.fa-glow { animation: faGlow 1.4s ease-in-out infinite; }
+@keyframes faGlow { 0%, 100% { filter: drop-shadow(0 0 6px #FFE89A) brightness(1.08); } 50% { filter: drop-shadow(0 0 22px #FFD45C) brightness(1.25); } }
+.fa-bop { animation: faBop .45s ease-in-out infinite; }
+@keyframes faBop { 50% { scale: 1.03 .96; translate: 0 2px; } }
+.fa-sway { animation: faSway 1.6s ease-in-out infinite; transform-origin: 50% 100%; }
+@keyframes faSway { 25% { rotate: -4deg; } 75% { rotate: 4deg; } }
+.fa-swing { animation: faSwing 1.8s ease-in-out infinite; transform-origin: 50% 0; }
+@keyframes faSwing { 25% { rotate: 7deg; } 75% { rotate: -7deg; } }
+.fa-rock { animation: faRock 1.3s ease-in-out infinite; }
+@keyframes faRock { 25% { rotate: -6deg; } 75% { rotate: 6deg; } }
+.fa-squash { animation: faSquash .6s ease-in-out infinite; }
+@keyframes faSquash { 0%, 100% { scale: 1 1; } 45% { scale: 1.05 .9; } }
+.fa-flicker { animation: faFlicker .5s steps(2) infinite; }
+@keyframes faFlicker { 0%, 100% { filter: brightness(1.05) drop-shadow(0 0 10px #FFB36B); } 50% { filter: brightness(1.18) drop-shadow(0 0 20px #FF9A4D); } }
+.fa-spin { animation: faSpin 2.4s ease-in-out infinite; }
+@keyframes faSpin { 25% { scale: -1 1; } 50% { scale: -1 1; translate: 0 -4px; } 75% { scale: 1 1; } }
+.fa-float { animation: faFloat 2.2s ease-in-out infinite; }
+@keyframes faFloat { 50% { translate: 0 -14px; } }
+.fa-tick { animation: faTick 1s steps(2) infinite; }
+@keyframes faTick { 50% { rotate: 1.5deg; } }
+
+.room-pet .pet-svg { transform-origin: 50% 100%; }
+.pa-bop .pet-svg { animation: paBop .45s ease-in-out infinite; }
+@keyframes paBop { 50% { translate: 0 -8px; rotate: -4deg; } }
+.pa-swing .pet-svg { animation: paSwing 1.8s ease-in-out infinite; transform-origin: 50% -120%; }
+@keyframes paSwing { 25% { rotate: 12deg; } 75% { rotate: -12deg; } }
+.pa-rock .pet-svg { animation: faRock 1.3s ease-in-out infinite; }
+.pa-jump .pet-svg { animation: paJump .6s ease-in-out infinite; }
+@keyframes paJump { 0%, 100% { translate: 0 0; scale: 1.06 .94; } 15% { scale: 1 1; } 50% { translate: 0 -70%; scale: .96 1.05; } 85% { scale: 1 1; } }
+.pa-bob .pet-svg { animation: paBob 2s ease-in-out infinite; }
+@keyframes paBob { 50% { translate: 0 4px; scale: 1.02 .98; } }
+.pa-spin .pet-svg { animation: faSpin 2.4s ease-in-out infinite; }
+
+.f-particle {
+  position: absolute; z-index: 4500; pointer-events: none; font-size: clamp(14px, 2.2vw, 30px);
+  translate: -50% -50%; animation: fParticle 1.8s ease-out forwards;
+}
+@keyframes fParticle {
+  0% { opacity: 0; transform: translate(0, 0) scale(.5); }
+  20% { opacity: 1; transform: translate(calc(var(--dx) * .3), -20px) scale(1); }
+  100% { opacity: 0; transform: translate(var(--dx), -110px) scale(1.15); }
+}
+@media (prefers-reduced-motion: reduce) {
+  [class*="fa-"], [class*="pa-"] .pet-svg, .f-particle { animation-duration: 0s !important; animation-iteration-count: 1 !important; }
+}
+
+/* ───────────── 自己畫 ───────────── */
+.diy-new .thumb { background: repeating-linear-gradient(45deg, #FFF1F5, #FFF1F5 10px, #FFF8E6 10px, #FFF8E6 20px); border: 3px dashed var(--pink); }
+.diy-new-icon { font-size: 40px; }
+.item { position: relative; }
+.diy-edit { position: absolute; top: 4px; right: 4px; width: 30px; height: 30px; border-radius: 50%; background: #fff; border: 2px solid var(--line); display: grid; place-items: center; font-size: 15px; }
+.diy { display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; }
+.diy h2 { margin: 0; color: var(--pink-deep); }
+.diy-main { display: flex; gap: 16px; align-items: center; justify-content: center; width: 100%; }
+.diy-canvas-wrap { flex: 1 1 auto; max-width: 620px; }
+.diy-canvas { width: 100%; max-height: calc(100dvh - 330px); display: block; touch-action: none; cursor: crosshair; background: #FFF6EE; border-radius: 14px; border: 3px solid var(--line); }
+.diy-side { display: flex; flex-direction: column; gap: 8px; align-items: center; width: min(220px, 34vw); }
+.diy-preview { width: 100%; aspect-ratio: 1; background: #FFF1F5; border-radius: 18px; border: 3px solid #F3E6E0; }
+.diy-preview svg { width: 100%; height: 100%; display: block; }
+.diy-name { font-weight: bold; display: flex; flex-direction: column; gap: 4px; width: 100%; }
+.diy-name input { font: inherit; font-size: 16px; padding: 6px 10px; border-radius: 12px; border: 3px solid #F3E6E0; width: 100%; box-sizing: border-box; }
+.diy-palette { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; max-width: 620px; }
+.diy-color { width: 34px; height: 34px; border-radius: 50%; border: 3px solid #fff; background: var(--c); box-shadow: 0 0 0 2px var(--line); cursor: pointer; }
+.diy-color.clear { background: repeating-conic-gradient(#F1E8E4 0 25%, #fff 0 50%) 50% / 12px 12px; }
+.diy-color.on { transform: scale(1.22); box-shadow: 0 0 0 3px var(--pink-deep); }
+.diy-tools { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+.diy-tools .btn { background: #fff; border: 2px solid #F3E6E0; }
+.diy-tools .btn.on { background: var(--pink-light); border-color: var(--pink); }
+.diy .modal-actions { margin-top: 4px; }
+@media (max-width: 700px) {
+  .diy-main { flex-direction: column; gap: 8px; }
+  .diy-side { flex-direction: row; width: 100%; }
+  .diy-preview { width: 96px; flex: none; }
+  .diy-canvas { max-height: calc(100dvh - 380px); }
+  .diy-canvas-wrap { width: 100%; }
+  .diy-color { width: 28px; height: 28px; }
+}
+@media (max-height: 520px) and (orientation: landscape) {
+  .diy h2 { display: none; }
+  .diy-canvas { max-height: calc(100dvh - 150px); }
+  .diy-preview { width: 120px; }
+}
+.seat-cover { position: absolute; pointer-events: none; -webkit-user-drag: none; transform-origin: 50% 100%; }

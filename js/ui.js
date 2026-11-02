@@ -62,8 +62,9 @@ function toast(msg) {
 let openModals = 0;
 const uiBlocked = () => openModals > 0;
 
-function modal(content, { cls = '', closable = true } = {}) {
-  const root = html(`<div class="modal-back"><div class="modal ${cls}">${closable ? '<button class="modal-x" aria-label="關閉">✕</button>' : ''}</div></div>`);
+// fullscreen：全螢幕（小遊戲用），點外面不會關閉，只能按 ✕；beforeClose 回傳 false 可攔下 ✕
+function modal(content, { cls = '', closable = true, fullscreen = false, beforeClose = null } = {}) {
+  const root = html(`<div class="modal-back ${fullscreen ? 'full' : ''}"><div class="modal ${cls} ${fullscreen ? 'fullscreen' : ''}">${closable ? '<button class="modal-x" aria-label="關閉">✕</button>' : ''}</div></div>`);
   const box = $('.modal', root);
   if (typeof content === 'string') box.insertAdjacentHTML('beforeend', content);
   else box.appendChild(content);
@@ -79,10 +80,18 @@ function modal(content, { cls = '', closable = true } = {}) {
     root.dispatchEvent(new Event('closed'));
   };
   if (closable) {
-    $('.modal-x', root).onclick = close;
-    root.addEventListener('pointerdown', (e) => { if (e.target === root) close(); });
+    $('.modal-x', root).onclick = () => { if (!beforeClose || beforeClose(close) !== false) close(); };
+    if (!fullscreen) root.addEventListener('pointerdown', (e) => { if (e.target === root) close(); });
   }
   return { root, box, close };
+}
+
+// 遊戲進行中按 ✕：先確認，避免不小心點到
+function confirmQuit(onYes, text = '遊戲還沒結束，確定要離開嗎？', [stay, quit] = ['繼續玩', '離開遊戲']) {
+  const m = modal(`<div class="buy-box"><div class="game-icon">🐹</div><h3>${text}</h3>
+    <div class="modal-actions"><button class="btn btn-gray" data-q="no">${stay}</button><button class="btn btn-pink" data-q="yes">${quit}</button></div></div>`, { cls: 'small quit-box' });
+  $('[data-q=no]', m.box).onclick = m.close;
+  $('[data-q=yes]', m.box).onclick = () => { m.close(); onYes(); };
 }
 
 // 購買確認。成功時呼叫 onBought

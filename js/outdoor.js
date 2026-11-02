@@ -21,17 +21,21 @@ const PARK = { hooks: { tick: [], enter: [], leave: [] } };
     { img: 'o_booth_whack', x: 2300, y: 1500, w: 340, r: 110, act: 'whack', label: '打地鼠' },
     { img: 'o_booth_memory', x: 1600, y: 1420, w: 380, r: 125, act: 'memory', label: '翻牌配對' },
     { img: 'o_booth_maze', x: 520, y: 1600, w: 360, r: 115, act: 'maze', label: '迷宮找瓜子' },
+    { img: 'o_booth_stack', x: 1850, y: 780, w: 300, r: 100, act: 'stack', label: '疊疊蛋糕' },
+    { img: 'o_booth_fish', x: 1230, y: 1320, w: 320, r: 100, act: 'fish', label: '池塘釣魚' },
+    { img: 'o_booth_music', x: 960, y: 1740, w: 320, r: 100, act: 'music', label: '鼠鼠音樂會' },
+    { img: 'o_booth_bubble', x: 2000, y: 1180, w: 300, r: 100, act: 'bubble', label: '戳泡泡' },
     { img: 'o_pond', x: 950, y: 1150, w: 460, r: 0, flat: true, block: { rx: 200, ry: 90, dy: -110 } },
     { img: 'o_bench', x: 1350, y: 900, w: 200, r: 55 },
     { img: 'o_tree', x: 110, y: 230, w: 280, r: 50 }, { img: 'o_tree', x: 580, y: 160, w: 260, r: 50 },
     { img: 'o_sakura', x: 1150, y: 200, w: 300, r: 50 }, { img: 'o_tree', x: 1720, y: 200, w: 280, r: 50 },
     { img: 'o_sakura', x: 2450, y: 260, w: 300, r: 50 }, { img: 'o_tree', x: 2700, y: 600, w: 260, r: 45 },
     { img: 'o_tree', x: 2650, y: 1250, w: 280, r: 50 }, { img: 'o_sakura', x: 2700, y: 1800, w: 300, r: 50 },
-    { img: 'o_tree', x: 1950, y: 1820, w: 300, r: 50 }, { img: 'o_sakura', x: 1150, y: 1830, w: 300, r: 50 },
+    { img: 'o_tree', x: 1950, y: 1820, w: 300, r: 50 }, { img: 'o_sakura', x: 1360, y: 1850, w: 300, r: 50 },
     { img: 'o_tree', x: 120, y: 1800, w: 290, r: 50 }, { img: 'o_tree', x: 90, y: 1000, w: 270, r: 50 },
-    { img: 'o_sakura', x: 560, y: 820, w: 260, r: 50 }, { img: 'o_tree', x: 2000, y: 1100, w: 240, r: 45 },
+    { img: 'o_sakura', x: 560, y: 820, w: 260, r: 50 }, 
     { img: 'o_tree', x: 1000, y: 700, w: 230, r: 45 },
-    { img: 'o_bush', x: 700, y: 560, w: 150, r: 40 }, { img: 'o_bush', x: 1750, y: 640, w: 150, r: 40 },
+    { img: 'o_bush', x: 700, y: 560, w: 150, r: 40 }, { img: 'o_bush', x: 1580, y: 690, w: 150, r: 40 },
     { img: 'o_bush', x: 1300, y: 1550, w: 150, r: 40 }, { img: 'o_bush', x: 260, y: 1250, w: 150, r: 40 },
     { img: 'o_bush', x: 2550, y: 1150, w: 150, r: 40 },
     { img: 'o_rock', x: 1650, y: 980, w: 120, r: 35 }, { img: 'o_rock', x: 2150, y: 1300, w: 120, r: 35 },
@@ -50,8 +54,12 @@ const PARK = { hooks: { tick: [], enter: [], leave: [] } };
     'M2450 920 Q2400 1250 2300 1560 Q1950 1560 1600 1480',
     'M330 460 Q380 850 650 950 T1300 980 T1600 1480',
     'M650 950 Q480 1250 520 1660',
+    'M2050 450 Q1900 600 1850 800',
+    'M1850 800 Q1950 1000 2000 1200 Q2150 1350 2300 1560',
+    'M1300 980 Q1250 1150 1230 1340',
+    'M520 1660 Q750 1760 960 1760 Q1300 1700 1600 1480',
   ];
-  const NPC_LINES = ['今天天氣真好～', '接瓜子攤位超好玩的！', '打地鼠的時候不要打到我喔！', '跑酷可以二段跳耶！', '迷宮裡有好多瓜子～', '我最喜歡葵花子了！', '你的打扮好可愛喔！', '翻牌我都記不住…', '滾輪要左右交替才會快喔！', '池塘裡好像有青蛙呱呱叫', '要不要一起玩？'];
+  const NPC_LINES = ['今天天氣真好～', '接瓜子攤位超好玩的！', '打地鼠的時候不要打到我喔！', '跑酷可以二段跳耶！', '迷宮裡有好多瓜子～', '我最喜歡葵花子了！', '你的打扮好可愛喔！', '翻牌我都記不住…', '滾輪要左右交替才會快喔！', '池塘裡好像有青蛙呱呱叫', '要不要一起玩？', '釣魚的時候要等魚游到魚鉤下面喔！', '疊蛋糕要看準了再放～', '戳泡泡只能戳一樣顏色的！', '音樂會的旋律好難記呀！'];
 
   const player = { x: 420, y: 560, tx: null, ty: null, pendingAct: null, el: null, moving: false };
   const keys = {};
@@ -92,7 +100,7 @@ const PARK = { hooks: { tick: [], enter: [], leave: [] } };
     }
     player.el = html('<div class="walker player"></div>');
     world.appendChild(player.el);
-    npcs = [[700, 700], [1250, 780], [1900, 900], [1150, 1420], [2150, 1150]].map(([x, y]) => {
+    npcs = [[700, 700], [1250, 780], [1700, 1060], [1450, 1250], [2250, 1300]].map(([x, y]) => {
       const n = { look: randomLook(), x, y, tx: null, ty: null, wait: Math.random() * 3, el: html('<div class="walker npc"></div>'), bubble: 0 };
       n.home = { x: n.x, y: n.y };
       n.el.innerHTML = petSvg(n.look) + '<div class="bubble"></div>';

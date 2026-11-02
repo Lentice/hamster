@@ -45,7 +45,7 @@
           <div class="shop-thumb">${thumb(cat, item, i)}</div><div class="shop-name">${item.name}</div><div class="owned-tag">${isOwned(cat.id, item) ? '✔ 已擁有' : `${box.name}限定`}</div></div>`).join('');
       return;
     }
-    const entries = tab.items.filter((it) => it.price).map((item) => ({ cat: tab, item }));
+    const entries = byPrice(tab.items.filter((it) => it.price)).map((item) => ({ cat: tab, item }));
     $('#shop-grid').innerHTML = entries.map(({ cat, item }, i) => {
       const owned = isOwned(cat.id, item);
       return `<div class="shop-item ${owned ? 'owned' : ''}" data-id="${item.id}" data-cat="${cat.id}">

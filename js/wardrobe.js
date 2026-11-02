@@ -53,11 +53,13 @@
 
   function drawGrid() {
     const cat = CATEGORIES.find((c) => c.id === currentCat);
-    grid.innerHTML = cat.items.map((item, i) => {
+    const diy = DIY_TEMPLATES[cat.id];
+    grid.innerHTML = (diy ? `<button class="item diy-new" data-diy-new="${cat.id}" title="自己畫">
+        <div class="thumb"><span class="diy-new-icon">🎨</span></div><span class="item-name">自己畫${diy.name}</span></button>` : '') + cat.items.map((item, i) => {
       const owned = isOwned(cat.id, item);
-      return `<button class="item ${look[cat.id] === item.id ? 'selected' : ''} ${owned ? '' : 'locked'}" data-id="${item.id}" title="${item.name}">
+      return `<button class="item ${look[cat.id] === item.id ? 'selected' : ''} ${owned ? '' : 'locked'}" data-id="${item.id}" title="${escapeXml(item.name)}">
         <div class="thumb">${thumbFor(cat, item, i)}</div>
-        <span class="item-name">${item.name}</span>
+        <span class="item-name">${escapeXml(item.name)}</span>${item.diy ? `<span class="diy-edit" data-diy-edit="${item.id}" role="button" aria-label="修改作品">✏️</span>` : ''}
         ${owned ? '' : `<span class="price-tag">${item.boxOnly ? (item.currency === 'moon' ? '☾ 月亮盲盒' : '🎁 普通盲盒') : `${itemCurrencyIcon(item)} ${item.price}`}</span>`}
       </button>`;
     }).join('');
@@ -79,6 +81,11 @@
   });
 
   grid.addEventListener('click', (e) => {
+    const done = () => { drawStage(); drawGrid(); petAct(stagePet(), 'dance', 900); burst(10); };
+    const edit = e.target.closest('[data-diy-edit]');
+    if (edit) { openDiyEditor(currentCat, edit.dataset.diyEdit, done); return; }
+    const neu = e.target.closest('[data-diy-new]');
+    if (neu) { openDiyEditor(neu.dataset.diyNew, null, done); return; }
     const btn = e.target.closest('.item');
     if (!btn) return;
     const cat = CATEGORIES.find((c) => c.id === currentCat);

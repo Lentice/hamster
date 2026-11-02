@@ -22,7 +22,15 @@ function openGame(id, onDone) {
       <div class="game-icon">${g.icon}</div><h2>${g.name}</h2><p>${g.desc}</p>
       <p class="best">最佳紀錄：${save.best[id] || 0}</p>
       <div class="modal-actions"><button class="btn btn-pink" data-act="start">開始！</button></div>
-    </div>`, { cls: 'game-modal' });
+    </div>`, {
+    cls: 'game-modal', fullscreen: true,
+    // 遊戲進行中（還沒出結算）按 ✕ 先確認
+    beforeClose: (close) => {
+      if (!m.box.classList.contains('playing') || $('.game-result', m.box)) return true;
+      confirmQuit(close);
+      return false;
+    },
+  });
   m.root.addEventListener('closed', () => onDone?.());
   $('[data-act=start]', m.box).onclick = () => runGame(id, m);
 }
