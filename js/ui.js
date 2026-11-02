@@ -15,6 +15,12 @@ let audioCtx;
 let muted = false;
 try { muted = localStorage.getItem('hamster-muted') === '1'; } catch { /* 忽略 */ }
 
+// 手機短震動（有支援才會震；關掉音效時也一起關）
+function buzz(ms) {
+  if (muted) return;
+  try { navigator.vibrate?.(ms); } catch { /* 不支援就算了 */ }
+}
+
 function tone(freq, dur = 0.15, type = 'sine', vol = 0.12, slide = 1.8, delay = 0) {
   if (muted) return;
   try {
@@ -39,7 +45,7 @@ const sfx = {
   squeak: () => { tone(1200, 0.08, 'sine', 0.1, 1.4); tone(1500, 0.1, 'sine', 0.08, 1.3, 0.09); },
   coin: () => { tone(988, 0.08, 'square', 0.05, 1); tone(1319, 0.16, 'square', 0.05, 1, 0.08); },
   buy: () => [523, 659, 784, 1047].forEach((f, i) => tone(f, 0.14, 'triangle', 0.1, 1, i * 0.08)),
-  bad: () => tone(300, 0.25, 'sawtooth', 0.06, 0.5),
+  bad: () => { tone(300, 0.25, 'sawtooth', 0.06, 0.5); buzz(40); },
   win: () => [523, 659, 784, 659, 784, 1047].forEach((f, i) => tone(f, 0.16, 'triangle', 0.1, 1, i * 0.1)),
   step: () => tone(240 + Math.random() * 60, 0.05, 'sine', 0.04, 1.2),
 };
