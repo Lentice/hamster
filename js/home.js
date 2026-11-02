@@ -585,7 +585,12 @@
   function think(now) {
     if (now < pet.until) return;
     const usable = floor().items.filter((i) => furnitureOf(i).use);
-    if (usable.length && Math.random() < 0.6) {
+    // 晚上比較常去睡覺
+    const beds = usable.filter((i) => furnitureOf(i).use === 'sleep');
+    if (beds.length && document.body.classList.contains('night') && Math.random() < 0.5) {
+      const it = beds[Math.floor(Math.random() * beds.length)];
+      walkTo(it.x + useSide(it), it.y + 30, it);
+    } else if (usable.length && Math.random() < 0.6) {
       const it = usable[Math.floor(Math.random() * usable.length)];
       // 自由活動時偶爾才爬樓梯
       if (furnitureOf(it).use === 'climb' && Math.random() < 0.6) { pet.until = now + 500; return; }
