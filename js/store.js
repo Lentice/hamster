@@ -92,8 +92,23 @@ function buy(cat, item) {
   save.owned[itemKey(cat, item.id)] = true;
   // 衣櫃 NEW 標記，穿過就拿掉（家具、房間不在衣櫃，不用標）
   if (CATEGORIES.some((c) => c.id === cat)) (save.fresh ||= {})[itemKey(cat, item.id)] = 1;
+  checkCollection(cat);
   persist();
   return true;
+}
+
+// 收集成就：商店賣的某一類全部買齊，送一次鼠鼠幣
+const COLLECT_REWARD = 100;
+function shopItemsOf(cat) {
+  const list = cat === 'furniture' ? FURNITURE : cat === 'rooms' ? ROOMS : CATEGORIES.find((c) => c.id === cat)?.items || [];
+  return list.filter((it) => it.price && !it.boxOnly);
+}
+function checkCollection(cat) {
+  const items = shopItemsOf(cat);
+  if (!items.length || save.collected?.[cat] || !items.every((it) => isOwned(cat, it))) return;
+  (save.collected ||= {})[cat] = 1;
+  save.coins += COLLECT_REWARD;
+  setTimeout(() => { toast(`🏅 全部收集完成！再送 ${COLLECT_REWARD} 鼠鼠幣`); updateCoins?.(); sfx.win(); }, 600);
 }
 
 const DAILY_MOON_COINS = 12;

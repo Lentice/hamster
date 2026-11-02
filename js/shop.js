@@ -48,7 +48,9 @@
     const entries = byPrice(tab.items.filter((it) => it.price)).map((item) => ({ cat: tab, item }));
     // 收集進度（只算商店賣的東西）
     const got = entries.filter(({ cat, item }) => isOwned(cat.id, item)).length;
-    const progress = `<div class="collect-bar"><span>已收集 <b>${got}</b> / ${entries.length}</span><i style="--p:${entries.length ? (got / entries.length) * 100 : 0}%"></i></div>`;
+    const buyable = shopItemsOf(tab.id).length;
+    const reward = save.collected?.[tab.id] ? '🏅 已集滿' : buyable ? `集滿送 ${COLLECT_REWARD}` : '';
+    const progress = `<div class="collect-bar"><span>已收集 <b>${got}</b> / ${entries.length}</span><i style="--p:${entries.length ? (got / entries.length) * 100 : 0}%"></i><small>${reward}</small></div>`;
     $('#shop-grid').innerHTML = progress + entries.map(({ cat, item }, i) => {
       const owned = isOwned(cat.id, item);
       return `<div class="shop-item ${owned ? 'owned' : ''}" data-id="${item.id}" data-cat="${cat.id}">
