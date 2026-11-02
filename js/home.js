@@ -257,6 +257,29 @@
     sfx.tab();
   }));
 
+  // 從商店買完直接擺進房間：回到家、打開佈置模式，把家具放在中間並選起來
+  window.placeFromShop = (kind, id) => {
+    showScreen('home');
+    if (!editing) $('#edit-toggle').click();
+    if (kind === 'rooms') {
+      panel = 'rooms';
+      floor().bg = byId(ROOMS, id).id;
+      persist();
+      drawRoom();
+      drawInventory();
+      sfx.pop();
+      return;
+    }
+    panel = 'furniture';
+    const it = { uid: nextUid(), id, x: 700 + Math.random() * 100, y: 780 + Math.random() * 60, flip: false, size: 1 };
+    floor().items.push(it);
+    selected = it;
+    persist();
+    drawAll();
+    drawInventory();
+    sfx.pop();
+  };
+
   inventory.addEventListener('click', (e) => {
     const b = e.target.closest('.inv-item');
     if (!b) return;

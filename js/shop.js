@@ -105,6 +105,13 @@
         save.look[tab.id] = item.id;
         persist();
         toast('已經幫鼠鼠換上囉！');
+      } else if (tab.id === 'furniture' || tab.id === 'rooms') {
+        // 家具、房間買完問要不要馬上擺進家裡
+        const m = modal(`<div class="buy-box"><h3>🎉 買到「${item.name}」了！</h3><div class="buy-thumb"><img src="${assetUrl(item.img)}" alt=""></div>
+          <p>${tab.id === 'rooms' ? '要馬上把房間換成這個樣子嗎？' : '要馬上擺進房間嗎？'}</p>
+          <div class="modal-actions"><button class="btn btn-pink" data-act="place">${tab.id === 'rooms' ? '🏠 馬上換上' : '🏠 擺進房間'}</button><button class="btn btn-gray" data-act="stay">繼續逛商店</button></div></div>`, { cls: 'small' });
+        $('[data-act=stay]', m.box).onclick = m.close;
+        $('[data-act=place]', m.box).onclick = () => { m.close(); placeFromShop(tab.id, item.id); };
       }
     });
   });
