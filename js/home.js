@@ -145,10 +145,14 @@
   function drawInventory() {
     $$('.panel-tab').forEach((b) => b.classList.toggle('active', b.dataset.panel === panel));
     if (panel === 'furniture') {
-      inventory.innerHTML = FURNITURE.map((f) => {
+      // 已擁有的排前面；右上角顯示這層樓已經擺了幾個
+      const placed = {};
+      floor().items.forEach((it) => { placed[it.id] = (placed[it.id] || 0) + 1; });
+      const list = [...FURNITURE].sort((a, b) => isOwned('furniture', b) - isOwned('furniture', a));
+      inventory.innerHTML = list.map((f) => {
         const owned = isOwned('furniture', f);
         return `<button class="inv-item ${owned ? '' : 'locked'}" data-id="${f.id}">
-          <img src="${assetUrl(f.img)}" alt="" loading="lazy"><span>${f.name}</span>${owned ? '' : `<em class="price-tag">${HAMSTER_COIN_ICON}${f.price}</em>`}</button>`;
+          <img src="${assetUrl(f.img)}" alt="" loading="lazy"><span>${f.name}</span>${owned ? '' : `<em class="price-tag">${HAMSTER_COIN_ICON}${f.price}</em>`}${placed[f.id] ? `<i class="placed-count">×${placed[f.id]}</i>` : ''}</button>`;
       }).join('');
     } else {
       inventory.innerHTML = ROOMS.map((r) => {
@@ -324,6 +328,7 @@
       floor().items = floor().items.filter((i) => i !== selected);
       if (pet.use === selected) stopUsing();
       selected = null;
+      drawInventory(); // 更新「擺了幾個」
     }
     persist();
     drawRoom();

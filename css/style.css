@@ -1013,3 +1013,5 @@ button.logo { border: none; background: none; padding: 0; font-family: inherit; 
 .diy-code p { font-size: 13px; color: var(--soft); margin: 8px 0 4px; }
 .game-result .quest-line { margin: 0; font-size: 14px; color: var(--soft); }
 .sel-name { font-size: 14px; color: var(--pink-deep); margin-right: 4px; white-space: nowrap; }
+.inv-item { position: relative; }
+.placed-count { position: absolute; top: 4px; right: 6px; font-style: normal; font-size: 12px; font-weight: bold; color: #fff; background: var(--pink); border-radius: 999px; padding: 0 7px; }
