@@ -128,9 +128,18 @@ function runGame(id, m) {
         <div class="modal-actions">
           <button class="btn btn-pink" data-act="again">再玩一次</button>
           <button class="btn btn-gray" data-act="back">回公園</button>
+          <button class="btn btn-blue" data-act="share">📤 分享成績</button>
         </div></div>`;
       $('[data-act=again]', area).onclick = () => { area.remove(); runGame(id, m); };
       $('[data-act=back]', area).onclick = () => m.close();
+      // 分享成績：手機用系統分享，不支援就複製文字
+      $('[data-act=share]', area).onclick = async () => {
+        const text = `我在「鼠鼠小屋」的${g.name}拿到 ${score} 分${record ? '，破紀錄了' : ''}！你也來玩玩看～ ${location.origin}${location.pathname}`;
+        try {
+          if (navigator.share) await navigator.share({ text });
+          else { await navigator.clipboard.writeText(text); toast('成績複製好了，可以貼給朋友！'); }
+        } catch (err) { if (err?.name !== 'AbortError') toast(text); }
+      };
     },
   });
 }
