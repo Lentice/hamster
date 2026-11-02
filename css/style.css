@@ -970,3 +970,9 @@ body.night .room::after, body.night .viewport::after {
 /* 我的搭配 */
 .outfit-tip { grid-column: 1 / -1; margin: 4px 0 0; font-size: 13px; color: var(--soft); text-align: center; }
 .outfit-del { font-size: 14px; }
+
+/* 設定 */
+button.logo { border: none; background: none; padding: 0; font-family: inherit; cursor: pointer; }
+.settings-list { display: grid; gap: 10px; margin: 8px 0; }
+.settings-note { font-size: 13px; color: var(--soft); margin: 4px 0 0; }
+.settings-box { text-align: center; }
