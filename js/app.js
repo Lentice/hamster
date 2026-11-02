@@ -76,6 +76,7 @@ $('#settings').addEventListener('click', () => {
       <button class="btn btn-gray" data-act="mute">${muted ? '🔇 音效：關' : '🔊 音效：開'}</button>
       <button class="btn btn-blue" data-act="export">📥 備份存檔（下載檔案）</button>
       <button class="btn btn-yellow" data-act="import">📤 從備份檔還原</button>
+      <button class="btn btn-pink" data-act="records">🏆 我的紀錄</button>
       <input type="file" accept=".json,application/json" hidden>
     </div>
     <p class="settings-note">存檔只存在這台裝置的瀏覽器裡。換手機或清除瀏覽器資料前，記得先備份喔！</p></div>`, { cls: 'small' });
@@ -94,6 +95,11 @@ $('#settings').addEventListener('click', () => {
       toast('存檔下載好了！');
     }
     if (act === 'import') file.click();
+    if (act === 'records') {
+      // 每款遊戲的最佳紀錄，沒玩過的顯示「還沒玩過」
+      const rows = Object.entries(GAMES).map(([id, g]) => `<li><span>${g.icon} ${g.name}</span><b>${save.best[id] ? `🏆 ${save.best[id]}` : '<i>還沒玩過</i>'}</b></li>`).join('');
+      modal(`<div class="records-box"><h2>🏆 我的紀錄</h2><ul class="records">${rows}</ul></div>`, { cls: 'small' });
+    }
   });
   file.addEventListener('change', async () => {
     const f = file.files[0];

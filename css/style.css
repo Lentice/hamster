@@ -1017,3 +1017,9 @@ button.logo { border: none; background: none; padding: 0; font-family: inherit; 
 .placed-count { position: absolute; top: 4px; right: 6px; font-style: normal; font-size: 12px; font-weight: bold; color: #fff; background: var(--pink); border-radius: 999px; padding: 0 7px; }
 .game-intro .quest-line { margin: 0 0 8px; font-size: 14px; color: var(--soft); }
 .map-today { font-style: normal; font-size: 13px; }
+
+/* 我的紀錄 */
+.records { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 6px; }
+.records li { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: #FFF6FA; border-radius: 12px; font-size: 15px; }
+.records b { color: var(--pink-deep); }
+.records i { color: var(--soft); font-style: normal; font-weight: normal; font-size: 13px; }
