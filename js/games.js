@@ -54,6 +54,15 @@ function runGame(id, m) {
   m.box.querySelectorAll(':scope > :not(.modal-x)').forEach((el) => el.remove());
   const area = html('<div class="game-area"></div>');
   m.box.appendChild(area);
+  // ⏸ 暫停：開一個 quit-box 類的小視窗，gamePaused() 就會讓遊戲停住
+  $('.game-pause', m.box)?.remove();
+  const pauseBtn = html('<button class="game-pause" type="button" aria-label="暫停">⏸</button>');
+  m.box.appendChild(pauseBtn);
+  pauseBtn.onclick = () => {
+    if (gamePaused()) return;
+    const p = modal('<div class="buy-box"><div class="game-icon">⏸</div><h3>暫停中</h3><div class="modal-actions"><button class="btn btn-pink" data-q="go">▶ 繼續玩</button></div></div>', { cls: 'small quit-box' });
+    $('[data-q=go]', p.box).onclick = p.close;
+  };
   let stopped = false;
   const stopFns = [];
   // 倒數的遊戲最後 5 秒：時間變紅跳動，每秒滴一聲
@@ -104,6 +113,7 @@ function runGame(id, m) {
       addCoins(coins);
       sfx.win();
       m.box.dataset.resultAt = performance.now();
+      pauseBtn.remove();
       area.innerHTML = `<div class="game-result">
         <div class="game-icon">${record ? '🏆' : '🎉'}</div>
         <h2>${record ? '新紀錄！' : '完成！'}</h2>
