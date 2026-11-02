@@ -57,7 +57,7 @@ async function startStack(area, ctl) {
       setTimeout(() => ctl.finish(score(), Math.min(90, score() * 2)), 1000);
       return;
     }
-    if (Math.abs(x - top.x) <= 6) {
+    if (Math.abs(x - top.x) <= 10) {
       x = top.x; w = top.w; perfect++;
       sfx.coin();
       floatAt('完美！', 'coin-pop');
@@ -81,7 +81,7 @@ async function startStack(area, ctl) {
 
   cv.addEventListener('pointerdown', (e) => { e.preventDefault(); drop(); });
   const onKey = (e) => {
-    if (document.querySelector('.quit-box')) return; // 「確定離開？」開著時不吃按鍵
+    if (gamePaused() && e.type === 'keydown') return; // 「確定離開？」開著時暫停
     if ([' ', 'Enter', 'ArrowDown'].includes(e.key)) { e.preventDefault(); if (!e.repeat) drop(); }
   };
   window.addEventListener('keydown', onKey);
@@ -112,7 +112,7 @@ async function startStack(area, ctl) {
   next();
   function frame(t) {
     if (ctl.isStopped()) return;
-    const dt = Math.min(0.05, (t - last) / 1000);
+    const dt = gamePaused() ? 0 : Math.min(0.05, (t - last) / 1000);
     last = t;
     if (cur) {
       cur.x += cur.dir * cur.speed * dt;
@@ -214,7 +214,7 @@ function startMusic(area, ctl) {
     if (b && !b.disabled) { e.preventDefault(); press(Number(b.dataset.i)); }
   });
   const onKey = (e) => {
-    if (document.querySelector('.quit-box')) return; // 「確定離開？」開著時不吃按鍵
+    if (gamePaused() && e.type === 'keydown') return; // 「確定離開？」開著時暫停
     const i = KEYS.findIndex((ks) => ks.includes(e.key) || ks.includes(e.key.toLowerCase()));
     if (i >= 0) { e.preventDefault(); if (!e.repeat) press(i); }
   };
@@ -226,7 +226,8 @@ function startMusic(area, ctl) {
 // ───────────────────────── 池塘釣魚 ─────────────────────────
 
 async function startFish(area, ctl) {
-  const W = 800, H = 520, DURATION = 45, WATER = 150;
+  const tall = innerHeight > innerWidth; // 直式手機用直的畫布，魚才不會太小
+  const W = tall ? 520 : 800, H = tall ? 700 : 520, DURATION = 45, WATER = 150;
   const KINDS = [
     { e: '🐟', pts: 1, w: 5, speed: 90, size: 40 },
     { e: '🐠', pts: 2, w: 3, speed: 130, size: 42 },
@@ -263,7 +264,7 @@ async function startFish(area, ctl) {
     hook.autoCast = true;
   });
   const onKey = (e) => {
-    if (document.querySelector('.quit-box')) return; // 「確定離開？」開著時不吃按鍵
+    if (gamePaused() && e.type === 'keydown') return; // 「確定離開？」開著時暫停
     if (['ArrowLeft', 'ArrowRight', 'a', 'd', 'A', 'D'].includes(e.key)) { keys[e.key.toLowerCase().replace('arrow', '')] = e.type === 'keydown'; e.preventDefault(); me.tx = null; }
     if (e.type === 'keydown' && [' ', 'ArrowDown', 'Enter'].includes(e.key)) { e.preventDefault(); if (!e.repeat) cast(); }
   };
@@ -273,7 +274,7 @@ async function startFish(area, ctl) {
 
   function frame(t) {
     if (ctl.isStopped()) return;
-    const dt = Math.min(0.05, (t - last) / 1000);
+    const dt = gamePaused() ? 0 : Math.min(0.05, (t - last) / 1000);
     last = t;
     time -= dt;
     $('.h-time', area).textContent = Math.max(0, Math.ceil(time));
@@ -288,7 +289,7 @@ async function startFish(area, ctl) {
       me.x = Math.max(60, Math.min(W - 60, me.x));
     }
     if (hook.state === 'down') {
-      hook.y += 330 * dt;
+      hook.y += (tall ? 420 : 330) * dt; // 直式池塘比較深，魚鉤快一點
       const hit = fishes.find((f) => Math.abs(f.x - me.x) < f.k.size * 0.7 && Math.abs(f.y - hook.y) < f.k.size * 0.5);
       if (hit) { hook.fish = hit; fishes = fishes.filter((f) => f !== hit); hook.state = 'up'; }
       else if (hook.y > H - 20) hook.state = 'up';
@@ -307,7 +308,7 @@ async function startFish(area, ctl) {
       }
     }
     spawn -= dt;
-    if (spawn <= 0 && fishes.length < 9) { addFish(); spawn = 0.8 + Math.random(); }
+    if (spawn <= 0 && fishes.length < (tall ? 11 : 9)) { addFish(); spawn = 0.8 + Math.random(); }
     for (const f of fishes) { f.x += f.dir * f.k.speed * dt; f.wob += dt * 4; }
     fishes = fishes.filter((f) => f.x > -60 && f.x < W + 60);
 
@@ -318,7 +319,7 @@ async function startFish(area, ctl) {
     g.addColorStop(0, '#7FC8EE'); g.addColorStop(1, '#4F93C8');
     cx.fillStyle = g; cx.fillRect(0, WATER, W, H - WATER);
     cx.strokeStyle = 'rgba(255,255,255,.5)'; cx.lineWidth = 3;
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; WATER + 30 + i * 46 < H; i++) {
       const y = WATER + 30 + i * 46, o = (t / 30 + i * 50) % 80;
       cx.beginPath();
       for (let x = -80 + o; x < W; x += 80) { cx.moveTo(x, y); cx.quadraticCurveTo(x + 20, y - 6, x + 40, y); }
@@ -361,7 +362,8 @@ async function startFish(area, ctl) {
 // ───────────────────────── 戳泡泡 ─────────────────────────
 
 function startBubble(area, ctl) {
-  const W = 800, H = 520, DURATION = 40;
+  const tall = innerHeight > innerWidth; // 直式手機用直的畫布，泡泡才夠大好戳
+  const W = tall ? 520 : 800, H = tall ? 760 : 520, DURATION = 40;
   const COLORS = [
     { id: 'pink', name: '粉紅', c: '#FF9DB5' }, { id: 'blue', name: '天藍', c: '#86C5F2' },
     { id: 'mint', name: '薄荷', c: '#86D9B0' }, { id: 'yellow', name: '奶油黃', c: '#FFD45C' },
@@ -376,7 +378,7 @@ function startBubble(area, ctl) {
     target = options[Math.floor(Math.random() * options.length)];
     $('.h-target', area).textContent = `${target.name}泡泡`;
     $('.bubble-target i', area).style.background = target.c;
-    $('.bubble-target', area).classList.remove('flash'); void area.offsetWidth; $('.bubble-target', area).classList.add('flash');
+    $('.bubble-target', area).classList.remove('bump'); void area.offsetWidth; $('.bubble-target', area).classList.add('bump');
   }
   newTarget();
   switchAt = DURATION - 9;
@@ -392,7 +394,7 @@ function startBubble(area, ctl) {
     const p = canvasPoint(cv, e);
     for (let i = bubbles.length - 1; i >= 0; i--) {
       const b = bubbles[i];
-      if (Math.hypot(b.x - p.x, b.y - p.y) > b.r + 8) continue;
+      if (Math.hypot(b.x - p.x, b.y - p.y) > b.r + 14) continue;
       bubbles.splice(i, 1);
       const add = b.rainbow ? 3 : b.col === target ? 1 : -1;
       score = Math.max(0, score + add);
@@ -421,7 +423,7 @@ function startBubble(area, ctl) {
   }
   function frame(t) {
     if (ctl.isStopped()) return;
-    const dt = Math.min(0.05, (t - last) / 1000);
+    const dt = gamePaused() ? 0 : Math.min(0.05, (t - last) / 1000);
     last = t;
     time -= dt;
     $('.h-time', area).textContent = Math.max(0, Math.ceil(time));

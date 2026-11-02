@@ -71,6 +71,9 @@ function runGame(id, m) {
   });
 }
 
+// 「確定離開？」對話框開著時遊戲暫停：計時、移動、按鍵都先停住
+const gamePaused = () => !!document.querySelector('.quit-box');
+
 function hudHtml(extra = '') {
   return `<div class="game-hud"><span>⏱ <b class="h-time">0</b></span><span>⭐ <b class="h-score">0</b></span>${extra}</div>`;
 }
@@ -96,6 +99,7 @@ async function startCatch(area, ctl) {
   const pops = [];
 
   const onKey = (e) => {
+    if (gamePaused() && e.type === 'keydown') return; // 「確定離開？」開著時暫停
     if (['ArrowLeft', 'ArrowRight', 'a', 'd', 'A', 'D'].includes(e.key)) { keys[e.key.toLowerCase()] = e.type === 'keydown'; e.preventDefault(); }
   };
   const onMove = (e) => {
@@ -133,7 +137,7 @@ async function startCatch(area, ctl) {
 
   function frame(t) {
     if (ctl.isStopped()) return;
-    const dt = Math.min(0.05, (t - last) / 1000);
+    const dt = gamePaused() ? 0 : Math.min(0.05, (t - last) / 1000);
     last = t;
     time -= dt;
     const k = 1 - time / DURATION;
@@ -227,6 +231,7 @@ function startWheel(area, ctl) {
     }
   }
   const onKey = (e) => {
+    if (gamePaused() && e.type === 'keydown') return; // 「確定離開？」開著時暫停
     if (e.repeat) return;
     if (['ArrowLeft', 'a', 'A'].includes(e.key)) { press('l'); e.preventDefault(); }
     if (['ArrowRight', 'd', 'D'].includes(e.key)) { press('r'); e.preventDefault(); }
@@ -237,7 +242,7 @@ function startWheel(area, ctl) {
 
   function frame(t) {
     if (ctl.isStopped()) return;
-    const dt = Math.min(0.05, (t - last) / 1000);
+    const dt = gamePaused() ? 0 : Math.min(0.05, (t - last) / 1000);
     last = t;
     if (started) time -= dt;
     speed = Math.max(0, speed - 7 * dt);

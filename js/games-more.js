@@ -72,6 +72,7 @@ function startWhack(area, ctl) {
     if (b) { e.preventDefault(); bonk(Number(b.dataset.i)); }
   });
   const onKey = (e) => {
+    if (gamePaused() && e.type === 'keydown') return; // 「確定離開？」開著時暫停
     const i = KEYS.indexOf(e.key.toLowerCase());
     if (i >= 0) { e.preventDefault(); bonk(i); }
   };
@@ -80,7 +81,7 @@ function startWhack(area, ctl) {
 
   function frame(t) {
     if (ctl.isStopped()) return;
-    const dt = Math.min(0.05, (t - last) / 1000);
+    const dt = gamePaused() ? 0 : Math.min(0.05, (t - last) / 1000);
     last = t;
     time -= dt;
     const k = 1 - time / DURATION;
@@ -132,6 +133,7 @@ async function startRunner(area, ctl) {
     sfx.step();
   }
   const onKey = (e) => {
+    if (gamePaused() && e.type === 'keydown') return; // 「確定離開？」開著時暫停
     if ([' ', 'arrowup', 'w'].includes(e.key.toLowerCase())) { e.preventDefault(); if (!e.repeat) jump(); }
   };
   window.addEventListener('keydown', onKey);
@@ -147,7 +149,7 @@ async function startRunner(area, ctl) {
 
   function frame(t) {
     if (ctl.isStopped()) return;
-    const dt = Math.min(0.05, (t - last) / 1000);
+    const dt = gamePaused() ? 0 : Math.min(0.05, (t - last) / 1000);
     last = t;
     if (!dead) {
       time += dt;
@@ -282,6 +284,7 @@ async function startMaze(area, ctl) {
   }
   const KEYMAP = { arrowup: 'n', w: 'n', arrowdown: 's', s: 's', arrowleft: 'w', a: 'w', arrowright: 'e', d: 'e' };
   const onKey = (e) => {
+    if (gamePaused() && e.type === 'keydown') return; // 「確定離開？」開著時暫停
     const d = KEYMAP[e.key.toLowerCase()];
     if (d) { e.preventDefault(); move(d); }
   };
@@ -296,7 +299,7 @@ async function startMaze(area, ctl) {
 
   function frame(t) {
     if (ctl.isStopped()) return;
-    const dt = Math.min(0.05, (t - last) / 1000);
+    const dt = gamePaused() ? 0 : Math.min(0.05, (t - last) / 1000);
     last = t;
     if (!done) { time -= dt; if (time <= 0) { time = 0; end(false); } }
     // 走一格的滑動動畫

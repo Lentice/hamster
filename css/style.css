@@ -769,7 +769,7 @@ input, textarea { -webkit-user-select: text; user-select: text; }
 .music-pad:disabled { cursor: default; }
 .bubble-target { display: inline-flex; align-items: center; gap: 6px; }
 .bubble-target i { display: inline-block; width: 22px; height: 22px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 0 0 2px var(--line); }
-.bubble-target.flash { animation: bump .5s; }
+.bubble-target.bump { animation: bump .5s; }
 .bubble-canvas, .stack-canvas { cursor: pointer; }
 @media (max-height: 520px) and (orientation: landscape) {
   .music-stage { display: none; }
