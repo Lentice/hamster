@@ -58,7 +58,7 @@ function runGame(id, m) {
       // 沒破紀錄時告訴玩家還差多少，有破就顯示超過舊紀錄多少
       const bestLine = record
         ? (prevBest ? `比舊紀錄 ${prevBest} 多了 ${score - prevBest} 分！` : '第一次的紀錄，下次再挑戰！')
-        : `最佳紀錄 ${save.best[id]}${save.best[id] - score <= Math.max(3, save.best[id] * 0.2) ? `，只差 ${save.best[id] - score + 1} 分就破紀錄了！` : ''}`;
+        : bestText(save.best[id] || 0, score);
       addCoins(coins);
       sfx.win();
       area.innerHTML = `<div class="game-result">
@@ -79,6 +79,13 @@ function runGame(id, m) {
 
 // 「確定離開？」對話框開著時遊戲暫停：計時、移動、按鍵都先停住
 const gamePaused = () => !!document.querySelector('.quit-box');
+
+// 沒破紀錄時的那一行（還沒有任何紀錄、或差一點就破紀錄時給點鼓勵）
+function bestText(best, score) {
+  if (!best) return '再試一次，拿到第一分吧！';
+  const gap = best - score + 1;
+  return `最佳紀錄 ${best}${best - score <= Math.max(3, best * 0.2) ? `，只差 ${gap} 分就破紀錄了！` : ''}`;
+}
 
 function hudHtml(extra = '') {
   return `<div class="game-hud"><span>⏱ <b class="h-time">0</b></span><span>⭐ <b class="h-score">0</b></span>${extra}</div>`;
