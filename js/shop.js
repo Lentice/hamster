@@ -110,7 +110,12 @@
     if (!card?.dataset.id || card.classList.contains('owned')) return;
     const tab = CATEGORIES.find((t) => t.id === card.dataset.cat) || SHOP_TABS.find((t) => t.id === current);
     const item = tab.items.find((x) => x.id === card.dataset.id);
-    askBuy(tab.id, item, $('.shop-thumb', card).innerHTML, () => {
+    // 服裝配件：購買視窗裡試穿（配上現在的打扮）；家具、房間照舊用縮圖
+    const isLook = CATEGORIES.some((c) => c.id === tab.id);
+    const preview = isLook
+      ? `<div class="try-on">${svgWrap(renderScene({ ...save.look, [tab.id]: item.id }, 'tryon'), '0 0 400 400', 'scene pet-svg')}<span>👀 試穿看看</span></div>`
+      : $('.shop-thumb', card).innerHTML;
+    askBuy(tab.id, item, preview, () => {
       draw();
       if (CATEGORIES.some((cat) => cat.id === tab.id)) {
         save.look[tab.id] = item.id;
