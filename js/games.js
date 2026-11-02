@@ -94,6 +94,7 @@ function runGame(id, m) {
       stopFns.length = 0;
       const prevBest = save.best[id] || 0;
       const record = recordBest(id, score);
+      const questDone = questPlayed(id);
       // 沒破紀錄時告訴玩家還差多少，有破就顯示超過舊紀錄多少
       const bestLine = record
         ? (prevBest ? `比舊紀錄 ${prevBest} 多了 ${score - prevBest} 分！` : '第一次的紀錄，下次再挑戰！')
@@ -106,6 +107,7 @@ function runGame(id, m) {
         <p class="score">分數 <b>${score}</b></p>
         <p class="best-line">${bestLine}</p>
         <p class="reward">獲得 <b>${HAMSTER_COIN_ICON} ${coins}</b> 鼠鼠幣</p>
+        ${questDone ? `<p class="quest-done">🎯 完成今日任務！再送 ${HAMSTER_COIN_ICON} ${QUEST_REWARD}</p>` : ''}
         <div class="modal-actions">
           <button class="btn btn-pink" data-act="again">再玩一次</button>
           <button class="btn btn-gray" data-act="back">回公園</button>

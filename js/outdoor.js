@@ -358,7 +358,9 @@ const PARK = { hooks: { tick: [], enter: [], leave: [] } };
   viewport.append(mapChip);
   mapChip.addEventListener('click', () => {
     const places = PROPS.filter((p) => p.act);
-    const m = modal(`<div class="map-box"><h2>🗺️ 要去哪裡？</h2><div class="map-list">${places.map((p) => {
+    const q = questState();
+    const quest = q.done ? '🎯 今日任務完成！明天再來喔' : `🎯 今日任務：玩 ${QUEST_GAMES} 種遊戲（${q.games.length}/${QUEST_GAMES}），送 ${QUEST_REWARD} 鼠鼠幣`;
+    const m = modal(`<div class="map-box"><h2>🗺️ 要去哪裡？</h2><p class="map-quest">${quest}</p><div class="map-list">${places.map((p) => {
       const g = GAMES[p.act];
       const fresh = g && !save.played?.[p.act] && !save.best[p.act];
       return `<button class="map-place" data-act="${p.act}"><span class="map-icon">${g ? g.icon : p.act === 'home' ? '🏠' : '🛒'}</span><b>${p.label}</b>${fresh ? '<i class="map-new">NEW</i>' : g && save.best[p.act] ? `<small>🏆 ${save.best[p.act]}</small>` : ''}</button>`;

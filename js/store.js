@@ -114,6 +114,26 @@ function claimDailyMoonCoins(now = new Date()) {
   return true;
 }
 
+// 每日任務：一天內玩 3 種不同的小遊戲，額外送鼠鼠幣
+const QUEST_GAMES = 3, QUEST_REWARD = 50;
+const localDay = (now = new Date()) => `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+function questState() {
+  const day = localDay();
+  if (save.quest?.day !== day) save.quest = { day, games: [], done: false };
+  return save.quest;
+}
+// 玩完一局時呼叫；剛好完成任務時回傳 true
+function questPlayed(game) {
+  syncStoredSave();
+  const q = questState();
+  if (!q.games.includes(game)) q.games.push(game);
+  if (q.done || q.games.length < QUEST_GAMES) { persist(); return false; }
+  q.done = true;
+  save.coins += QUEST_REWARD;
+  persist();
+  return true;
+}
+
 function boxItems(type) {
   const box = BLIND_BOXES[type];
   return CATEGORIES.flatMap((cat) => cat.items

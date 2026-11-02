@@ -938,3 +938,6 @@ button.diy-preview { position: relative; padding: 0; font: inherit; cursor: zoom
 .map-new { font-style: normal; font-size: 10px; font-weight: bold; color: #fff; background: #F0506A; border-radius: 999px; padding: 1px 6px; }
 .walker.poof { animation: poof .45s ease-out; }
 @keyframes poof { 0% { scale: .2; opacity: 0; } 70% { scale: 1.15; opacity: 1; } 100% { scale: 1; } }
+
+.map-quest { margin: -4px 0 10px; font-size: 14px; color: var(--soft); }
+.quest-done { color: var(--pink-deep); font-weight: bold; animation: bump .5s; }
