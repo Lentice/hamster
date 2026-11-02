@@ -90,8 +90,8 @@ function runGame(id, m) {
   });
 }
 
-// 「確定離開？」對話框開著時遊戲暫停：計時、移動、按鍵都先停住
-const gamePaused = () => !!document.querySelector('.quit-box');
+// 「確定離開？」對話框開著、或切到別的 App／分頁時遊戲暫停：計時、移動、按鍵都先停住
+const gamePaused = () => document.hidden || !!document.querySelector('.quit-box');
 
 // 沒破紀錄時的那一行（還沒有任何紀錄、或差一點就破紀錄時給點鼓勵）
 function bestText(best, score) {
