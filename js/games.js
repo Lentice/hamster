@@ -68,6 +68,8 @@ function runGame(id, m) {
   // 倒數的遊戲最後 5 秒：時間變紅跳動，每秒滴一聲
   let lastSec = null;
   const hurry = new MutationObserver(() => {
+    // 順便幫遊戲畫布加上名字（螢幕閱讀器用）
+    $$('canvas:not([aria-label])', area).forEach((c) => { c.setAttribute('role', 'img'); c.setAttribute('aria-label', `${g.name}遊戲畫面`); });
     const el = $('.h-time', area);
     if (!el) return;
     const sec = Number(el.textContent);
