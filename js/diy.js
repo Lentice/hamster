@@ -5,9 +5,11 @@
 const DIY_PALETTE = [
   '', '#FFFFFF', '#2E211D', '#8A6A5C', '#FF8FA3', '#FFC4D2', '#F0506A', '#FFD45C', '#FFF1B8',
   '#F0A070', '#86D9B0', '#3FA36C', '#86C5F2', '#4A7FD6', '#C3A3F0', '#8E6FD0', '#C9A27A',
+  // 後來加的顏色接在後面，舊作品的顏色代號不變
+  '#D8D0CC', '#9A9290', '#A63A3A', '#FFB347', '#2FB5A8', '#1F3F8A', '#F7D6B5', '#6B4226',
 ];
 const DIY_MAX = 8;
-const DIY_CHARS = '0123456789abcdefg';
+const DIY_CHARS = '0123456789abcdefghijklmno';
 
 // box：作品在 400x400 鼠鼠座標中的範圍（帽子、旗子會依物種的 dy 平移）
 const DIY_TEMPLATES = {
