@@ -171,7 +171,8 @@
       sfx.pop();
     };
     if (isOwned(cat.id, item)) wear(false);
-    else askBuy(cat.id, item, $('.thumb', btn).innerHTML, () => wear(true));
+    // 買之前先試穿：購買視窗裡顯示鼠鼠穿上它（配上現在其他的打扮）的樣子
+    else askBuy(cat.id, item, `<div class="try-on">${svgWrap(renderScene({ ...look, [cat.id]: item.id }, 'tryon'), '0 0 400 400', 'scene pet-svg')}<span>👀 試穿看看</span></div>`, () => wear(true));
   });
 
   stage.addEventListener('click', (e) => {
