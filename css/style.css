@@ -927,3 +927,14 @@ button.diy-preview { position: relative; padding: 0; font: inherit; cursor: zoom
 .collect-bar { grid-column: 1 / -1; display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--soft); }
 .collect-bar b { color: var(--pink-deep); }
 .collect-bar i { flex: 1; height: 10px; border-radius: 999px; background: linear-gradient(90deg, var(--pink) var(--p), #F3E6E0 var(--p)); }
+
+/* 公園地圖 */
+.map-ui { top: 10px; right: 10px; }
+.map-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; max-height: 60dvh; overflow: auto; }
+.map-place { display: flex; align-items: center; gap: 6px; padding: 8px 10px; border: 3px solid #F3E6E0; border-radius: 16px; background: #fff; font: inherit; text-align: left; cursor: pointer; position: relative; }
+.map-place b { font-size: 14px; flex: 1; }
+.map-place small { font-size: 11px; color: var(--soft); }
+.map-icon { font-size: 22px; }
+.map-new { font-style: normal; font-size: 10px; font-weight: bold; color: #fff; background: #F0506A; border-radius: 999px; padding: 1px 6px; }
+.walker.poof { animation: poof .45s ease-out; }
+@keyframes poof { 0% { scale: .2; opacity: 0; } 70% { scale: 1.15; opacity: 1; } 100% { scale: 1; } }

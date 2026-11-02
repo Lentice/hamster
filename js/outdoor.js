@@ -353,6 +353,34 @@ const PARK = { hooks: { tick: [], enter: [], leave: [] } };
     PARK.hooks.tick.forEach((f) => f(dt));
   }
 
+  // 🗺️ 地圖：列出所有攤位，點一下就咻～地跑到那個攤位前面
+  const mapChip = html('<div class="park-ui map-ui"><button class="online-chip" type="button">🗺️ <span>地圖</span></button></div>');
+  viewport.append(mapChip);
+  mapChip.addEventListener('click', () => {
+    const places = PROPS.filter((p) => p.act);
+    const m = modal(`<div class="map-box"><h2>🗺️ 要去哪裡？</h2><div class="map-list">${places.map((p) => {
+      const g = GAMES[p.act];
+      const fresh = g && !save.played?.[p.act] && !save.best[p.act];
+      return `<button class="map-place" data-act="${p.act}"><span class="map-icon">${g ? g.icon : p.act === 'home' ? '🏠' : '🛒'}</span><b>${p.label}</b>${fresh ? '<i class="map-new">NEW</i>' : g && save.best[p.act] ? `<small>🏆 ${save.best[p.act]}</small>` : ''}</button>`;
+    }).join('')}</div></div>`, { cls: 'small' });
+    m.box.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-act]');
+      if (!b) return;
+      const p = PROPS.find((q) => q.act === b.dataset.act);
+      m.close();
+      // 站到攤位前面（被擋住就再往下一點）
+      let y = p.y + 70;
+      while (blocked(p.x, y) && y < WH - 20) y += 20;
+      Object.assign(player, { x: p.x, y, tx: null, pendingAct: null });
+      const r = viewport.getBoundingClientRect();
+      const sc = r.width / viewW();
+      cam.x = Math.max(0, Math.min(WW - viewW(), player.x - viewW() / 2));
+      cam.y = Math.max(0, Math.min(WH - r.height / sc, player.y - r.height / sc / 2));
+      player.el.classList.remove('poof'); void player.el.offsetWidth; player.el.classList.add('poof');
+      sfx.squeak();
+    });
+  });
+
   // 還沒玩過的遊戲攤位掛上 NEW（有紀錄的也算玩過）
   const refreshNew = () => $$('.prop-label', world).forEach((t) => {
     t.classList.toggle('new', !!GAMES[t.dataset.act] && !save.played?.[t.dataset.act] && !save.best[t.dataset.act]);
