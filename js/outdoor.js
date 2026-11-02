@@ -162,7 +162,7 @@ const PARK = { hooks: { tick: [], enter: [], leave: [] } };
     keysUp();
     if (act === 'home') return showScreen('home');
     if (act === 'shop') return showScreen('shop');
-    if (GAMES[act]) openGame(act, () => viewport.focus());
+    if (GAMES[act]) openGame(act, () => { refreshNew(); viewport.focus(); }); // 玩過就拿掉攤位的 NEW
   }
 
   function keysUp() { Object.keys(keys).forEach((k) => { keys[k] = false; }); }
