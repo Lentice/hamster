@@ -883,3 +883,10 @@ input, textarea { -webkit-user-select: text; user-select: text; }
 /* 遊戲提示：觸控裝置只顯示觸控說明，有滑鼠鍵盤時只顯示鍵盤說明 */
 .game-tip .tc { display: none; }
 @media (pointer: coarse) { .game-tip .tc { display: inline; } .game-tip .kb { display: none; } }
+
+/* 音樂會進度點 */
+.music-dots { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; min-height: 16px; max-width: 360px; }
+.music-dots i { width: 14px; height: 14px; border-radius: 50%; background: #F3E6E0; border: 2px solid #fff; box-shadow: 0 0 0 1px var(--line); transition: transform .15s, background .15s; }
+.music-dots i.now { background: var(--c); transform: scale(1.35); }
+.music-dots i.on { background: var(--c); }
+@media (pointer: coarse) { .music-pad kbd { display: none; } }

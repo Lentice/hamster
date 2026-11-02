@@ -158,9 +158,14 @@ function startMusic(area, ctl) {
   const KEYS = [['1', 'ArrowLeft', 'a'], ['2', 'ArrowUp', 'w'], ['3', 'ArrowDown', 's'], ['4', 'ArrowRight', 'd']];
   area.innerHTML = `<div class="game-hud"><span>🎵 第 <b class="h-score">1</b> 關</span></div>
     <div class="music-stage"><div class="music-pet">${petSvg({ ...save.look, background: 'none' })}</div><p class="music-say">仔細聽喔～</p></div>
+    <div class="music-dots"></div>
     <div class="music-pads">${PADS.map((p, i) => `<button class="music-pad" data-i="${i}" style="--c:${p.color}" disabled><span>${p.icon}</span><kbd>${i + 1}</kbd></button>`).join('')}</div>
     <p class="game-tip"><span class="tc">👆 照順序點按鈕</span><span class="kb">🖱️ 點按鈕　⌨️ 1 2 3 4 或 ← ↑ ↓ →</span></p>`;
-  const pads = $$('.music-pad', area), say = $('.music-say', area), pet = $('.music-pet', area);
+  const pads = $$('.music-pad', area), say = $('.music-say', area), pet = $('.music-pet', area), dots = $('.music-dots', area);
+  // 進度點：旋律有幾個音就幾個點，彈對一個亮一個
+  const drawDots = (done, playing = -1) => {
+    dots.innerHTML = seq.map((n, k) => `<i class="${k < done ? 'on' : ''} ${k === playing ? 'now' : ''}" style="--c:${PADS[n].color}"></i>`).join('');
+  };
   const seq = [];
   let pos = 0, listening = false, round = 0;
   const timers = [];
@@ -182,9 +187,11 @@ function startMusic(area, ctl) {
     $('.h-score', area).textContent = round;
     say.textContent = '仔細聽喔～';
     const gap = Math.max(330, 620 - round * 22);
-    seq.forEach((n, k) => later(() => light(n, gap * 0.7), 700 + k * gap));
+    drawDots(0);
+    seq.forEach((n, k) => later(() => { light(n, gap * 0.7); drawDots(0, k); }, 700 + k * gap));
     later(() => {
       listening = true; pos = 0;
+      drawDots(0);
       pads.forEach((p) => { p.disabled = false; });
       say.textContent = '換你彈囉！';
     }, 700 + seq.length * gap);
@@ -203,6 +210,7 @@ function startMusic(area, ctl) {
     }
     light(i, 220);
     pos++;
+    drawDots(pos);
     if (pos === seq.length) {
       listening = false;
       say.textContent = ['好棒！', '太厲害了！', '完美！', '再來！'][Math.floor(Math.random() * 4)];
