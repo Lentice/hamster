@@ -941,3 +941,13 @@ button.diy-preview { position: relative; padding: 0; font: inherit; cursor: zoom
 
 .map-quest { margin: -4px 0 10px; font-size: 14px; color: var(--soft); }
 .quest-done { color: var(--pink-deep); font-weight: bold; animation: bump .5s; }
+
+/* 開盲盒動畫 */
+.box-reveal { position: relative; }
+.box-open-anim { position: absolute; inset: -20px; display: grid; place-items: center; background: #FFFDFB; border-radius: 24px; z-index: 2;
+  animation: boxCover 1.2s ease-in forwards; pointer-events: none; }
+.box-open-anim span { font-size: 96px; animation: boxShake .9s ease-in-out, boxPop .3s .9s ease-in forwards; }
+@keyframes boxShake { 0%, 100% { rotate: 0deg; } 15% { rotate: -14deg; } 30% { rotate: 12deg; } 45% { rotate: -10deg; } 60% { rotate: 8deg; } 75% { rotate: -5deg; } }
+@keyframes boxPop { to { scale: 1.8; opacity: 0; } }
+@keyframes boxCover { 0%, 80% { opacity: 1; } 100% { opacity: 0; visibility: hidden; } }
+@media (prefers-reduced-motion: reduce) { .box-open-anim { display: none; } }

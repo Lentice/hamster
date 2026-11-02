@@ -92,9 +92,10 @@
         m.close();
         draw();
         if (!prize) { toast(`目前無法開盒，請確認${box.currencyName}與收藏狀態。`); return; }
-        sfx.win();
+        setTimeout(() => sfx.win(), 900);
         const bonus = prize.bonusCoins ? `<div class="bonus-prize"><div class="reward-coins">${HAMSTER_COIN_ICON.repeat(3)}</div><h3>🍀 還有金幣小驚喜！</h3><p>額外獲得 <b>${HAMSTER_COIN_ICON} ${prize.bonusCoins} 枚鼠鼠幣</b><br>已經放進你的錢包囉！</p></div>` : '';
-        const reveal = modal(`<div class="buy-box"><h3>✨ 開出了「${prize.item.name}」！</h3><div class="buy-thumb">${thumb(prize.cat, prize.item, 0)}</div><p>已經放進你的衣櫃囉！</p>${bonus}<div class="modal-actions"><button class="btn btn-pink" id="wear-prize">馬上戴上</button><button class="btn btn-gray" id="keep-shopping">繼續逛商店</button></div></div>`, { cls: 'small' });
+        // 先蓋一層搖晃的禮物盒動畫，約 1 秒後打開露出獎品
+        const reveal = modal(`<div class="buy-box box-reveal"><div class="box-open-anim" aria-hidden="true"><span>${tab.icon}</span></div><h3>✨ 開出了「${prize.item.name}」！</h3><div class="buy-thumb">${thumb(prize.cat, prize.item, 0)}</div><p>已經放進你的衣櫃囉！</p>${bonus}<div class="modal-actions"><button class="btn btn-pink" id="wear-prize">馬上戴上</button><button class="btn btn-gray" id="keep-shopping">繼續逛商店</button></div></div>`, { cls: 'small' });
         $('#keep-shopping', reveal.box).onclick = reveal.close;
         $('#wear-prize', reveal.box).onclick = () => {
           save.look[prize.cat.id] = prize.item.id;
