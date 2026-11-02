@@ -915,3 +915,6 @@ button.diy-preview { position: relative; padding: 0; font: inherit; cursor: zoom
 /* 商店：錢不夠 */
 .buy-btn.short { filter: grayscale(.85); opacity: .75; }
 .short-tag { font-size: 12px; color: var(--soft); margin-top: 2px; }
+
+/* 衣櫃：新拿到還沒穿過 */
+.fresh-tag { position: absolute; top: 6px; left: 6px; padding: 1px 7px; border-radius: 999px; background: #F0506A; color: #fff; font-size: 11px; font-weight: bold; }

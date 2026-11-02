@@ -90,6 +90,7 @@ function buy(cat, item) {
   if (save[wallet] < item.price) return false;
   save[wallet] -= item.price;
   save.owned[itemKey(cat, item.id)] = true;
+  (save.fresh ||= {})[itemKey(cat, item.id)] = 1; // 衣櫃 NEW 標記，穿過就拿掉
   persist();
   return true;
 }
@@ -132,6 +133,7 @@ function openBlindBox(type) {
   const prize = pool[Math.floor(Math.random() * pool.length)];
   save[box.wallet] -= box.price;
   save.owned[itemKey(prize.cat.id, prize.item.id)] = true;
+  (save.fresh ||= {})[itemKey(prize.cat.id, prize.item.id)] = 1;
   // 配飾保底，額外金幣不佔收藏名額；與配飾分開抽取。
   const bonusRoll = Math.random();
   const bonusCoins = bonusRoll < 0.05 ? box.bonusCoins[2]
