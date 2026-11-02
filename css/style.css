@@ -908,3 +908,6 @@ button.diy-preview { position: relative; padding: 0; font: inherit; cursor: zoom
 .game-hud .hurry { color: #F0506A; animation: hurryPulse 1s ease-in-out infinite; }
 @keyframes hurryPulse { 0%, 100% { scale: 1; } 50% { scale: 1.18; } }
 @media (prefers-reduced-motion: reduce) { .game-hud .hurry { animation: none; } }
+
+/* 沒玩過的遊戲攤位 */
+.prop-label.new::after { content: 'NEW'; margin-left: 6px; padding: 1px 7px; border-radius: 999px; background: #F0506A; color: #fff; font-size: .75em; vertical-align: middle; }

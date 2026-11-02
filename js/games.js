@@ -46,6 +46,9 @@ function openGame(id, onDone) {
 function runGame(id, m) {
   const g = GAMES[id];
   m.box.classList.add('playing');
+  // 記下玩過哪些遊戲（公園攤位的 NEW 標籤用）
+  save.played ||= {};
+  if (!save.played[id]) { save.played[id] = 1; persist(); }
   m.box.querySelectorAll(':scope > :not(.modal-x)').forEach((el) => el.remove());
   const area = html('<div class="game-area"></div>');
   m.box.appendChild(area);

@@ -353,9 +353,15 @@ const PARK = { hooks: { tick: [], enter: [], leave: [] } };
     PARK.hooks.tick.forEach((f) => f(dt));
   }
 
+  // 還沒玩過的遊戲攤位掛上 NEW（有紀錄的也算玩過）
+  const refreshNew = () => $$('.prop-label', world).forEach((t) => {
+    t.classList.toggle('new', !!GAMES[t.dataset.act] && !save.played?.[t.dataset.act] && !save.best[t.dataset.act]);
+  });
+
   SCREENS.outdoor = {
     enter() {
       if (!built) build();
+      refreshNew();
       player.moving = false;
       near = null;
       renderPlayer();
