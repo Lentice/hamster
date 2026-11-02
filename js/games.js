@@ -1,7 +1,7 @@
 // 小遊戲：接瓜子、滾輪衝刺、翻牌配對。玩完依分數獲得鼠鼠幣。
 
 const GAMES = {
-  catch: { name: '接瓜子', icon: '🌻', desc: '左右移動接住掉下來的瓜子！金色瓜子 +5，小心辣椒！', start: startCatch },
+  catch: { name: '接瓜子', icon: '🌻', desc: '左右移動接住掉下來的瓜子！金色瓜子 +5，小心辣椒！<br>連續接 10 個不碰辣椒再 +5！', start: startCatch },
   wheel: { name: '滾輪衝刺', icon: '🎡', desc: '交替按 ← → （或點左右按鈕）讓滾輪越轉越快，10 秒內跑最遠！', start: startWheel },
   memory: { name: '翻牌配對', icon: '🃏', desc: '開場會先翻開 1.5 秒，快記住位置！<br>翻開兩張一樣的牌就配對成功，步數越少獎勵越多！', start: startMemory },
 };
@@ -164,7 +164,7 @@ async function startCatch(area, ctl) {
   const player = { x: W / 2, w: 130, stun: 0 };
   const items = [];
   const keys = {};
-  let score = 0, time = DURATION, spawn = 0, last = performance.now(), shake = 0;
+  let score = 0, time = DURATION, spawn = 0, last = performance.now(), shake = 0, streak = 0;
   const pops = [];
 
   const onKey = (e) => {
@@ -228,12 +228,15 @@ async function startCatch(area, ctl) {
       if (it.y > catchY && it.y < catchY + 50 && Math.abs(it.x - player.x) < player.w / 2 && player.stun <= 0) {
         items.splice(i, 1);
         if (it.type === 'pepper') {
-          score = Math.max(0, score - 3); player.stun = 0.9; shake = 0.3; sfx.bad();
+          score = Math.max(0, score - 3); player.stun = 0.9; shake = 0.3; sfx.bad(); streak = 0;
           pops.push({ x: it.x, y: catchY, t: 0.8, txt: '-3', c: '#F0506A' });
         } else {
-          const add = it.type === 'gold' ? 5 : 1;
+          // 連續接到不碰辣椒：每 10 個多 +5
+          streak++;
+          const bonus = streak % 10 === 0 ? 5 : 0;
+          const add = (it.type === 'gold' ? 5 : 1) + bonus;
           score += add; sfx.coin();
-          pops.push({ x: it.x, y: catchY, t: 0.8, txt: `+${add}`, c: it.type === 'gold' ? '#F7B932' : '#5A3E36' });
+          pops.push({ x: it.x, y: catchY, t: bonus ? 1.2 : 0.8, txt: bonus ? `${streak} 連接！+${add}` : `+${add}`, c: bonus || it.type === 'gold' ? '#F7B932' : '#5A3E36' });
         }
       } else if (it.y > H + 40) items.splice(i, 1);
     }
