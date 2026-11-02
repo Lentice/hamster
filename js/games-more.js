@@ -32,7 +32,7 @@ function startWhack(area, ctl) {
   const KEYS = ['q', 'w', 'e', 'a', 's', 'd', 'z', 'x', 'c'];
   area.innerHTML = `${hudHtml()}<div class="whack-grid">${KEYS.map((k, i) => `
     <button class="hole" data-i="${i}"><span class="mole-slot"><span class="mole"></span></span><span class="hole-key">${k.toUpperCase()}</span></button>`).join('')}</div>
-    <p class="game-tip"><span class="tc">👆 地鼠探頭就點牠</span><span class="kb">🖱️ 點地鼠　⌨️ Q W E / A S D / Z X C 對應九個洞</span></p>`;
+    <p class="game-tip"><span class="touch-only">👆 地鼠探頭就點牠</span><span class="kb-only">🖱️ 點地鼠　⌨️ Q W E / A S D / Z X C 對應九個洞</span></p>`;
   const holes = $$('.hole', area).map((el) => ({ el, mole: $('.mole', el), up: false, kind: null, until: 0, hit: false }));
   let score = 0, time = DURATION, spawn = 0.6, last = performance.now();
 

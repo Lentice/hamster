@@ -30,7 +30,7 @@ async function startStack(area, ctl) {
   const CAKES = [['#FFD1DC', '#FF8FA3'], ['#FFF1B8', '#F2C94C'], ['#CDEFD9', '#7CC8A0'], ['#D9E4FF', '#8FA8E8'], ['#F3D9FF', '#C08FE0'], ['#FFE0C7', '#F0A070']];
   area.innerHTML = `<div class="game-hud"><span>🎂 <b class="h-score">0</b> 層</span><span>✨ 完美 <b class="h-perfect">0</b></span></div>
     <canvas class="game-canvas stack-canvas" width="${W}" height="${H}"></canvas>
-    <p class="game-tip"><span class="tc">👆 點畫面放下蛋糕</span><span class="kb">⌨️ 空白鍵 / Enter　🖱️ 點畫面放下蛋糕</span></p>`;
+    <p class="game-tip"><span class="touch-only">👆 點畫面放下蛋糕</span><span class="kb-only">⌨️ 空白鍵 / Enter　🖱️ 點畫面放下蛋糕</span></p>`;
   const cv = $('canvas', area), cx = cv.getContext('2d');
   const petImg = await svgToImage(petSvg({ ...save.look, background: 'none', effect: 'none' }));
   if (ctl.isStopped()) return;
@@ -166,7 +166,7 @@ function startMusic(area, ctl) {
     <div class="music-stage"><div class="music-pet">${petSvg({ ...save.look, background: 'none' })}</div><p class="music-say">仔細聽喔～</p></div>
     <div class="music-dots"></div>
     <div class="music-pads">${PADS.map((p, i) => `<button class="music-pad" data-i="${i}" style="--c:${p.color}" disabled><span>${p.icon}</span><kbd>${i + 1}</kbd></button>`).join('')}</div>
-    <p class="game-tip"><span class="tc">👆 照順序點按鈕</span><span class="kb">🖱️ 點按鈕　⌨️ 1 2 3 4 或 ← ↑ ↓ →</span></p>`;
+    <p class="game-tip"><span class="touch-only">👆 照順序點按鈕</span><span class="kb-only">🖱️ 點按鈕　⌨️ 1 2 3 4 或 ← ↑ ↓ →</span></p>`;
   const pads = $$('.music-pad', area), say = $('.music-say', area), pet = $('.music-pet', area), dots = $('.music-dots', area);
   // 進度點：旋律有幾個音就幾個點，彈對一個亮一個
   const drawDots = (done, playing = -1) => {
@@ -251,7 +251,7 @@ async function startFish(area, ctl) {
     { e: '🥾', pts: -2, w: 2, speed: 50, size: 40 },
   ];
   area.innerHTML = `${hudHtml()}<canvas class="game-canvas fish-canvas" width="${W}" height="${H}"></canvas>
-    <p class="game-tip"><span class="tc">👆 點水面，鼠鼠就走過去在那裡釣</span><span class="kb">⌨️ ← → 移動、空白鍵放魚鉤　🖱️ 點水面就在那裡釣</span></p>`;
+    <p class="game-tip"><span class="touch-only">👆 點水面，鼠鼠就走過去在那裡釣</span><span class="kb-only">⌨️ ← → 移動、空白鍵放魚鉤　🖱️ 點水面就在那裡釣</span></p>`;
   const cv = $('canvas', area), cx = cv.getContext('2d');
   const petImg = await svgToImage(petSvg({ ...save.look, background: 'none', effect: 'none' }));
   if (ctl.isStopped()) return;

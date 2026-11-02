@@ -146,7 +146,9 @@ const PARK = { hooks: { tick: [], enter: [], leave: [] } };
     Object.assign(el.style, { left: `${x - w / 2}px`, top: `${y - h * 0.97}px`, width: `${w}px`, zIndex: Math.round(y) + 1 });
   }
 
-  const promptText = (p) => (p ? `<span class="kb-only">按 <kbd>空白鍵</kbd> 或點一下：</span><span class="touch-only">👆 點這裡：</span>${p.label}` : '');
+  // 遊戲攤位多顯示一行最佳紀錄
+  const boothBest = (p) => (GAMES[p.act] ? `<span class="booth-best">🏆 最佳紀錄 ${save.best[p.act] || 0}</span>` : '');
+  const promptText = (p) => (p ? `<span class="kb-only">按 <kbd>空白鍵</kbd> 或點一下：</span><span class="touch-only">👆 點這裡：</span>${p.label}${boothBest(p)}` : '');
 
   function renderPlayer() {
     player.el.innerHTML = petSvg(save.look, player.moving ? 'walking' : '') +
