@@ -83,12 +83,14 @@ function diyEncode(type, px) {
 function diyDecode(type, code) {
   const t = DIY_TEMPLATES[type];
   const s = String(code || '').trim();
-  if (s[0] !== '鼠' || s[1] !== DIY_CODE_TYPES[type] || (s.length - 2) % 3) return null;
+  // 每段 3 個字至少 1 格，太長的代碼一定不對，先擋掉
+  if (s[0] !== '鼠' || s[1] !== DIY_CODE_TYPES[type] || (s.length - 2) % 3 || s.length > 2 + 3 * t.cols * t.rows) return null;
   let px = '';
   for (let i = 2; i < s.length; i += 3) {
     const c = s[i], n = parseInt(s.slice(i + 1, i + 3), 36);
     if (!DIY_CHARS.includes(c) || !(n > 0)) return null;
     px += c.repeat(n);
+    if (px.length > t.cols * t.rows) return null;
   }
   return px.length === t.cols * t.rows ? px : null;
 }

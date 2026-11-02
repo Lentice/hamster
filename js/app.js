@@ -48,7 +48,11 @@ updateCoins();
 
 let startScreen = 'wardrobe';
 try { startScreen = localStorage.getItem('hamster-screen') || startScreen; } catch { /* 忽略 */ }
-showScreen(SCREENS[startScreen] ? startScreen : 'wardrobe');
+// 存檔內容有問題時不要讓整個遊戲卡住（設定按鈕還要能用來還原）
+try { showScreen(SCREENS[startScreen] ? startScreen : 'wardrobe'); } catch (err) {
+  console.error(err);
+  try { showScreen('wardrobe'); } catch { /* 至少讓設定按鈕能用 */ }
+}
 
 // 第一次玩的歡迎訊息
 try {
@@ -68,6 +72,20 @@ function updateDayTime() {
 }
 updateDayTime();
 setInterval(updateDayTime, 5 * 60 * 1000);
+
+// 檢查備份檔的主要欄位型別，避免壞掉的檔案讓遊戲開不起來
+function validBackup(d) {
+  const obj = (v) => !!v && typeof v === 'object' && !Array.isArray(v);
+  const opt = (v, ok) => v === undefined || ok(v);
+  return obj(d) && Number.isFinite(d.coins) && obj(d.look)
+    && opt(d.look.name, (v) => typeof v === 'string')
+    && opt(d.look.species, (v) => typeof v === 'string')
+    && opt(d.moonCoins, Number.isFinite)
+    && opt(d.house, (v) => obj(v) && Array.isArray(v.floors) && v.floors.length > 0 && v.floors.every(obj))
+    && ['owned', 'best', 'collected', 'fresh', 'played', 'quest'].every((k) => opt(d[k], obj))
+    && opt(d.outfits, Array.isArray)
+    && opt(d.diy, (v) => obj(v) && Object.values(v).every(Array.isArray));
+}
 
 // ⚙️ 設定（點左上角標誌）：音效、備份存檔到檔案、從檔案還原（換手機、清瀏覽器資料前可以先備份）
 $('#settings').addEventListener('click', () => {
@@ -108,11 +126,13 @@ $('#settings').addEventListener('click', () => {
       const text = await f.text();
       const data = JSON.parse(text);
       // 簡單檢查是不是鼠鼠小屋的存檔
-      if (!data || typeof data !== 'object' || typeof data.coins !== 'number' || typeof data.look !== 'object') throw new Error('bad');
+      if (!validBackup(data)) throw new Error('bad');
       const ok = modal(`<div class="buy-box"><h3>要用這個備份蓋掉現在的存檔嗎？</h3><p>備份裡有 ${HAMSTER_COIN_ICON} ${Math.floor(data.coins)} 鼠鼠幣。<br>現在的存檔會被取代，沒辦法復原喔。</p>
         <div class="modal-actions"><button class="btn btn-pink" data-act="yes">還原</button><button class="btn btn-gray" data-act="no">先不要</button></div></div>`, { cls: 'small' });
       $('[data-act=no]', ok.box).onclick = ok.close;
-      $('[data-act=yes]', ok.box).onclick = () => { localStorage.setItem(SAVE_KEY, JSON.stringify(data)); location.reload(); };
+      $('[data-act=yes]', ok.box).onclick = () => {
+        try { localStorage.setItem(SAVE_KEY, JSON.stringify(data)); location.reload(); } catch { toast('瀏覽器不讓存檔，還原失敗了'); ok.close(); }
+      };
     } catch {
       toast('這個檔案看起來不是鼠鼠小屋的存檔');
     }
