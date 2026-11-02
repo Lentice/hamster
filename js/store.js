@@ -119,7 +119,8 @@ const QUEST_GAMES = 3, QUEST_REWARD = 50;
 const localDay = (now = new Date()) => `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 function questState() {
   const day = localDay();
-  if (save.quest?.day !== day) save.quest = { day, games: [], done: false };
+  // 只有日期往後才換新任務；把時鐘往回調不會重設（避免重複領獎）
+  if (!save.quest || day > save.quest.day) save.quest = { day, games: [], done: false };
   return save.quest;
 }
 // 玩完一局時呼叫；剛好完成任務時回傳 true
