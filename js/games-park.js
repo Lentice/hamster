@@ -1,10 +1,10 @@
 // 公園新攤位小遊戲：疊疊蛋糕、鼠鼠音樂會、池塘釣魚、戳泡泡
 
 Object.assign(GAMES, {
-  stack: { name: '疊疊蛋糕', icon: '🎂', desc: '蛋糕會左右滑動，按空白鍵或點畫面放下去！<br>對得越準疊越高，完全對齊有額外加分！', start: startStack },
+  stack: { name: '疊疊蛋糕', icon: '🎂', desc: '蛋糕會左右滑動，點畫面放下去！<br>對得越準疊越高，完全對齊有額外加分，<br>連續 3 次完美蛋糕還會變大！', start: startStack },
   music: { name: '鼠鼠音樂會', icon: '🎵', desc: '仔細聽鼠鼠彈的旋律，照順序按出一樣的音！<br>每過一關旋律就多一個音。', start: startMusic },
   fish: { name: '池塘釣魚', icon: '🎣', desc: '左右移動鼠鼠，按空白鍵或點畫面放下魚鉤！<br>金魚最值錢，小心別釣到舊靴子。', start: startFish },
-  bubble: { name: '戳泡泡', icon: '🫧', desc: '只戳和題目一樣顏色的泡泡！彩虹泡泡永遠加分，<br>戳錯顏色會扣分喔。', start: startBubble },
+  bubble: { name: '戳泡泡', icon: '🫧', desc: '只戳和題目一樣顏色的泡泡！彩虹泡泡永遠加分，<br>每連續戳對 5 個再 +2，戳錯顏色會扣分喔。', start: startBubble },
 });
 
 // 把指標位置換成畫布座標
@@ -35,7 +35,7 @@ async function startStack(area, ctl) {
   const petImg = await svgToImage(petSvg({ ...save.look, background: 'none', effect: 'none' }));
   if (ctl.isStopped()) return;
   const layers = [{ x: W / 2 - 150, w: 300 }];
-  let cur = null, perfect = 0, cam = 0, over = false, last = performance.now();
+  let cur = null, perfect = 0, streak = 0, cam = 0, over = false, last = performance.now();
   const crumbs = [];
 
   function next() {
@@ -58,10 +58,16 @@ async function startStack(area, ctl) {
       return;
     }
     if (Math.abs(x - top.x) <= 10) {
-      x = top.x; w = top.w; perfect++;
+      x = top.x; w = top.w; perfect++; streak++;
       sfx.coin();
-      floatAt('完美！', 'coin-pop');
+      // 連續 3 次完美：蛋糕長回來一點（最寬 300）
+      if (streak >= 3 && w < 300) {
+        const grow = Math.min(24, 300 - w);
+        x -= grow / 2; w += grow;
+        floatAt(`連續完美 ×${streak}！蛋糕變大了`, 'coin-pop');
+      } else floatAt(streak >= 2 ? `完美 ×${streak}！` : '完美！', 'coin-pop');
     } else {
+      streak = 0;
       // 切掉的部分掉下去
       const cutX = x < top.x ? x : right, cutW = w - (right - left);
       crumbs.push({ x: cutX, w: cutW, y: layers.length, vy: 0, c: layers.length });
@@ -397,6 +403,7 @@ function startBubble(area, ctl) {
   area.innerHTML = `${hudHtml('<span class="bubble-target">戳 <i></i> <b class="h-target"></b></span>')}<canvas class="game-canvas bubble-canvas" width="${W}" height="${H}"></canvas>
     <p class="game-tip">👆 點泡泡　🌈 彩虹泡泡 +3</p>`;
   const cv = $('canvas', area), cx = cv.getContext('2d');
+  let combo = 0;
   let bubbles = [], pops = [], score = 0, time = DURATION, last = performance.now(), spawn = 0, target = null, switchAt = 0;
   function newTarget() {
     const options = COLORS.filter((c) => c !== target);
@@ -421,13 +428,16 @@ function startBubble(area, ctl) {
       const b = bubbles[i];
       if (Math.hypot(b.x - p.x, b.y - p.y) > b.r + 14) continue;
       bubbles.splice(i, 1);
-      const add = b.rainbow ? 3 : b.col === target ? 1 : -1;
+      let add = b.rainbow ? 3 : b.col === target ? 1 : -1;
+      // 連續戳對：每 5 連擊額外 +2；戳錯就斷掉
+      combo = add > 0 ? combo + 1 : 0;
+      if (combo && combo % 5 === 0) add += 2;
       score = Math.max(0, score + add);
       $('.h-score', area).textContent = score;
       pops.push({ x: b.x, y: b.y, r: b.r, t: 0, c: b.rainbow ? '#fff' : b.col.c });
       const r = cv.getBoundingClientRect(), ar = area.getBoundingClientRect();
-      floatText(area, r.left - ar.left + (b.x / W) * r.width, r.top - ar.top + (b.y / H) * r.height, add > 0 ? `+${add}` : `${add}`, add > 0 ? 'coin-pop' : 'bad-pop');
-      add > 0 ? sfx.pop() : sfx.bad();
+      floatText(area, r.left - ar.left + (b.x / W) * r.width, r.top - ar.top + (b.y / H) * r.height, add > 0 ? (combo % 5 === 0 ? `${combo} 連擊！+${add}` : `+${add}`) : `${add}`, add > 0 ? 'coin-pop' : 'bad-pop');
+      add > 0 ? (combo % 5 === 0 ? sfx.coin() : sfx.pop()) : sfx.bad();
       return;
     }
   });
