@@ -951,3 +951,8 @@ button.diy-preview { position: relative; padding: 0; font: inherit; cursor: zoom
 @keyframes boxPop { to { scale: 1.8; opacity: 0; } }
 @keyframes boxCover { 0%, 80% { opacity: 1; } 100% { opacity: 0; visibility: hidden; } }
 @media (prefers-reduced-motion: reduce) { .box-open-anim { display: none; } }
+
+/* 用鍵盤（Tab）操作時看得到目前在哪個按鈕上；滑鼠、手指點擊不會出現 */
+button:focus-visible, [role="button"]:focus-visible, .tab:focus-visible, .item:focus-visible, input:focus-visible {
+  outline: 3px solid #5087CA; outline-offset: 2px;
+}
