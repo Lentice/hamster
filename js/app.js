@@ -59,3 +59,12 @@ try {
       <p>先送你 <b>${HAMSTER_COIN_ICON} ${START_COINS}</b> 鼠鼠幣當見面禮！<br>每天登入再領 <b>☾ 12 枚月亮金幣</b>，開月亮盲盒抽夢幻稀有配飾。<br>普通盲盒可以開出玫瑰花等小驚喜喔！</p></div>`, { cls: 'small' });
   }
 } catch { /* 忽略 */ }
+
+// 晝夜：17–19 點黃昏、19–6 點晚上（每 5 分鐘檢查一次）
+function updateDayTime() {
+  const h = new Date().getHours();
+  document.body.classList.toggle('dusk', h >= 17 && h < 19);
+  document.body.classList.toggle('night', h >= 19 || h < 6);
+}
+updateDayTime();
+setInterval(updateDayTime, 5 * 60 * 1000);
