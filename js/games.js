@@ -36,7 +36,9 @@ function openGame(id, onDone) {
   // 鍵盤：說明頁按 Enter／空白鍵開始，結算頁按 Enter 再玩一次
   const onKey = (e) => {
     if (gamePaused() || !['Enter', ' '].includes(e.key) || e.repeat) return;
-    const btn = $('[data-act=start]', m.box) || (e.key === 'Enter' && $('.game-result [data-act=again]', m.box));
+    // 結算剛出現的 0.8 秒內不接受 Enter（疊蛋糕、釣魚會一直按 Enter，不然結算會一閃就被跳過）
+    const settled = performance.now() - (Number(m.box.dataset.resultAt) || 0) > 800;
+    const btn = $('[data-act=start]', m.box) || (e.key === 'Enter' && settled && $('.game-result [data-act=again]', m.box));
     if (btn && m.root.isConnected && m.root === $$('.modal-back').at(-1)) { e.preventDefault(); btn.click(); }
   };
   window.addEventListener('keydown', onKey);
@@ -101,6 +103,7 @@ function runGame(id, m) {
         : bestText(save.best[id] || 0, score);
       addCoins(coins);
       sfx.win();
+      m.box.dataset.resultAt = performance.now();
       area.innerHTML = `<div class="game-result">
         <div class="game-icon">${record ? '🏆' : '🎉'}</div>
         <h2>${record ? '新紀錄！' : '完成！'}</h2>
