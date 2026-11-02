@@ -355,13 +355,13 @@
       // 摸摸鼠鼠：動作、表情隨機，每摸 5 下說一句話
       pats++;
       const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
-      petAct($('.pet-svg', pet.el), pick(['hop', 'wiggle', 'tilt', 'wave']), 600);
+      petAct($('.pet-svg', pet.el), pick(['hop', 'wiggle', 'tilt', 'wave']), 850); // 最長的動畫 .8s，讓它播完
       sfx.squeak();
       const r = room.getBoundingClientRect();
       floatText(room, e.clientX - r.left, e.clientY - r.top, pick(['💗', '💕', '✨', '🥰', '🌸']), 'emoji');
       if (pats % 5 === 0) {
         const name = save.look.name.trim();
-        floatText(room, e.clientX - r.left, e.clientY - r.top - 40, pick(['最喜歡你了！', '好舒服～', '再摸一下嘛', name ? `${name}好開心！` : '好開心！', '嘿嘿～']), 'coin-pop');
+        floatText(room, e.clientX - r.left, e.clientY - r.top - 40, pick(['最喜歡你了！', '好舒服～', '再摸一下嘛', name ? `${escapeXml(name)}好開心！` : '好開心！', '嘿嘿～']), 'coin-pop');
       }
       return;
     }
