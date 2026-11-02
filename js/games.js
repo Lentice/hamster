@@ -96,7 +96,7 @@ function runGame(id, m) {
       stopFns.length = 0;
       const prevBest = save.best[id] || 0;
       const record = recordBest(id, score);
-      const questDone = questPlayed(id);
+      const questDone = score > 0 && questPlayed(id); // 0 分（掛機等時間到）不算
       // 沒破紀錄時告訴玩家還差多少，有破就顯示超過舊紀錄多少
       const bestLine = record
         ? (prevBest ? `比舊紀錄 ${prevBest} 多了 ${score - prevBest} 分！` : '第一次的紀錄，下次再挑戰！')
