@@ -161,6 +161,11 @@
 
   function drawSelBar() {
     $('#sel-bar').classList.toggle('has-sel', !!selected);
+    // 顯示選中的是哪一件、使用時會做什麼
+    if (selected) {
+      const f = furnitureOf(selected);
+      $('.sel-name').textContent = `${f.name}${USE[f.use] ? `（${USE[f.use].verb}）` : ''}`;
+    }
   }
 
   // ───────────── 樓層 ─────────────
