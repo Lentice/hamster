@@ -14,6 +14,20 @@
 
   const stagePet = () => $('.pet-svg', stage);
 
+  // 「全部 / 已擁有」篩選：東西多了以後比較好找自己的
+  let ownOnly = false;
+  try { ownOnly = localStorage.getItem('hamster-own-only') === '1'; } catch { /* 忽略 */ }
+  const filter = html('<div class="own-filter" role="group" aria-label="篩選"></div>');
+  grid.before(filter);
+  filter.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-own]');
+    if (!b) return;
+    ownOnly = b.dataset.own === 'mine';
+    try { localStorage.setItem('hamster-own-only', ownOnly ? '1' : '0'); } catch { /* 忽略 */ }
+    drawGrid();
+    sfx.tab();
+  });
+
   function drawStage() {
     const shown = dozing ? { ...look, expression: 'sleepy' } : look;
     stage.innerHTML = svgWrap(renderScene(shown, 'main'), '0 0 400 400', `scene pet-svg ${dozing ? 'dozing' : ''}`);
@@ -54,8 +68,13 @@
   function drawGrid() {
     const cat = CATEGORIES.find((c) => c.id === currentCat);
     const diy = DIY_TEMPLATES[cat.id];
+    const mine = cat.items.filter((item) => isOwned(cat.id, item));
+    const hasLocked = mine.length < cat.items.length;
+    filter.hidden = !hasLocked;
+    filter.innerHTML = `<button class="${ownOnly ? '' : 'on'}" data-own="all">全部 ${cat.items.length}</button><button class="${ownOnly ? 'on' : ''}" data-own="mine">✔ 已擁有 ${mine.length}</button>`;
+    const shown = ownOnly && hasLocked ? mine : cat.items;
     grid.innerHTML = (diy ? `<button class="item diy-new" data-diy-new="${cat.id}" title="自己畫">
-        <div class="thumb"><span class="diy-new-icon">🎨</span></div><span class="item-name">自己畫${diy.name}</span></button>` : '') + cat.items.map((item, i) => {
+        <div class="thumb"><span class="diy-new-icon">🎨</span></div><span class="item-name">自己畫${diy.name}</span></button>` : '') + shown.map((item, i) => {
       const owned = isOwned(cat.id, item);
       return `<button class="item ${look[cat.id] === item.id ? 'selected' : ''} ${owned ? '' : 'locked'}" data-id="${item.id}" title="${escapeXml(item.name)}">
         <div class="thumb">${thumbFor(cat, item, i)}</div>

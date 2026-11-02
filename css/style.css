@@ -897,3 +897,9 @@ button.diy-preview { position: relative; padding: 0; font: inherit; cursor: zoom
 .diy-big { text-align: center; cursor: zoom-out; }
 .diy-big .pet-svg, .diy-big svg { width: min(78vw, 360px); height: auto; }
 .diy-big p { margin: 4px 0 0; font-weight: bold; color: var(--pink-deep); }
+
+/* 衣櫃「全部 / 已擁有」篩選 */
+.own-filter { display: flex; gap: 8px; margin: 0 0 10px; }
+.own-filter[hidden] { display: none; }
+.own-filter button { border: 3px solid #F3E6E0; background: #fff; border-radius: 999px; padding: 6px 14px; font: inherit; font-size: 14px; font-weight: bold; color: var(--soft); cursor: pointer; }
+.own-filter button.on { background: var(--pink); border-color: var(--pink); color: #fff; }
