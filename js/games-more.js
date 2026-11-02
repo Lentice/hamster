@@ -226,9 +226,11 @@ async function startRunner(area, ctl) {
 // ───────────────────────── 迷宮找瓜子 ─────────────────────────
 
 async function startMaze(area, ctl) {
-  const COLS = 13, ROWS = 9, C = 56, W = COLS * C, H = ROWS * C, LIMIT = 60;
+  // 直式手機把迷宮轉成直的，格子才夠大
+  const tall = innerHeight > innerWidth;
+  const COLS = tall ? 9 : 13, ROWS = tall ? 13 : 9, C = 56, W = COLS * C, H = ROWS * C, LIMIT = 60;
   area.innerHTML = `${hudHtml()}<canvas class="game-canvas maze" width="${W}" height="${H}"></canvas>
-    <p class="game-tip">⌨️ 方向鍵 / WASD　🖱️ 點鼠鼠旁邊的方向走一格</p>`;
+    <p class="game-tip">${tall ? '👆 點鼠鼠的上下左右走一格，按住不放可以一直走' : '⌨️ 方向鍵 / WASD　🖱️ 點鼠鼠旁邊的方向走一格'}</p>`;
   const cv = $('canvas', area);
   const cx = cv.getContext('2d');
   const [petImg, seedImg, homeImg] = await Promise.all([
@@ -294,12 +296,28 @@ async function startMaze(area, ctl) {
   };
   window.addEventListener('keydown', onKey);
   ctl.onStop(() => window.removeEventListener('keydown', onKey));
-  cv.addEventListener('pointerdown', (e) => {
+  // 點鼠鼠的哪一邊就往那邊走一格；按住不放會朝手指的方向一直走
+  let hold = null, holdTimer = null;
+  const stepToward = () => {
+    if (!hold || gamePaused()) return;
     const r = cv.getBoundingClientRect();
-    const mx = ((e.clientX - r.left) / r.width) * W - (P.x + 0.5) * C;
-    const my = ((e.clientY - r.top) / r.height) * H - (P.y + 0.5) * C;
+    const mx = ((hold.x - r.left) / r.width) * W - (P.x + 0.5) * C;
+    const my = ((hold.y - r.top) / r.height) * H - (P.y + 0.5) * C;
+    if (Math.abs(mx) < C / 2 && Math.abs(my) < C / 2) return; // 已經走到手指下面
     move(Math.abs(mx) > Math.abs(my) ? (mx > 0 ? 'e' : 'w') : (my > 0 ? 's' : 'n'));
+  };
+  const release = () => { hold = null; clearInterval(holdTimer); };
+  cv.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    cv.setPointerCapture?.(e.pointerId);
+    hold = { x: e.clientX, y: e.clientY };
+    stepToward();
+    clearInterval(holdTimer);
+    holdTimer = setInterval(stepToward, 170);
   });
+  cv.addEventListener('pointermove', (e) => { if (hold) hold = { x: e.clientX, y: e.clientY }; });
+  ['pointerup', 'pointercancel', 'lostpointercapture'].forEach((ev) => cv.addEventListener(ev, release));
+  ctl.onStop(release);
 
   function frame(t) {
     if (ctl.isStopped()) return;

@@ -206,10 +206,12 @@
 
   // ───────────── 彈窗 ─────────────
 
+  let roomMenu = null;
   function openRoomMenu() {
+    roomMenu?.close(); // 不要疊兩個
     const room = Net.room;
     const inRoom = state === 'on' && room && !room.startsWith('pub');
-    const m = modal(`<div class="online-box">
+    const m = roomMenu = modal(`<div class="online-box">
       <div class="game-icon">🌐</div>
       <h2>跟大家一起玩</h2>
       <p class="online-now">現在：<b>${$('span', chip).textContent}</b></p>
@@ -393,6 +395,7 @@
     if (!pref) { setState('off'); openRoomMenu(); } else connect();
   });
   PARK.hooks.leave.push(() => {
+    roomMenu?.close(); // 離開公園時一起關掉，不要蓋在別的畫面上
     joinToken++;
     clearRemotes();
     Net.leave();

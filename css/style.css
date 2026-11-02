@@ -876,3 +876,6 @@ input, textarea { -webkit-user-select: text; user-select: text; }
   font: inherit; font-size: 24px; font-weight: bold; box-shadow: 0 5px 0 #E0507A; touch-action: none; }
 .runner-jump:active { transform: translateY(3px); box-shadow: 0 2px 0 #E0507A; }
 .fish-canvas { cursor: pointer; }
+
+/* 觸控裝置不顯示打地鼠的鍵盤字母 */
+@media (pointer: coarse) { .hole-key { display: none; } }

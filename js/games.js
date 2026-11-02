@@ -81,9 +81,11 @@ function hudHtml(extra = '') {
 // ───────────────────────── 接瓜子 ─────────────────────────
 
 async function startCatch(area, ctl) {
-  const W = 800, H = 500, DURATION = 30;
+  // 直式手機用直的畫布；手指可以在畫面下方的空白處滑，不會擋住鼠鼠
+  const tall = innerHeight > innerWidth;
+  const W = tall ? 560 : 800, H = tall ? 700 : 500, DURATION = 30;
   area.innerHTML = `${hudHtml()}<canvas class="game-canvas" width="${W}" height="${H}"></canvas>
-    <p class="game-tip">⌨️ ← → / A D　🖱️ 移動滑鼠或手指</p>`;
+    <p class="game-tip">${tall ? '👆 手指左右滑（在畫面下方滑也可以）' : '⌨️ ← → / A D　🖱️ 移動滑鼠或手指'}</p>`;
   const cv = $('canvas', area);
   const cx = cv.getContext('2d');
   const [petImg, dizzyImg, seed, gold, pepper] = await Promise.all([
@@ -108,8 +110,9 @@ async function startCatch(area, ctl) {
   };
   window.addEventListener('keydown', onKey);
   window.addEventListener('keyup', onKey);
-  cv.addEventListener('pointermove', onMove);
-  cv.addEventListener('pointerdown', onMove);
+  area.style.touchAction = 'none';
+  area.addEventListener('pointermove', onMove);
+  area.addEventListener('pointerdown', onMove);
   ctl.onStop(() => {
     window.removeEventListener('keydown', onKey);
     window.removeEventListener('keyup', onKey);

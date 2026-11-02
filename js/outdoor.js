@@ -362,6 +362,8 @@ const PARK = { hooks: { tick: [], enter: [], leave: [] } };
       const s = r.width / viewW();
       cam.x = Math.max(0, Math.min(WW - viewW(), player.x - viewW() / 2));
       cam.y = Math.max(0, Math.min(WH - r.height / s, player.y - r.height / s / 2));
+      // 先套用鏡頭：一進公園就跳出彈窗時，背景才不會是沒縮放的大地圖
+      world.style.transform = `scale(${s}) translate(${-cam.x}px, ${-cam.y}px)`;
       last = performance.now();
       raf = requestAnimationFrame(tick);
       viewport.focus();
