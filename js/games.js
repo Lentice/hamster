@@ -43,6 +43,19 @@ function runGame(id, m) {
   m.box.appendChild(area);
   let stopped = false;
   const stopFns = [];
+  // 倒數的遊戲最後 5 秒：時間變紅跳動，每秒滴一聲
+  let lastSec = null;
+  const hurry = new MutationObserver(() => {
+    const el = $('.h-time', area);
+    if (!el) return;
+    const sec = Number(el.textContent);
+    const down = lastSec != null && sec < lastSec;
+    if (down && sec <= 5 && sec > 0) { el.parentElement.classList.add('hurry'); tone(880, 0.06, 'sine', 0.06); }
+    if (sec > 5) el.parentElement.classList.remove('hurry');
+    lastSec = sec;
+  });
+  hurry.observe(area, { subtree: true, childList: true, characterData: true });
+  stopFns.push(() => hurry.disconnect());
   m.root.addEventListener('closed', () => { stopped = true; stopFns.forEach((f) => f()); });
   g.start(area, {
     isStopped: () => stopped,

@@ -903,3 +903,8 @@ button.diy-preview { position: relative; padding: 0; font: inherit; cursor: zoom
 .game-result .best-line { margin: -4px 0 4px; color: var(--soft); font-size: 15px; }
 
 .booth-best { display: block; font-size: 20px; color: var(--soft); font-weight: normal; }
+
+/* 最後 5 秒 */
+.game-hud .hurry { color: #F0506A; animation: hurryPulse 1s ease-in-out infinite; }
+@keyframes hurryPulse { 0%, 100% { scale: 1; } 50% { scale: 1.18; } }
+@media (prefers-reduced-motion: reduce) { .game-hud .hurry { animation: none; } }
