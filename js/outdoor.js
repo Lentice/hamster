@@ -363,7 +363,8 @@ const PARK = { hooks: { tick: [], enter: [], leave: [] } };
     const m = modal(`<div class="map-box"><h2>🗺️ 要去哪裡？</h2><p class="map-quest">${quest}</p><div class="map-list">${places.map((p) => {
       const g = GAMES[p.act];
       const fresh = g && !save.played?.[p.act] && !save.best[p.act];
-      return `<button class="map-place" data-act="${p.act}"><span class="map-icon">${g ? g.icon : p.act === 'home' ? '🏠' : '🛒'}</span><b>${p.label}</b>${fresh ? '<i class="map-new">NEW</i>' : g && save.best[p.act] ? `<small>🏆 ${save.best[p.act]}</small>` : ''}</button>`;
+      const today = g && q.games.includes(p.act) ? '<i class="map-today" title="今天已經算進任務">✅</i>' : '';
+      return `<button class="map-place" data-act="${p.act}"><span class="map-icon">${g ? g.icon : p.act === 'home' ? '🏠' : '🛒'}</span><b>${p.label}</b>${today}${fresh ? '<i class="map-new">NEW</i>' : g && save.best[p.act] ? `<small>🏆 ${save.best[p.act]}</small>` : ''}</button>`;
     }).join('')}</div></div>`, { cls: 'small' });
     m.box.addEventListener('click', (e) => {
       const b = e.target.closest('[data-act]');
