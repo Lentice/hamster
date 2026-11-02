@@ -66,6 +66,21 @@ function runGame(id, m) {
     lastSec = sec;
   });
   hurry.observe(area, { subtree: true, childList: true, characterData: true });
+  // 分數列加上最佳紀錄（遊戲畫好分數列後才加；有些遊戲要等圖片載入）
+  const best = save.best[id];
+  if (best) {
+    const addBest = () => {
+      const hud = $('.game-hud', area);
+      if (!hud || $('.h-best', hud)) return !!hud;
+      hud.insertAdjacentHTML('beforeend', `<span class="h-best">🏆 ${best}</span>`);
+      return true;
+    };
+    if (!addBest()) {
+      const wait = new MutationObserver(() => { if (addBest()) wait.disconnect(); });
+      wait.observe(area, { childList: true });
+      stopFns.push(() => wait.disconnect());
+    }
+  }
   stopFns.push(() => hurry.disconnect());
   m.root.addEventListener('closed', () => { stopped = true; stopFns.forEach((f) => f()); });
   g.start(area, {

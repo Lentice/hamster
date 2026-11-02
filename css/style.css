@@ -918,3 +918,7 @@ button.diy-preview { position: relative; padding: 0; font: inherit; cursor: zoom
 
 /* 衣櫃：新拿到還沒穿過 */
 .fresh-tag { position: absolute; top: 6px; left: 6px; padding: 1px 7px; border-radius: 999px; background: #F0506A; color: #fff; font-size: 11px; font-weight: bold; }
+
+.game-hud .h-best { color: var(--soft); font-size: .9em; }
+.game-hud > span { white-space: nowrap; }
+@media (max-width: 480px) { .game-hud { gap: 10px; font-size: 16px; padding: 4px 14px; flex-wrap: wrap; justify-content: center; } }
