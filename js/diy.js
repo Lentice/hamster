@@ -133,7 +133,7 @@ function openDiyEditor(type, designId, onDone) {
           </svg>
         </div>
         <div class="diy-side">
-          <div class="diy-preview"></div>
+          <button class="diy-preview" type="button" aria-label="放大看看"></button>
           <label class="diy-name">名字 <input maxlength="8" placeholder="我的${t.name}"></label>
         </div>
       </div>
@@ -142,6 +142,7 @@ function openDiyEditor(type, designId, onDone) {
         <button class="btn btn-small diy-tool on" data-tool="pen">🖊️ 畫筆</button>
         <button class="btn btn-small diy-tool" data-tool="fill">🪣 填滿</button>
         <button class="btn btn-small diy-tool" data-tool="erase">🧽 橡皮擦</button>
+        <button class="btn btn-small diy-tool" data-tool="pick">💧 取色</button>
         <button class="btn btn-small diy-size" data-size="1">● 細</button>
         <button class="btn btn-small diy-mirror on">🪞 左右對稱</button>
         <button class="btn btn-small" data-act="undo">↶ 復原</button>
@@ -161,15 +162,18 @@ function openDiyEditor(type, designId, onDone) {
   rects.forEach((_, i) => paint(i));
 
   let previewTimer = 0;
+  // 用目前的畫畫出穿上的樣子（uid 不同才不會跟別的預覽撞 id）
+  function previewSvg(uid) {
+    const item = diyItem(type, { id: 'diy_preview', name: '', px: px.join('') });
+    const list = t.list();
+    list.push(item);
+    const out = svgWrap(renderPet({ ...save.look, [type]: 'diy_preview' }, uid), '30 60 340 340');
+    list.splice(list.indexOf(item), 1);
+    return out;
+  }
   function preview() {
     clearTimeout(previewTimer);
-    previewTimer = setTimeout(() => {
-      const item = diyItem(type, { id: 'diy_preview', name: '', px: px.join('') });
-      const list = t.list();
-      list.push(item);
-      $('.diy-preview', m.box).innerHTML = svgWrap(renderPet({ ...save.look, [type]: 'diy_preview' }, 'diyp'), '30 60 340 340');
-      list.splice(list.indexOf(item), 1);
-    }, 60);
+    previewTimer = setTimeout(() => { $('.diy-preview', m.box).innerHTML = previewSvg('diyp') + '<span class="diy-zoom">🔍</span>'; }, 60);
   }
   preview();
 
@@ -226,6 +230,15 @@ function openDiyEditor(type, designId, onDone) {
     const c = cellAt(e);
     if (!c) return;
     e.preventDefault();
+    if (tool === 'pick') {
+      // 取色：選到畫布上這一格的顏色，然後換回畫筆（透明就換成橡皮擦）
+      color = DIY_CHARS.indexOf(px[idx(c[0], c[1])]);
+      tool = color ? 'pen' : 'erase';
+      $$('.diy-color', m.box).forEach((x) => x.classList.toggle('on', Number(x.dataset.c) === color));
+      $$('.diy-tool', m.box).forEach((x) => x.classList.toggle('on', x.dataset.tool === tool));
+      sfx.pop();
+      return;
+    }
     undo.push(px.join(''));
     if (undo.length > 40) undo.shift();
     if (tool === 'fill') { fill(c[0], c[1], DIY_CHARS[color]); preview(); sfx.pop(); return; }
@@ -247,6 +260,11 @@ function openDiyEditor(type, designId, onDone) {
   m.box.addEventListener('click', (e) => {
     const b = e.target.closest('button');
     if (!b) return;
+    if (b.classList.contains('diy-preview')) {
+      const big = modal(`<div class="diy-big">${previewSvg('diypbig')}<p>${escapeXml(nameInput.value.trim() || `我的${t.name}`)}</p></div>`, { cls: 'small' });
+      big.box.addEventListener('click', big.close);
+      return;
+    }
     if (b.dataset.c) {
       color = Number(b.dataset.c);
       if (color === 0) tool = 'erase';
