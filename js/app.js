@@ -44,6 +44,12 @@ document.addEventListener('visibilitychange', () => {
 });
 // 跨午夜仍開著遊戲時，也能領到新一天的登入禮。
 setInterval(collectDailyMoonCoins, 60000);
+// 收集獎勵上線前就已經買齊的分類，開遊戲時補發
+{
+  const before = Object.keys(save.collected || {}).length;
+  [...CATEGORIES.map((c) => c.id), 'furniture', 'rooms'].forEach(checkCollection);
+  if (Object.keys(save.collected || {}).length !== before) persist();
+}
 updateCoins();
 
 let startScreen = 'wardrobe';

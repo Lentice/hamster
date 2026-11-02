@@ -174,9 +174,8 @@ function startMusic(area, ctl) {
   };
   const seq = [];
   let pos = 0, listening = false, round = 0;
-  const timers = [];
-  const later = (f, ms) => timers.push(setTimeout(() => { if (!ctl.isStopped()) f(); }, ms));
-  ctl.onStop(() => timers.forEach(clearTimeout));
+  // 暫停時旋律也停住，回來再接著彈
+  const later = gameClock(ctl).later;
 
   function light(i, ms = 320) {
     const p = pads[i];

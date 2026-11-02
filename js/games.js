@@ -146,6 +146,22 @@ function runGame(id, m) {
 
 // 「確定離開？」對話框開著、或切到別的 App／分頁時遊戲暫停：計時、移動、按鍵都先停住
 const gamePaused = () => document.hidden || !!document.querySelector('.quit-box');
+// 暫停時會停住的時鐘：給靠計時器跑的遊戲（翻牌、音樂會）用，later 的時間只在沒暫停時才走
+function gameClock(ctl) {
+  let t = 0, last = performance.now();
+  let jobs = [];
+  const iv = setInterval(() => {
+    const now = performance.now();
+    if (!gamePaused()) t += Math.min(250, now - last);
+    last = now;
+    const due = jobs.filter((j) => j.at <= t).sort((a, b) => a.at - b.at);
+    if (!due.length) return;
+    jobs = jobs.filter((j) => j.at > t);
+    due.forEach((j) => { if (!ctl.isStopped()) j.f(); });
+  }, 30);
+  ctl.onStop(() => clearInterval(iv));
+  return { now: () => t, later: (f, ms) => { jobs.push({ at: t + ms, f }); } };
+}
 
 // 沒破紀錄時的那一行（還沒有任何紀錄、或差一點就破紀錄時給點鼓勵）
 function bestText(best, score) {
@@ -362,14 +378,14 @@ function startMemory(area, ctl) {
   const cards = $$('.mcard', area);
   cards.forEach((c) => c.classList.add('flip'));
   let start = Infinity;
-  setTimeout(() => {
-    if (ctl.isStopped()) return;
+  const clock = gameClock(ctl);
+  clock.later(() => {
     cards.forEach((c) => c.classList.remove('flip'));
     lock = false;
-    start = performance.now();
+    start = clock.now();
     sfx.tab();
   }, 1500);
-  const timer = setInterval(() => { $('.h-time', area).textContent = Math.max(0, Math.floor((performance.now() - start) / 1000)); }, 250);
+  const timer = setInterval(() => { $('.h-time', area).textContent = Math.max(0, Math.floor((clock.now() - start) / 1000)); }, 250);
   ctl.onStop(() => clearInterval(timer));
 
   $('.memory-grid', area).addEventListener('click', (e) => {
@@ -390,11 +406,11 @@ function startMemory(area, ctl) {
       $('.h-score', area).textContent = matched;
       if (matched === faces.length) {
         const score = Math.max(10, 100 - (moves - 8) * 5);
-        setTimeout(() => ctl.finish(score, Math.round(score / 2.5)), 600);
+        clock.later(() => ctl.finish(score, Math.round(score / 2.5)), 600);
       }
     } else {
       lock = true;
-      setTimeout(() => { a.classList.remove('flip'); c.classList.remove('flip'); open = []; lock = false; }, 750);
+      clock.later(() => { a.classList.remove('flip'); c.classList.remove('flip'); open = []; lock = false; }, 750);
     }
   });
 }
