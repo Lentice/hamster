@@ -352,10 +352,17 @@
       return;
     }
     if (e.target.closest('.room-pet')) {
-      petAct($('.pet-svg', pet.el), 'hop', 500);
+      // 摸摸鼠鼠：動作、表情隨機，每摸 5 下說一句話
+      pats++;
+      const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+      petAct($('.pet-svg', pet.el), pick(['hop', 'wiggle', 'tilt', 'wave']), 600);
       sfx.squeak();
       const r = room.getBoundingClientRect();
-      floatText(room, e.clientX - r.left, e.clientY - r.top, '💗', 'emoji');
+      floatText(room, e.clientX - r.left, e.clientY - r.top, pick(['💗', '💕', '✨', '🥰', '🌸']), 'emoji');
+      if (pats % 5 === 0) {
+        const name = save.look.name.trim();
+        floatText(room, e.clientX - r.left, e.clientY - r.top - 40, pick(['最喜歡你了！', '好舒服～', '再摸一下嘛', name ? `${name}好開心！` : '好開心！', '嘿嘿～']), 'coin-pop');
+      }
       return;
     }
     if (editing) {
@@ -375,6 +382,7 @@
     }
   });
   let holding = false;
+  let pats = 0;
 
   // 點擊位置下有沒有可使用的家具（用家具的外框判斷）
   function usableAt(p) {
