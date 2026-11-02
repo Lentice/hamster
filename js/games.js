@@ -21,6 +21,7 @@ function openGame(id, onDone) {
   const m = modal(`<div class="game-intro">
       <div class="game-icon">${g.icon}</div><h2>${g.name}</h2><p>${g.desc}</p>
       <p class="best">最佳紀錄：${save.best[id] || 0}</p>
+      ${!questState().done && !questState().games.includes(id) ? `<p class="quest-line">🎯 今天還沒玩過這款，拿到分數就算今日任務的一種（${questState().games.length}/${QUEST_GAMES}）</p>` : ''}
       <div class="modal-actions"><button class="btn btn-pink" data-act="start">開始！</button></div>
     </div>`, {
     cls: 'game-modal', fullscreen: true,
