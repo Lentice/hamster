@@ -3,7 +3,7 @@
 const GAMES = {
   catch: { name: '接瓜子', icon: '🌻', desc: '左右移動接住掉下來的瓜子！金色瓜子 +5，小心辣椒！', start: startCatch },
   wheel: { name: '滾輪衝刺', icon: '🎡', desc: '交替按 ← → （或點左右按鈕）讓滾輪越轉越快，10 秒內跑最遠！', start: startWheel },
-  memory: { name: '翻牌配對', icon: '🃏', desc: '翻開兩張一樣的牌就配對成功，步數越少獎勵越多！', start: startMemory },
+  memory: { name: '翻牌配對', icon: '🃏', desc: '開場會先翻開 1.5 秒，快記住位置！<br>翻開兩張一樣的牌就配對成功，步數越少獎勵越多！', start: startMemory },
 };
 
 function loadImg(src) {
@@ -326,9 +326,19 @@ function startMemory(area, ctl) {
     <div class="memory-grid">${deck.map((c, k) => `<button class="mcard" data-k="${k}">
       <span class="mback"><img src="${assetUrl('g_card_back')}" alt=""></span>
       <span class="mface"><img src="${c.f === 'g_coin' ? 'assets/coin_hamster.svg' : assetUrl(c.f)}" alt=""></span></button>`).join('')}</div>`;
-  let open = [], moves = 0, matched = 0, lock = false;
-  const start = performance.now();
-  const timer = setInterval(() => { $('.h-time', area).textContent = Math.floor((performance.now() - start) / 1000); }, 250);
+  let open = [], moves = 0, matched = 0, lock = true;
+  // 開場先全部翻開 1.5 秒讓大家記位置，蓋回去才開始計時
+  const cards = $$('.mcard', area);
+  cards.forEach((c) => c.classList.add('flip'));
+  let start = Infinity;
+  setTimeout(() => {
+    if (ctl.isStopped()) return;
+    cards.forEach((c) => c.classList.remove('flip'));
+    lock = false;
+    start = performance.now();
+    sfx.tab();
+  }, 1500);
+  const timer = setInterval(() => { $('.h-time', area).textContent = Math.max(0, Math.floor((performance.now() - start) / 1000)); }, 250);
   ctl.onStop(() => clearInterval(timer));
 
   $('.memory-grid', area).addEventListener('click', (e) => {
