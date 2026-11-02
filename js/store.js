@@ -90,7 +90,8 @@ function buy(cat, item) {
   if (save[wallet] < item.price) return false;
   save[wallet] -= item.price;
   save.owned[itemKey(cat, item.id)] = true;
-  (save.fresh ||= {})[itemKey(cat, item.id)] = 1; // 衣櫃 NEW 標記，穿過就拿掉
+  // 衣櫃 NEW 標記，穿過就拿掉（家具、房間不在衣櫃，不用標）
+  if (CATEGORIES.some((c) => c.id === cat)) (save.fresh ||= {})[itemKey(cat, item.id)] = 1;
   persist();
   return true;
 }

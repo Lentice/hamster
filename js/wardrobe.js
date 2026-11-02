@@ -14,6 +14,9 @@
 
   const stagePet = () => $('.pet-svg', stage);
 
+  // 舊版存檔把家具、房間也標了 NEW，衣櫃清不掉，先清乾淨
+  if (save.fresh) for (const k of Object.keys(save.fresh)) if (!CATEGORIES.some((c) => k.startsWith(`${c.id}:`))) delete save.fresh[k];
+
   // 「全部 / 已擁有」篩選：東西多了以後比較好找自己的
   let ownOnly = false;
   try { ownOnly = localStorage.getItem('hamster-own-only') === '1'; } catch { /* 忽略 */ }
