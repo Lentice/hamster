@@ -67,6 +67,32 @@ function diyItem(type, design) {
   };
 }
 
+// 作品代碼：分享給朋友用。格式「鼠<種類><顏色字元 + 兩位 36 進位的連續格數>…」
+const DIY_CODE_TYPES = { clothes: 'c', hat: 'h', neck: 'n', held: 'f' };
+function diyEncode(type, px) {
+  let out = `鼠${DIY_CODE_TYPES[type]}`;
+  for (let i = 0; i < px.length;) {
+    let j = i;
+    while (j < px.length && px[j] === px[i] && j - i < 1295) j++;
+    out += px[i] + (j - i).toString(36).padStart(2, '0');
+    i = j;
+  }
+  return out;
+}
+// 解不開或種類不合就回傳 null
+function diyDecode(type, code) {
+  const t = DIY_TEMPLATES[type];
+  const s = String(code || '').trim();
+  if (s[0] !== '鼠' || s[1] !== DIY_CODE_TYPES[type] || (s.length - 2) % 3) return null;
+  let px = '';
+  for (let i = 2; i < s.length; i += 3) {
+    const c = s[i], n = parseInt(s.slice(i + 1, i + 3), 36);
+    if (!DIY_CHARS.includes(c) || !(n > 0)) return null;
+    px += c.repeat(n);
+  }
+  return px.length === t.cols * t.rows ? px : null;
+}
+
 function diyDesigns(type) {
   save.diy ||= {};
   save.diy[type] ||= [];
@@ -154,6 +180,7 @@ function openDiyEditor(type, designId, onDone) {
         <button class="btn btn-small" data-act="undo">↶ 復原</button>
         <button class="btn btn-small" data-act="redo">↷ 重做</button>
         <button class="btn btn-small" data-act="clear">🗑️ 清空</button>
+        <button class="btn btn-small" data-act="code">🔗 作品代碼</button>
       </div>
       <div class="modal-actions">
         ${existing ? '<button class="btn btn-gray" data-act="delete">刪除作品</button>' : ''}
@@ -309,6 +336,34 @@ function openDiyEditor(type, designId, onDone) {
       px = redo.pop().split('');
       rects.forEach((_, i) => paint(i));
       preview();
+    } else if (b.dataset.act === 'code') {
+      // 複製自己的代碼，或貼上朋友的代碼
+      const code = diyEncode(type, px.join(''));
+      const c = modal(`<div class="buy-box diy-code"><h3>🔗 作品代碼</h3>
+        <p>把代碼傳給朋友，朋友在「自己畫${t.name}」貼上就能看到一樣的作品！</p>
+        <textarea readonly rows="3">${code}</textarea>
+        <div class="modal-actions"><button class="btn btn-blue" data-c="copy">📋 複製</button></div>
+        <p>收到朋友的代碼？貼在這裡：</p>
+        <textarea class="paste" rows="3" placeholder="貼上代碼…"></textarea>
+        <div class="modal-actions"><button class="btn btn-pink" data-c="load">套用到畫布</button><button class="btn btn-gray" data-c="no">關閉</button></div></div>`, { cls: 'small' });
+      c.box.addEventListener('click', async (ev) => {
+        const k = ev.target.closest('[data-c]')?.dataset.c;
+        if (k === 'no') c.close();
+        if (k === 'copy') {
+          try { await navigator.clipboard.writeText(code); toast('代碼複製好了！'); }
+          catch { $('textarea', c.box).select(); toast('請長按代碼複製'); }
+        }
+        if (k === 'load') {
+          const got = diyDecode(type, $('.paste', c.box).value);
+          if (!got) { toast(`這不是「${t.name}」的作品代碼喔`); return; }
+          undo.push(px.join('')); redo.length = 0;
+          px = got.split('');
+          rects.forEach((_, i) => paint(i));
+          preview();
+          c.close();
+          toast('套用好了！可以再修改或直接儲存');
+        }
+      });
     } else if (b.dataset.act === 'clear') {
       undo.push(px.join(''));
       redo.length = 0;
