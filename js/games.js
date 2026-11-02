@@ -33,6 +33,14 @@ function openGame(id, onDone) {
   });
   m.root.addEventListener('closed', () => onDone?.());
   $('[data-act=start]', m.box).onclick = () => runGame(id, m);
+  // 鍵盤：說明頁按 Enter／空白鍵開始，結算頁按 Enter 再玩一次
+  const onKey = (e) => {
+    if (gamePaused() || !['Enter', ' '].includes(e.key) || e.repeat) return;
+    const btn = $('[data-act=start]', m.box) || (e.key === 'Enter' && $('.game-result [data-act=again]', m.box));
+    if (btn && m.root.isConnected && m.root === $$('.modal-back').at(-1)) { e.preventDefault(); btn.click(); }
+  };
+  window.addEventListener('keydown', onKey);
+  m.root.addEventListener('closed', () => window.removeEventListener('keydown', onKey));
 }
 
 function runGame(id, m) {
