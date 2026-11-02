@@ -51,9 +51,16 @@
       return `<div class="shop-item ${owned ? 'owned' : ''}" data-id="${item.id}" data-cat="${cat.id}">
         <div class="shop-thumb">${thumb(cat, item, i)}</div>
         <div class="shop-name">${item.name}</div>
-        ${owned ? '<div class="owned-tag">✔ 已擁有</div>' : `<button class="btn btn-pink btn-small buy-btn">${itemCurrencyIcon(item)} ${item.price}</button>`}
+        ${owned ? '<div class="owned-tag">✔ 已擁有</div>' : buyButton(item)}
       </div>`;
     }).join('');
+  }
+
+  // 錢不夠時按鈕變灰，下面寫還差多少
+  function buyButton(item) {
+    const have = item.currency === 'moon' ? save.moonCoins : save.coins;
+    const short = item.price - have;
+    return `<button class="btn btn-pink btn-small buy-btn ${short > 0 ? 'short' : ''}">${itemCurrencyIcon(item)} ${item.price}</button>${short > 0 ? `<div class="short-tag">還差 ${short}</div>` : ''}`;
   }
 
   $('#shop-tabs').addEventListener('click', (e) => {
