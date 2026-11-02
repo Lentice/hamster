@@ -319,7 +319,7 @@ async function startFish(area, ctl) {
           score = Math.max(0, score + p);
           $('.h-score', area).textContent = score;
           const r = cv.getBoundingClientRect(), ar = area.getBoundingClientRect();
-          floatText(area, r.left - ar.left + (me.x / W) * r.width, r.top - ar.top + (WATER / H) * r.height * 0.6, p > 0 ? `+${p}` : `${p} 靴子…`, p > 0 ? 'coin-pop' : 'bad-pop');
+          floatText(area, r.left - ar.left + (me.x / W) * r.width, r.top - ar.top + (WATER / H) * r.height * 0.6, p > 0 ? `${hook.fish.k.gold ? '✨🐟✨' : hook.fish.k.e} +${p}` : `🥾 ${p} 靴子…`, p > 0 ? 'coin-pop' : 'bad-pop');
           p > 0 ? sfx.coin() : sfx.bad();
         }
         hook.fish = null; hook.state = 'idle';
