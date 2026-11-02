@@ -62,10 +62,27 @@
     tabs.innerHTML = CATEGORIES.map((c) => `
       <button class="tab ${c.id === currentCat ? 'active' : ''}" data-cat="${c.id}" role="tab" aria-selected="${c.id === currentCat}">
         <span class="tab-icon">${c.icon}</span><span class="tab-name">${c.name}</span>
-      </button>`).join('');
+      </button>`).join('') + `
+      <button class="tab ${currentCat === 'outfits' ? 'active' : ''}" data-cat="outfits" role="tab" aria-selected="${currentCat === 'outfits'}">
+        <span class="tab-icon">💾</span><span class="tab-name">我的搭配</span>
+      </button>`;
+  }
+
+  // 我的搭配：最多存 3 套，點一下整套換上（沒擁有的部件會略過）
+  const OUTFIT_SLOTS = 3;
+  const outfits = () => (save.outfits ||= []);
+  function drawOutfits() {
+    filter.hidden = true;
+    grid.innerHTML = Array.from({ length: OUTFIT_SLOTS }, (_, i) => {
+      const o = outfits()[i];
+      if (!o) return `<button class="item outfit-empty" data-outfit-save="${i}"><div class="thumb"><span class="diy-new-icon">＋</span></div><span class="item-name">存下現在的搭配</span></button>`;
+      return `<button class="item outfit" data-outfit-wear="${i}"><div class="thumb">${petSvg({ ...o, background: 'none' })}</div><span class="item-name">搭配 ${i + 1}</span>
+        <span class="diy-edit outfit-del" data-outfit-del="${i}" role="button" aria-label="刪除搭配">✕</span></button>`;
+    }).join('') + '<p class="outfit-tip">點空格子存下現在的打扮，之後點一下就能整套換上！</p>';
   }
 
   function drawGrid() {
+    if (currentCat === 'outfits') { drawOutfits(); return; }
     const cat = CATEGORIES.find((c) => c.id === currentCat);
     const diy = DIY_TEMPLATES[cat.id];
     const mine = cat.items.filter((item) => isOwned(cat.id, item));
@@ -103,6 +120,30 @@
   });
 
   grid.addEventListener('click', (e) => {
+    const del = e.target.closest('[data-outfit-del]');
+    if (del) { outfits()[del.dataset.outfitDel] = null; persist(); drawGrid(); sfx.tab(); return; }
+    const sv = e.target.closest('[data-outfit-save]');
+    if (sv) {
+      const { name, ...rest } = look;
+      outfits()[sv.dataset.outfitSave] = rest;
+      persist(); drawGrid(); sfx.coin(); toast('存好了！之後點一下就能換上這套');
+      return;
+    }
+    const wr = e.target.closest('[data-outfit-wear]');
+    if (wr) {
+      const o = outfits()[wr.dataset.outfitWear];
+      let skipped = 0;
+      for (const c of CATEGORIES) {
+        if (!(c.id in o)) continue;
+        const item = c.items.find((x) => x.id === o[c.id]);
+        if (item && isOwned(c.id, item)) look[c.id] = item.id; else skipped++;
+      }
+      wake(); redraw();
+      petAct(stagePet(), 'dance', 900); burst(10); sfx.pop();
+      if (skipped) toast(`有 ${skipped} 件已經不見了，先略過`);
+      return;
+    }
+    if (currentCat === 'outfits') return;
     const done = () => { drawStage(); drawGrid(); petAct(stagePet(), 'dance', 900); burst(10); };
     const edit = e.target.closest('[data-diy-edit]');
     if (edit) { openDiyEditor(currentCat, edit.dataset.diyEdit, done); return; }
