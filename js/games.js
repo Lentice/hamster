@@ -120,7 +120,8 @@ function runGame(id, m) {
         <p class="score">分數 <b>${score}</b></p>
         <p class="best-line">${bestLine}</p>
         <p class="reward">獲得 <b>${HAMSTER_COIN_ICON} ${coins}</b> 鼠鼠幣</p>
-        ${questDone ? `<p class="quest-done">🎯 完成今日任務！再送 ${HAMSTER_COIN_ICON} ${QUEST_REWARD}</p>` : ''}
+        ${questDone ? `<p class="quest-done">🎯 完成今日任務！再送 ${HAMSTER_COIN_ICON} ${QUEST_REWARD}</p>`
+    : questState().done ? '' : `<p class="quest-line">🎯 今日任務 ${questState().games.length} / ${QUEST_GAMES}：再玩 ${QUEST_GAMES - questState().games.length} 種不同的遊戲送 ${QUEST_REWARD}</p>`}
         <div class="modal-actions">
           <button class="btn btn-pink" data-act="again">再玩一次</button>
           <button class="btn btn-gray" data-act="back">回公園</button>
