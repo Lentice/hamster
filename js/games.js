@@ -53,13 +53,19 @@ function runGame(id, m) {
       stopped = true;
       stopFns.forEach((f) => f());
       stopFns.length = 0;
+      const prevBest = save.best[id] || 0;
       const record = recordBest(id, score);
+      // 沒破紀錄時告訴玩家還差多少，有破就顯示超過舊紀錄多少
+      const bestLine = record
+        ? (prevBest ? `比舊紀錄 ${prevBest} 多了 ${score - prevBest} 分！` : '第一次的紀錄，下次再挑戰！')
+        : `最佳紀錄 ${save.best[id]}${save.best[id] - score <= Math.max(3, save.best[id] * 0.2) ? `，只差 ${save.best[id] - score + 1} 分就破紀錄了！` : ''}`;
       addCoins(coins);
       sfx.win();
       area.innerHTML = `<div class="game-result">
         <div class="game-icon">${record ? '🏆' : '🎉'}</div>
         <h2>${record ? '新紀錄！' : '完成！'}</h2>
         <p class="score">分數 <b>${score}</b></p>
+        <p class="best-line">${bestLine}</p>
         <p class="reward">獲得 <b>${HAMSTER_COIN_ICON} ${coins}</b> 鼠鼠幣</p>
         <div class="modal-actions">
           <button class="btn btn-pink" data-act="again">再玩一次</button>
