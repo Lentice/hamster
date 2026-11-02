@@ -981,3 +981,9 @@ button.logo { border: none; background: none; padding: 0; font-family: inherit; 
 .try-on { position: relative; width: min(220px, 56vw); margin: 0 auto; border-radius: 18px; overflow: hidden; }
 .try-on .pet-svg { width: 100%; height: auto; display: block; }
 .try-on span { position: absolute; left: 8px; top: 8px; font-size: 12px; font-weight: bold; background: #fffc; border-radius: 999px; padding: 2px 8px; color: var(--pink-deep); }
+
+/* 減少動態效果：關掉瞬移閃現、任務完成跳動、音樂進度點放大 */
+@media (prefers-reduced-motion: reduce) {
+  .walker.poof, .quest-done { animation: none; }
+  .music-dots i { transition: none; }
+}
