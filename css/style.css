@@ -996,3 +996,14 @@ button.logo { border: none; background: none; padding: 0; font-family: inherit; 
 }
 .game-pause:active { transform: translateY(2px); box-shadow: 0 1px 0 #5C9BD6; }
 .modal.fullscreen > .game-pause { width: 48px; margin: 0; }
+
+/* 直式手機：自己畫的色塊、工具縮小一點，儲存鍵不用往下捲 */
+@media (max-width: 520px) {
+  .diy h2 { font-size: 20px; margin: 0; }
+  .diy-palette { gap: 5px; }
+  .diy-color { width: 26px; height: 26px; border-width: 2px; }
+  .diy-tools { gap: 4px; }
+  .diy-tools .btn { padding: 5px 9px; font-size: 13px; }
+  .diy-preview { width: 84px; }
+  .diy .modal-actions { margin-top: 6px; }
+}
