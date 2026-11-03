@@ -117,6 +117,31 @@ body { background-color: #fff8f0; background-size: 100px 100px; }
 .passport-games { display: grid; gap: 8px; margin-top: 16px; }
 .passport-games button { border: 1px solid #eadce3; border-radius: 12px; background: #fff; min-height: 48px; padding: 12px; display: flex; justify-content: space-between; gap: 12px; }
 @media (max-width: 600px) { .passport-badges { grid-template-columns: repeat(2, 1fr); }.arcade-header-tools { justify-items: start; } }
+/* 手機把主操作留在拇指可及的位置，長遊戲清單也能隨時切換。 */
+@media (max-width: 600px) {
+  body { padding-bottom: calc(88px + env(safe-area-inset-bottom)); }
+  .topbar { position: sticky; top: 0; }
+  .nav { position: fixed; inset: auto 0 0; z-index: 80; gap: 4px; padding: 8px 8px max(8px, env(safe-area-inset-bottom)); background: #fffcf7f5; border-top: 1px solid #e9d5df; box-shadow: 0 -5px 22px #80546a0c; }
+  .nav-btn { flex: 1; min-width: 0; min-height: 58px; padding: 6px 2px; border-radius: 17px; font-size: 12px; flex-direction: column; justify-content: center; gap: 4px; }
+  .nav-btn span { font-size: 22px; }
+  .arcade-header-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+  .arcade-header-tools .btn { font-size: 13px; }
+  .experience-heading { margin-bottom: 16px; }
+  .experience-heading p { font-size: 14px; }
+  .arcade-spotlight { gap: 12px; margin-bottom: 16px; }
+  .daily-pick { padding: 18px; }
+  .daily-pick h2 { font-size: 20px; margin: 9px 0; }
+  .daily-pick p { margin: 8px 0 14px; }
+  .daily-pass { padding: 16px; display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 8px; }
+  .daily-pass > .eyebrow, .daily-pass > p { grid-column: 1 / -1; }
+  .daily-pass h2 { font-size: 16px; margin: 0; line-height: 1.6; }
+  .daily-pass p { margin: 0; font-size: 12px; }
+  .quest-stamps { gap: 5px; margin: 0; }
+  .quest-stamps span { width: 31px; height: 31px; font-size: 13px; }
+  .arcade-toolbar { padding: 14px; gap: 10px; margin-bottom: 16px; }
+  .toasts { bottom: calc(92px + env(safe-area-inset-bottom)); width: calc(100% - 24px); }
+  .toast { border-radius: 18px; text-align: center; font-size: 14px; }
+}
 .arcade-meta { display: flex; justify-content: space-between; gap: 8px; color: #765c65; font-size: 12px; }
 .arcade-card h2 { margin-top: 12px; font-size: 22px; }
 .arcade-card p { margin: 8px 0 14px; color: var(--soft); font-size: 14px; }

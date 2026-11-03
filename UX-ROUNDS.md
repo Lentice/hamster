@@ -1,6 +1,6 @@
-# 20 rounds: more playful, clearer, cozier
+# 30 rounds: more playful, clearer, cozier
 
-2026-11-03. One reviewable product improvement and one commit per round. Cache versions advance with each round. Browser checks are recorded in the final validation notes.
+2026-11-03. Scope: original 20 rounds plus 10 additional rounds requested after real-time playtesting. One reviewable product improvement and one commit per round. Cache versions advance with each round. Browser checks are recorded in the final validation notes.
 
 | Round | Product improvement | Validation |
 |---|---|---|
@@ -22,3 +22,4 @@
 | 16 | Filter the shop by ownership budget and item name | JavaScript syntax + available Node regression suites passed |
 | 17 | Add companion interactions and contextual home controls | JavaScript syntax + available Node regression suites passed |
 | 18 | Create an adventure passport with stars badges and game milestones | JavaScript syntax + available Node regression suites passed |
+| 19 | Move mobile navigation within thumb reach and compact daily panels | JavaScript syntax + available Node regression suites passed |

@@ -18,7 +18,7 @@ const syncTopbar = () => document.documentElement.style.setProperty('--topbar-h'
 new ResizeObserver(syncTopbar).observe($('.topbar'));
 syncTopbar();
 
-$$('.nav-btn').forEach((b) => b.addEventListener('click', () => { showScreen(b.dataset.screen); sfx.tab(); }));
+$$('.nav-btn').forEach((b) => b.addEventListener('click', () => { showScreen(b.dataset.screen); window.scrollTo({ top: 0, behavior: 'auto' }); sfx.tab(); }));
 $('#mute').addEventListener('click', () => setMuted(!muted));
 setMuted(muted);
 function collectDailyMoonCoins() {
