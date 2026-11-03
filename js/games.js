@@ -122,6 +122,8 @@ function runGame(id, m) {
       sfx.win();
       m.box.dataset.resultAt = performance.now();
       pauseBtn.remove();
+      const remainingGames = Object.keys(GAMES).filter((other) => other !== id && !questState().games.includes(other));
+      const nextId = dailyGameId(localDay(), remainingGames.length ? remainingGames : Object.keys(GAMES).filter((other) => other !== id));
       area.innerHTML = `<div class="game-result">
         <div class="game-icon">${record ? '🏆' : '🎉'}</div>
         <h2>${record ? '新紀錄！' : '完成！'}</h2>
@@ -135,11 +137,17 @@ function runGame(id, m) {
     : questState().done ? '' : `<p class="quest-line">🎯 今日任務 ${questState().games.length} / ${QUEST_GAMES}：再玩 ${QUEST_GAMES - questState().games.length} 種不同的遊戲送 ${QUEST_REWARD}</p>`}
         <div class="modal-actions">
           <button class="btn btn-pink" data-act="again">再玩一次</button>
-          <button class="btn btn-gray" data-act="back">回公園</button>
+          <button class="btn btn-gray" data-act="back">${currentScreen === 'arcade' ? '回遊戲室' : '回公園'}</button>
           <button class="btn btn-blue" data-act="share">📤 分享成績</button>
-        </div></div>`;
+        </div>
+        ${nextId ? `<div class="result-discover"><span class="eyebrow">下一個小冒險</span><h3>${GAMES[nextId].icon} ${GAMES[nextId].name}</h3><p>${gameDetails(nextId).tip}</p><button class="btn btn-blue" data-act="next">換個遊戲玩</button></div>` : ''}</div>`;
       $('[data-act=again]', area).onclick = () => { area.remove(); runGame(id, m); };
       $('[data-act=back]', area).onclick = () => m.close();
+      $('[data-act=next]', area)?.addEventListener('click', () => {
+        m.close();
+        showScreen('arcade');
+        Arcade.launch(nextId);
+      });
       // 分享成績：手機用系統分享，不支援就複製文字
       $('[data-act=share]', area).onclick = async () => {
         const text = `我在「鼠鼠小屋」的${g.name}拿到 ${score} 分${record ? '，破紀錄了' : ''}！你也來玩玩看～ ${location.origin}${location.pathname}`;

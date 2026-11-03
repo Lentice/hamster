@@ -91,6 +91,9 @@ body { background-color: #fff8f0; background-size: 100px 100px; }
 .snack-answer b { font-size: 30px; }
 .snack-answer small { position: absolute; top: 6px; left: 10px; color: #876b45; }
 .snack-answer:active:not(:disabled) { transform: translateY(3px); }
+.result-discover { border-top: 1px solid #e9dbe2; margin: 28px auto 0; padding: 22px 0 0; max-width: 420px; }
+.result-discover h3 { margin: 10px 0; font-size: 21px; }
+.result-discover p { font-size: 14px; color: var(--soft); }
 .arcade-meta { display: flex; justify-content: space-between; gap: 8px; color: #765c65; font-size: 12px; }
 .arcade-card h2 { margin-top: 12px; font-size: 22px; }
 .arcade-card p { margin: 8px 0 14px; color: var(--soft); font-size: 14px; }
