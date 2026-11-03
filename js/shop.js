@@ -38,7 +38,7 @@
       $('#shop-grid').innerHTML = `<div class="blindbox-intro">
         <div class="blindbox-icon">${tab.icon}</div><h3>${box.title}・${box.name}</h3>
         <p>每盒 ${icon} ${box.price} ${box.currencyName}，隨機獲得一件未擁有的${box.rarity}配飾。</p>
-        <p>🍀 另外有 50% 機會附贈一袋鼠鼠幣！<br>${HAMSTER_COIN_ICON} ${box.bonusCoins[0]} 枚（30%）・${box.bonusCoins[1]} 枚（15%）・${box.bonusCoins[2]} 枚（5%）<br>配飾一定有，金幣是額外的小驚喜。</p>
+        <details class="box-odds"><summary>配飾保底，另有 50% 機會送金幣 · 查看機率</summary><p>額外鼠鼠幣：${box.bonusCoins[0]} 枚（30%）、${box.bonusCoins[1]} 枚（15%）、${box.bonusCoins[2]} 枚（5%），其餘 50% 不附贈金幣。配飾一定有，金幣不佔收藏名額。</p></details>
         <p>不會重複！剩下 ${pool.length} / ${all.length} 件待收集。${pool.length ? `每件未擁有配飾的機率相同（1/${pool.length}）。` : '這一套已經全部收集完成囉！'}</p>
         <button class="btn btn-pink" id="open-blind-box" ${!pool.length || save[box.wallet] < box.price ? 'disabled' : ''}>${!pool.length ? '✔ 已集齊' : `${icon} ${box.price} 開${box.name}`}</button>
         ${pool.length && save[box.wallet] < box.price ? `<p class="warn">${box.currencyName}還差 ${box.price - save[box.wallet]} 枚，${tab.boxType === 'moon' ? '每天登入可領 12 枚月亮金幣喔！' : '去出門玩賺一些吧！'}</p>${tab.boxType === 'normal' ? '<button class="btn btn-blue" id="earn-coins">出門賺鼠鼠幣</button>' : ''}` : ''}
@@ -86,7 +86,7 @@
 
   $('#shop-grid').addEventListener('click', (e) => {
     if (e.target.closest('[data-reset-shop]')) { $('#shop-search').value = ''; $('#shop-filter').value = 'all'; draw(); $('#shop-search').focus(); return; }
-    if (e.target.closest('#earn-coins')) { showScreen('outdoor'); return; }
+    if (e.target.closest('#earn-coins')) { showScreen('arcade'); return; }
     if (e.target.closest('#open-blind-box')) {
       const tab = SHOP_TABS.find((t) => t.id === current);
       const type = tab.boxType;

@@ -30,3 +30,4 @@
 | 24 | Protect DIY edits and keep creative actions easy to reach | JavaScript syntax + available Node regression suites passed |
 | 25 | Search furniture and rooms and focus on owned decorations | JavaScript syntax + available Node regression suites passed |
 | 26 | Undo furniture moves placement resizing and room changes | JavaScript syntax + available Node regression suites passed |
+| 27 | Simplify shop browsing while keeping blind-box odds clear | JavaScript syntax + available Node regression suites passed |

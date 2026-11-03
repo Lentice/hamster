@@ -82,6 +82,16 @@ body { background-color: #fff8f0; background-size: 100px 100px; }
 .inventory-own { display: flex; align-items: center; gap: 8px; min-height: 44px; font-size: 14px; white-space: nowrap; }
 .inventory-own input { width: 20px; height: 20px; accent-color: #a94c72; }
 .inventory-tools > span { grid-column: 1 / -1; }
+.box-odds { text-align: left; border: 1px solid #e8d8e6; border-radius: 14px; margin: 14px 0; background: #fff9; font-size: 13px; }
+.box-odds summary { min-height: 44px; padding: 12px; cursor: pointer; color: #76516b; line-height: 1.6; }
+.box-odds p { padding: 0 12px 12px; margin: 0; }
+.blindbox-intro .blindbox-icon { font-size: 50px; margin-bottom: 8px; }
+.blindbox-intro > p { font-size: 14px; }
+@media (max-width: 600px) {
+  #shop-tabs { display: flex; overflow-x: auto; gap: 8px; padding: 6px 2px 12px; scrollbar-width: thin; overscroll-behavior-x: contain; }
+  #shop-tabs .tab { flex: 0 0 72px; min-height: 66px; }
+  .shop-head .daily-moon-note { font-size: 13px; }
+}
 .park-heading { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; padding: 8px 4px 20px; }
 .park-heading h2 { margin: 7px 0; }
 .park-heading p { color: var(--soft); font-size: 14px; margin: 0; line-height: 1.6; }
