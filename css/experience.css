@@ -46,6 +46,19 @@ body { background-color: #fff8f0; background-size: 100px 100px; }
 .game-intro .intro-lead { font-size: 20px; font-weight: bold; color: #704354; }
 .intro-rules { line-height: 1.9; color: #765f67; background: #fff8; border-radius: 18px; padding: 16px; margin: 12px auto; max-width: 560px; }
 .intro-goals { display: grid; gap: 8px; margin: 20px 0; font-size: 14px; color: #795b36; }
+.cozy-game { width: min(620px, 100%); margin: 16px auto; text-align: center; }
+.delivery-counter { background: linear-gradient(#fff6e7, #ffe7d2); border: 2px solid #e8caa3; border-radius: 28px; padding: 24px 16px; }
+.delivery-order { display: grid; gap: 10px; place-items: center; margin: 18px 0; }
+.delivery-order > span { font-size: 90px; line-height: 1.3; }
+.delivery-order b { font-size: 24px; }
+.delivery-next { display: flex; align-items: center; justify-content: center; gap: 14px; color: #7d6253; font-size: 14px; }
+.delivery-next span { font-size: 26px; }
+.delivery-lanes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 24px 0 16px; }
+.delivery-lane { border: 2px solid #dfccb9; background: #fff; border-radius: 20px; min-height: 100px; display: grid; gap: 10px; place-content: center; box-shadow: 0 5px 0 #eadbcc; font-size: clamp(16px, 3vw, 22px); }
+.delivery-lane:active { transform: translateY(3px); box-shadow: 0 2px 0 #eadbcc; }
+.delivery-lane small { font-size: 13px; color: #80665b; }
+.play-feedback { min-height: 2.5em; line-height: 1.6; color: #456d56; font-weight: bold; }
+.play-feedback[data-tone=miss] { color: #a53c54; }
 .arcade-meta { display: flex; justify-content: space-between; gap: 8px; color: #765c65; font-size: 12px; }
 .arcade-card h2 { margin-top: 12px; font-size: 22px; }
 .arcade-card p { margin: 8px 0 14px; color: var(--soft); font-size: 14px; }

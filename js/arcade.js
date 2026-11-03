@@ -5,11 +5,12 @@ const GAME_DETAILS = {
   memory: { kind: 'puzzle', time: '慢慢想', tip: '把一樣的圖案找出來', goals: [30, 60, 90], color: '#f3e9fb' },
   whack: { kind: 'reaction', time: '30 秒', tip: '眼明手快，小心別打錯', goals: [10, 25, 45], color: '#ffe8dd' },
   runner: { kind: 'reaction', time: '挑戰最遠', tip: '跳過障礙，還能二段跳', goals: [100, 400, 800], color: '#e4f2ff' },
-  maze: { kind: 'puzzle', time: '90 秒', tip: '探索路線，帶瓜子回家', goals: [40, 100, 180], color: '#e9f5db' },
+  maze: { kind: 'puzzle', time: '60 秒', tip: '探索路線，帶瓜子回家', goals: [40, 100, 180], color: '#e9f5db' },
   stack: { kind: 'reaction', time: '挑戰最高', tip: '瞄準中心，疊出夢幻蛋糕', goals: [5, 12, 25], color: '#ffe4ef' },
   music: { kind: 'puzzle', time: '一關接一關', tip: '跟著旋律，記住順序', goals: [3, 6, 10], color: '#eee8ff' },
   fish: { kind: 'relax', time: '45 秒', tip: '看準時機，釣起金色驚喜', goals: [10, 25, 50], color: '#dff5f5' },
   bubble: { kind: 'relax', time: '40 秒', tip: '找對顏色，戳出連擊', goals: [15, 40, 80], color: '#e7edff' },
+  delivery: { kind: 'reaction', time: '35 秒', tip: '幫鼠鼠把點心送進正確籃子', goals: [10, 25, 45], color: '#fff0d9' },
 };
 const GAME_KINDS = { reaction: '手速挑戰', puzzle: '動動腦', relax: '輕鬆玩' };
 const gameDetails = (id) => GAME_DETAILS[id] || { kind: 'relax', time: '輕鬆一局', tip: '一起試試新玩法', goals: [10, 25, 50], color: '#fff0f5' };
