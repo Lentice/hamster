@@ -38,9 +38,32 @@ python -m http.server 8000
 # 打開 http://localhost:8000
 ```
 
-## 經濟系統驗證
+## 驗證
 
-執行 `node tools/economy-test.mjs`，檢查舊存檔、每日獎勵、兩種盲盒獎池、扣幣與跨分頁同步。
+不需安裝 npm 套件：
+
+```bash
+node tools/economy-test.mjs
+node tools/save-test.mjs
+node tools/assets-test.mjs
+```
+
+依序檢查經濟系統與跨分頁同步、損壞存檔與作品代碼、素材併發載入與失敗重試。
+載入與匯入會清理無效欄位並保留有效進度，支援舊版單層房間與定價遷移；匯入檔案上限為 2 MB。
+瀏覽器無法儲存進度時會提示下載備份，備份直接包含記憶體中的最新進度。
+
+另外啟動本機伺服器後，可使用已安裝的 `playwright-cli` 做瀏覽器回歸測試：
+
+```bash
+playwright-cli -s=hamster-test open http://127.0.0.1:8000
+playwright-cli -s=hamster-test run-code --filename=tools/browser-test.js
+playwright-cli -s=hamster-test close
+```
+
+請使用專用測試工作階段：這個腳本會清除該來源的 localStorage。測試涵蓋鍵盤分類、彈窗焦點、圖片與備份下載、備份還原、盲盒、十款遊戲載入與離開、素材重試、儲存失敗和手機排版。素材失敗測試會刻意產生 404 與一則載入錯誤紀錄。
+
+分類支援方向鍵與 Home / End；彈窗支援 Tab、Shift+Tab 和 Escape，遊戲離開仍會先確認。
+頁面可縮放，並尊重系統的減少動態效果設定。完整改善清單見 [50 輪改善紀錄](IMPROVEMENTS.md)。
 
 ## 多人連線（Firebase）
 
@@ -72,7 +95,7 @@ node tools/party-rules-test.mjs
 ## 發布到 GitHub Pages
 
 1. 在 GitHub 建立 repository，推上這個資料夾（`.gitignore` 已排除原始大圖）
-   - 更新程式後，把 `index.html` 裡的 `?v=13` 版本號加一，玩家的瀏覽器才會抓新版
+   - 更新程式後，把 `index.html` 裡所有 CSS / JavaScript 的 `?v=` 版本號一起加一（目前為 `33`），玩家的瀏覽器才會抓新版
 2. **Settings → Pages → Source** 選 `Deploy from a branch`，Branch 選 `main`、資料夾 `/ (root)`
 3. 約一分鐘後就能在 `https://<帳號>.github.io/<repository>/` 遊玩
 

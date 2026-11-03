@@ -63,10 +63,10 @@
 
   function drawTabs() {
     tabs.innerHTML = CATEGORIES.map((c) => `
-      <button class="tab ${c.id === currentCat ? 'active' : ''}" data-cat="${c.id}" role="tab" aria-selected="${c.id === currentCat}">
+      <button class="tab ${c.id === currentCat ? 'active' : ''}" data-cat="${c.id}" role="tab" tabindex="${c.id === currentCat ? 0 : -1}" aria-controls="grid" aria-selected="${c.id === currentCat}">
         <span class="tab-icon">${c.icon}</span><span class="tab-name">${c.name}</span>
       </button>`).join('') + `
-      <button class="tab ${currentCat === 'outfits' ? 'active' : ''}" data-cat="outfits" role="tab" aria-selected="${currentCat === 'outfits'}">
+      <button class="tab ${currentCat === 'outfits' ? 'active' : ''}" data-cat="outfits" role="tab" tabindex="${currentCat === 'outfits' ? 0 : -1}" aria-controls="grid" aria-selected="${currentCat === 'outfits'}">
         <span class="tab-icon">💾</span><span class="tab-name">我的搭配</span>
       </button>`;
   }
@@ -91,7 +91,7 @@
     const mine = cat.items.filter((item) => isOwned(cat.id, item));
     const hasLocked = mine.length < cat.items.length;
     filter.hidden = !hasLocked;
-    filter.innerHTML = `<button class="${ownOnly ? '' : 'on'}" data-own="all">全部 ${cat.items.length}</button><button class="${ownOnly ? 'on' : ''}" data-own="mine">✔ 已擁有 ${mine.length}</button>`;
+    filter.innerHTML = `<button class="${ownOnly ? '' : 'on'}" data-own="all" aria-pressed="${!ownOnly}">全部 ${cat.items.length}</button><button class="${ownOnly ? 'on' : ''}" data-own="mine" aria-pressed="${ownOnly}">✔ 已擁有 ${mine.length}</button>`;
     const shown = ownOnly && hasLocked ? mine : cat.items;
     // 正在穿的就不算新的了（商店買完會直接穿上）
     const wornKey = itemKey(cat.id, look[cat.id]);
@@ -99,7 +99,7 @@
     grid.innerHTML = (diy ? `<button class="item diy-new" data-diy-new="${cat.id}" title="自己畫">
         <div class="thumb"><span class="diy-new-icon">🎨</span></div><span class="item-name">自己畫${diy.name}</span></button>` : '') + shown.map((item, i) => {
       const owned = isOwned(cat.id, item);
-      return `<button class="item ${look[cat.id] === item.id ? 'selected' : ''} ${owned ? '' : 'locked'}" data-id="${item.id}" title="${escapeXml(item.name)}">
+      return `<button class="item ${look[cat.id] === item.id ? 'selected' : ''} ${owned ? '' : 'locked'}" data-id="${item.id}" aria-pressed="${look[cat.id] === item.id}" title="${escapeXml(item.name)}">
         <div class="thumb">${thumbFor(cat, item, i)}</div>
         <span class="item-name">${escapeXml(item.name)}</span>${save.fresh?.[itemKey(cat.id, item.id)] ? '<span class="fresh-tag">NEW</span>' : ''}${item.diy ? `<span class="diy-edit" data-diy-edit="${item.id}" role="button" aria-label="修改作品">✏️</span>` : ''}
         ${owned ? '' : `<span class="price-tag">${item.boxOnly ? (item.currency === 'moon' ? '☾ 月亮盲盒' : '🎁 普通盲盒') : `${itemCurrencyIcon(item)} ${item.price}`}</span>`}
@@ -113,6 +113,7 @@
     persist();
   }
 
+  keyboardTabs(tabs, '[role=tab]');
   tabs.addEventListener('click', (e) => {
     const btn = e.target.closest('.tab');
     if (!btn) return;
@@ -163,8 +164,9 @@
       drawStage();
       if (full) drawGrid();
       else {
-        $$('.item.selected', grid).forEach((el) => el.classList.remove('selected'));
+        $$('.item.selected', grid).forEach((el) => { el.classList.remove('selected'); el.setAttribute('aria-pressed', 'false'); });
         btn.classList.add('selected');
+        btn.setAttribute('aria-pressed', 'true');
         const key = itemKey(cat.id, item.id);
         if (save.fresh?.[key]) { delete save.fresh[key]; $('.fresh-tag', btn)?.remove(); }
       }
@@ -178,12 +180,16 @@
     else askBuy(cat.id, item, `<div class="try-on">${svgWrap(renderScene({ ...look, [cat.id]: item.id }, 'tryon'), '0 0 400 400', 'scene pet-svg')}<span>👀 試穿看看</span></div>`, () => wear(true));
   });
 
+  stage.addEventListener('keydown', (e) => {
+    if (!['Enter', ' '].includes(e.key) || e.repeat) return;
+    e.preventDefault(); stage.click();
+  });
   stage.addEventListener('click', (e) => {
     if (wake()) return;
     petAct(stagePet(), ['hop', 'wiggle', 'dance', 'stretch'][Math.floor(Math.random() * 4)], 900);
     sfx.squeak();
     const rect = stage.getBoundingClientRect();
-    floatText(stage, e.clientX - rect.left, e.clientY - rect.top, ['💗', '💕', '✨', '🌻', '💖'][Math.floor(Math.random() * 5)], 'emoji');
+    floatText(stage, e.detail === 0 ? rect.width / 2 : e.clientX - rect.left, e.detail === 0 ? rect.height / 2 : e.clientY - rect.top, ['💗', '💕', '✨', '🌻', '💖'][Math.floor(Math.random() * 5)], 'emoji');
   });
 
   $('#random').addEventListener('click', () => {
@@ -209,13 +215,18 @@
   });
 
   $('#save-img').addEventListener('click', async () => {
+    const button = $('#save-img');
+    if (button.disabled) return;
+    button.disabled = true;
+    button.setAttribute('aria-busy', 'true');
+    const snapshot = { ...look };
     try {
-      const img = await svgToImage(svgWrap(renderScene(look, 'export'), '0 0 400 400'));
+      const img = await svgToImage(svgWrap(renderScene(snapshot, 'export'), '0 0 400 400'));
       const canvas = document.createElement('canvas');
       canvas.width = canvas.height = 1000;
       canvas.getContext('2d').drawImage(img, 0, 0, 1000, 1000);
       const a = document.createElement('a');
-      a.download = `${look.name.trim() || byId(SPECIES, look.species).name}.png`;
+      a.download = `${snapshot.name.trim() || byId(SPECIES, snapshot.species).name}.png`;
       a.href = canvas.toDataURL('image/png');
       a.click();
       stage.appendChild(html('<div class="flash"></div>'));
@@ -223,6 +234,9 @@
       sfx.coin();
     } catch {
       toast('存圖失敗了，請用網址開啟遊戲（GitHub Pages 或本機伺服器）再試一次');
+    } finally {
+      button.disabled = false;
+      button.removeAttribute('aria-busy');
     }
   });
 

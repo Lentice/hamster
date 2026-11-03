@@ -54,6 +54,8 @@ function setMuted(v) {
   muted = v;
   try { localStorage.setItem('hamster-muted', v ? '1' : '0'); } catch { /* 忽略 */ }
   $('#mute').textContent = v ? '🔇' : '🔊';
+  $('#mute').setAttribute('aria-pressed', String(v));
+  $('#mute').setAttribute('aria-label', v ? '開啟音效' : '關閉音效');
 }
 
 // ───────────────────────── 提示與彈窗 ─────────────────────────
@@ -66,28 +68,74 @@ function toast(msg) {
 }
 
 let openModals = 0;
+const modalStack = [];
+let backgroundInert = [];
 const uiBlocked = () => openModals > 0;
 
 // fullscreen：全螢幕（小遊戲用），點外面不會關閉，只能按 ✕；beforeClose 回傳 false 可攔下 ✕
-function modal(content, { cls = '', closable = true, fullscreen = false, beforeClose = null } = {}) {
-  const root = html(`<div class="modal-back ${fullscreen ? 'full' : ''}"><div class="modal ${cls} ${fullscreen ? 'fullscreen' : ''}">${closable ? '<button class="modal-x" aria-label="關閉">✕</button>' : ''}</div></div>`);
+function modal(content, { cls = '', closable = true, fullscreen = false, beforeClose = null, label = '鼠鼠小屋視窗' } = {}) {
+  const previousFocus = document.activeElement;
+  const root = html(`<div class="modal-back ${fullscreen ? 'full' : ''}"><div class="modal ${cls} ${fullscreen ? 'fullscreen' : ''}" role="dialog" aria-modal="true" tabindex="-1">${closable ? '<button class="modal-x" aria-label="關閉">✕</button>' : ''}</div></div>`);
   const box = $('.modal', root);
   if (typeof content === 'string') box.insertAdjacentHTML('beforeend', content);
   else box.appendChild(content);
+  box.setAttribute('aria-label', $('h2, h3', box)?.textContent || label);
+  if (!modalStack.length) {
+    backgroundInert = [...document.querySelectorAll('body > header, body > main')].map((el) => [el, el.inert]);
+    backgroundInert.forEach(([el]) => { el.inert = true; });
+    document.body.classList.add('modal-open');
+  }
+  modalStack.forEach((entry) => { entry.root.inert = true; entry.box.removeAttribute('aria-modal'); });
   document.body.appendChild(root);
+  const entry = { root, box };
+  modalStack.push(entry);
   openModals++;
+  const focusable = () => $$('button, [href], input, select, textarea, [tabindex]', box)
+    .filter((el) => !el.disabled && !el.hidden && el.tabIndex >= 0 && el.getClientRects().length && !el.closest('[inert]'));
+  (focusable()[0] || box).focus({ preventScroll: true });
   let closed = false;
   const close = () => {
     if (closed) return;
     closed = true;
+    const wasTop = modalStack.at(-1) === entry;
+    modalStack.splice(modalStack.indexOf(entry), 1);
     openModals--;
+    document.removeEventListener('keydown', onKey, true);
+    root.inert = true;
+    box.removeAttribute('aria-modal');
+    const top = modalStack.at(-1);
+    if (top) { top.root.inert = false; top.box.setAttribute('aria-modal', 'true'); }
+    else {
+      backgroundInert.forEach(([el, inert]) => { el.inert = inert; });
+      backgroundInert = [];
+      document.body.classList.remove('modal-open');
+    }
+    if (wasTop) {
+      const target = previousFocus?.isConnected && !previousFocus.closest('[inert]') ? previousFocus : top?.box;
+      target?.focus({ preventScroll: true });
+    }
     root.classList.add('out');
     setTimeout(() => root.remove(), 200);
     root.dispatchEvent(new Event('closed'));
   };
+  const requestClose = () => { if (!beforeClose || beforeClose(close) !== false) close(); };
+  function onKey(e) {
+    if (modalStack.at(-1) !== entry) return;
+    if (e.key === 'Escape' && closable && !e.isComposing) {
+      e.preventDefault(); e.stopPropagation(); requestClose();
+    }
+    if (e.key !== 'Tab') return;
+    const list = focusable();
+    if (!list.length) { e.preventDefault(); box.focus(); return; }
+    const index = list.indexOf(document.activeElement);
+    if (index < 0 || (e.shiftKey && index === 0) || (!e.shiftKey && index === list.length - 1)) {
+      e.preventDefault(); list[e.shiftKey ? list.length - 1 : 0].focus();
+    }
+  }
+  document.addEventListener('keydown', onKey, true);
   if (closable) {
-    $('.modal-x', root).onclick = () => { if (!beforeClose || beforeClose(close) !== false) close(); };
-    if (!fullscreen) root.addEventListener('pointerdown', (e) => { if (e.target === root) close(); });
+    $('.modal-x', root).onclick = requestClose;
+    if (!fullscreen) root.addEventListener('pointerdown', (e) => { if (e.target === root) requestClose(); });
   }
   return { root, box, close };
 }
@@ -176,13 +224,33 @@ const SCREENS = {};
 let currentScreen = null;
 
 function showScreen(name) {
+  if (!Object.hasOwn(SCREENS, name)) return;
   if (currentScreen === name) return;
   if (currentScreen) SCREENS[currentScreen]?.leave?.();
   currentScreen = name;
   $$('.screen').forEach((s) => s.classList.toggle('active', s.id === `screen-${name}`));
-  $$('.nav-btn').forEach((b) => b.classList.toggle('active', b.dataset.screen === name));
+  $$('.nav-btn').forEach((b) => {
+    const active = b.dataset.screen === name;
+    b.classList.toggle('active', active);
+    if (active) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
+  });
   SCREENS[name]?.enter?.();
   try { localStorage.setItem('hamster-screen', name); } catch { /* 忽略 */ }
+}
+
+// 分類頁籤共用鍵盤操作；重繪後重新取得按鈕，保留焦點。
+function keyboardTabs(root, selector) {
+  root.addEventListener('keydown', (e) => {
+    if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) return;
+    const tabs = $$(selector, root);
+    const index = tabs.indexOf(e.target.closest(selector));
+    if (index < 0) return;
+    e.preventDefault();
+    const next = e.key === 'Home' ? 0 : e.key === 'End' ? tabs.length - 1
+      : (index + (e.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
+    tabs[next].click();
+    $$(selector, root)[next]?.focus();
+  });
 }
 
 // 鼠鼠的隨機小動作（加在 .pet-svg 上的 class）

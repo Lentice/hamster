@@ -53,7 +53,7 @@ function runGame(id, m) {
   save.played ||= {};
   if (!save.played[id]) { save.played[id] = 1; persist(); }
   m.box.querySelectorAll(':scope > :not(.modal-x)').forEach((el) => el.remove());
-  const area = html('<div class="game-area"></div>');
+  const area = html('<div class="game-area" aria-busy="true"></div>');
   m.box.appendChild(area);
   // ⏸ 暫停：開一個 quit-box 類的小視窗，gamePaused() 就會讓遊戲停住
   $('.game-pause', m.box)?.remove();
@@ -97,7 +97,7 @@ function runGame(id, m) {
   }
   stopFns.push(() => hurry.disconnect());
   m.root.addEventListener('closed', () => { stopped = true; stopFns.forEach((f) => f()); });
-  g.start(area, {
+  Promise.resolve().then(() => g.start(area, {
     isStopped: () => stopped,
     onStop: (f) => stopFns.push(f),
     finish: (score, coins) => {
@@ -141,6 +141,19 @@ function runGame(id, m) {
         } catch (err) { if (err?.name !== 'AbortError') toast(text); }
       };
     },
+  })).then(() => {
+    if (!stopped) area.setAttribute('aria-busy', 'false');
+  }).catch((err) => {
+    if (stopped) return;
+    stopped = true;
+    stopFns.forEach((f) => f());
+    stopFns.length = 0;
+    console.error('遊戲載入失敗', err);
+    area.setAttribute('aria-busy', 'false');
+    area.innerHTML = '<div class="game-intro"><h2>素材暫時載入不了</h2><p>請確認網路連線，再試一次。</p><button class="btn btn-pink" data-act="retry">重新載入遊戲</button></div>';
+    $('.game-pause', m.box)?.remove();
+    m.box.classList.remove('playing');
+    $('[data-act=retry]', area).onclick = () => { area.remove(); runGame(id, m); };
   });
 }
 

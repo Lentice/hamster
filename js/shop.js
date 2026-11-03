@@ -27,7 +27,7 @@
 
   function draw() {
     $('#shop-tabs').innerHTML = SHOP_TABS.map((t) => `
-      <button class="tab ${t.id === current ? 'active' : ''}" data-tab="${t.id}"><span class="tab-icon">${t.icon}</span><span class="tab-name">${t.name}</span></button>`).join('');
+      <button class="tab ${t.id === current ? 'active' : ''}" data-tab="${t.id}" role="tab" aria-selected="${t.id === current}" tabindex="${t.id === current ? 0 : -1}" aria-controls="shop-grid"><span class="tab-icon">${t.icon}</span><span class="tab-name">${t.name}</span></button>`).join('');
     const tab = SHOP_TABS.find((t) => t.id === current);
     if (tab.kind === 'box') {
       const box = BLIND_BOXES[tab.boxType];
@@ -68,6 +68,7 @@
     return `<button class="btn btn-pink btn-small buy-btn ${short > 0 ? 'short' : ''}">${itemCurrencyIcon(item)} ${item.price}</button>${short > 0 ? `<div class="short-tag">還差 ${short}</div>` : ''}`;
   }
 
+  keyboardTabs($('#shop-tabs'), '[role=tab]');
   $('#shop-tabs').addEventListener('click', (e) => {
     const b = e.target.closest('[data-tab]');
     if (!b) return;

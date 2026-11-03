@@ -1,24 +1,18 @@
 // 啟動
 
-// iPad / 手機：擋掉連點兩下放大、雙指縮放，避免遊戲畫面被放大後點不到按鈕
-let lastTouchEnd = 0;
-document.addEventListener('touchend', (e) => {
-  const now = Date.now();
-  if (now - lastTouchEnd < 350 && !e.target.closest('input, textarea')) {
-    e.preventDefault();
-    // 阻止放大的同時也吃掉了這次點擊，幫按鈕補發一次，連點才不會失靈
-    e.target.closest('button, a, [data-act]')?.click();
-  }
-  lastTouchEnd = now;
-}, { passive: false });
-['gesturestart', 'gesturechange'].forEach((type) => document.addEventListener(type, (e) => e.preventDefault(), { passive: false }));
-document.addEventListener('touchmove', (e) => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
-document.addEventListener('dblclick', (e) => e.preventDefault(), { passive: false });
-
 // 素材還沒產生或載入失敗時隱藏，不顯示破圖
 document.addEventListener('error', (e) => {
   if (e.target.tagName === 'IMG') e.target.classList.add('missing');
 }, true);
+
+let warnedStorage = false;
+saveListeners.push(() => {
+  if (storageFailed && !warnedStorage) {
+    warnedStorage = true;
+    toast('進度暫時無法存進瀏覽器，請到設定下載備份，避免關閉後遺失');
+  }
+  if (!storageFailed) warnedStorage = false;
+});
 
 const syncTopbar = () => document.documentElement.style.setProperty('--topbar-h', `${$('.topbar').offsetHeight}px`);
 new ResizeObserver(syncTopbar).observe($('.topbar'));
@@ -79,20 +73,6 @@ function updateDayTime() {
 updateDayTime();
 setInterval(updateDayTime, 5 * 60 * 1000);
 
-// 檢查備份檔的主要欄位型別，避免壞掉的檔案讓遊戲開不起來
-function validBackup(d) {
-  const obj = (v) => !!v && typeof v === 'object' && !Array.isArray(v);
-  const opt = (v, ok) => v === undefined || ok(v);
-  return obj(d) && Number.isFinite(d.coins) && obj(d.look)
-    && opt(d.look.name, (v) => typeof v === 'string')
-    && opt(d.look.species, (v) => typeof v === 'string')
-    && opt(d.moonCoins, Number.isFinite)
-    && opt(d.house, (v) => obj(v) && Array.isArray(v.floors) && v.floors.length > 0 && v.floors.every(obj))
-    && ['owned', 'best', 'collected', 'fresh', 'played', 'quest'].every((k) => opt(d[k], obj))
-    && opt(d.outfits, Array.isArray)
-    && opt(d.diy, (v) => obj(v) && Object.values(v).every(Array.isArray));
-}
-
 // ⚙️ 設定（點左上角標誌）：音效、備份存檔到檔案、從檔案還原（換手機、清瀏覽器資料前可以先備份）
 $('#settings').addEventListener('click', () => {
   const m = modal(`<div class="settings-box"><div class="game-icon">🐹</div><h2>設定與備份</h2>
@@ -109,8 +89,7 @@ $('#settings').addEventListener('click', () => {
     const act = e.target.closest('[data-act]')?.dataset.act;
     if (act === 'mute') { setMuted(!muted); e.target.closest('button').textContent = muted ? '🔇 音效：關' : '🔊 音效：開'; }
     if (act === 'export') {
-      persist();
-      const blob = new Blob([localStorage.getItem(SAVE_KEY) || JSON.stringify(save)], { type: 'application/json' });
+      const blob = new Blob([JSON.stringify(save)], { type: 'application/json' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
       a.download = `鼠鼠小屋存檔-${localDay()}.json`;
@@ -129,20 +108,25 @@ $('#settings').addEventListener('click', () => {
     const f = file.files[0];
     if (!f) return;
     try {
+      if (f.size > 2 * 1024 * 1024) { toast('備份檔太大了，請選擇 2 MB 以內的存檔'); return; }
       const text = await f.text();
-      const data = JSON.parse(text);
+      const parsed = JSON.parse(text);
       // 簡單檢查是不是鼠鼠小屋的存檔
-      if (!validBackup(data)) throw new Error('bad');
+      if (!validBackup(parsed)) throw new Error('bad');
+      const data = normalizeSave(parsed);
       const ok = modal(`<div class="buy-box"><h3>要用這個備份蓋掉現在的存檔嗎？</h3><p>備份裡有 ${HAMSTER_COIN_ICON} ${Math.floor(data.coins)} 鼠鼠幣。<br>現在的存檔會被取代，沒辦法復原喔。</p>
         <div class="modal-actions"><button class="btn btn-pink" data-act="yes">還原</button><button class="btn btn-gray" data-act="no">先不要</button></div></div>`, { cls: 'small' });
       $('[data-act=no]', ok.box).onclick = ok.close;
       $('[data-act=yes]', ok.box).onclick = () => {
+        const button = $('[data-act=yes]', ok.box);
+        if (button.disabled) return;
+        button.disabled = true;
         try { localStorage.setItem(SAVE_KEY, JSON.stringify(data)); location.reload(); } catch { toast('瀏覽器不讓存檔，還原失敗了'); ok.close(); }
       };
     } catch {
       toast('這個檔案看起來不是鼠鼠小屋的存檔');
     }
-    file.value = '';
+    finally { file.value = ''; }
   });
 });
 

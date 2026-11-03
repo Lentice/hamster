@@ -72,18 +72,25 @@ function stickerImage(name, { w, cx = 200, bottom, cy }) {
 
 // 把 SVG 內引用的 assets 轉成 data URL，才能畫進 canvas（存圖、小遊戲）
 const dataUrlCache = {};
+const assetLoads = new Map();
 async function inlineAssets(svg) {
   const names = [...new Set([...svg.matchAll(/href="(assets\/[^"]+)"/g)].map((m) => m[1]))];
   await Promise.all(names.map(async (url) => {
     if (dataUrlCache[url]) return;
-    try {
-      const blob = await (await fetch(url)).blob();
-      dataUrlCache[url] = await new Promise((res) => {
+    if (!assetLoads.has(url)) assetLoads.set(url, (async () => {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`素材載入失敗：${response.status} ${url}`);
+      const blob = await response.blob();
+      dataUrlCache[url] = await new Promise((res, rej) => {
         const r = new FileReader();
         r.onload = () => res(r.result);
+        r.onerror = () => rej(r.error || new Error('素材讀取失敗'));
+        r.onabort = () => rej(new Error('素材讀取已取消'));
         r.readAsDataURL(blob);
       });
-    } catch { /* file:// 下無法讀取，就保留原連結 */ }
+    })());
+    try { await assetLoads.get(url); }
+    finally { assetLoads.delete(url); }
   }));
   return svg.replace(/href="(assets\/[^"]+)"/g, (m, url) => (dataUrlCache[url] ? `href="${dataUrlCache[url]}"` : m));
 }
@@ -92,7 +99,10 @@ async function svgToImage(svg) {
   const inlined = await inlineAssets(svg);
   const url = URL.createObjectURL(new Blob([inlined], { type: 'image/svg+xml;charset=utf-8' }));
   const img = new Image();
-  await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = url; });
-  URL.revokeObjectURL(url);
+  try {
+    await new Promise((res, rej) => { img.onload = res; img.onerror = () => rej(new Error('SVG 圖片載入失敗')); img.src = url; });
+  } finally {
+    URL.revokeObjectURL(url);
+  }
   return img;
 }

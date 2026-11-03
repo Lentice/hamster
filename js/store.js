@@ -26,19 +26,88 @@ function defaultSave() {
   };
 }
 
+const saveObject = (v) => !!v && typeof v === 'object' && !Array.isArray(v);
+const safeAmount = (v, fallback = 0) => Number.isFinite(v) ? Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, Math.round(v))) : fallback;
+const saveFlags = (v) => Object.fromEntries(Object.entries(saveObject(v) ? v : {}).filter(([k, value]) => !['__proto__', 'constructor', 'prototype'].includes(k) && (value === true || value === 1)));
+const validSaveDay = (v) => {
+  if (typeof v !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(v)) return false;
+  const date = new Date(`${v}T12:00:00`);
+  return date.getFullYear() === Number(v.slice(0, 4)) && date.getMonth() + 1 === Number(v.slice(5, 7)) && date.getDate() === Number(v.slice(8, 10));
+};
+
+// 載入與匯入共用清理流程；單一欄位損壞時保留其他有效進度。
+function normalizeSave(saved) {
+  const base = defaultSave();
+  if (!saveObject(saved)) return base;
+  const cleanLook = (value) => {
+    const out = { ...DEFAULT_LOOK };
+    if (!saveObject(value)) return out;
+    for (const key of Object.keys(out)) {
+      if (typeof value[key] === 'string') out[key] = value[key].slice(0, key === 'name' ? 24 : 100);
+    }
+    return out;
+  };
+  base.coins = safeAmount(saved.coins, START_COINS);
+  base.moonCoins = safeAmount(saved.moonCoins);
+  if (saved.pricingV === 1) base.pricingV = 1;
+  base.lastMoonLogin = validSaveDay(saved.lastMoonLogin) ? saved.lastMoonLogin : '';
+  base.look = cleanLook(saved.look);
+  for (const key of ['owned', 'fresh', 'collected', 'played']) base[key] = saveFlags(saved[key]);
+  if (saveObject(saved.best)) base.best = Object.fromEntries(Object.entries(saved.best)
+    .filter(([id, score]) => /^[a-z][a-z0-9_-]*$/i.test(id) && Number.isFinite(score) && score >= 0)
+    .map(([id, score]) => [id, safeAmount(score)]));
+  const house = saveObject(saved.house) ? saved.house : saveObject(saved.room) ? { floors: [saved.room] } : null;
+  if (house && Array.isArray(house.floors) && house.floors.some(saveObject)) {
+    const usedUids = new Set();
+    let uid = Math.max(0, ...house.floors.filter(saveObject).slice(0, 5).flatMap((floor) =>
+      (Array.isArray(floor.items) ? floor.items : []).slice(0, 500).map((it) => Number.isSafeInteger(it?.uid) && it.uid > 0 && it.uid < Number.MAX_SAFE_INTEGER - 2500 ? it.uid : 0)));
+    const itemUid = (value) => {
+      const id = Number.isSafeInteger(value) && value > 0 && value <= uid && !usedUids.has(value) ? value : ++uid;
+      usedUids.add(id); return id;
+    };
+    const clamp = (v, min, max, fallback) => Number.isFinite(v) ? Math.max(min, Math.min(max, v)) : fallback;
+    base.house.floors = house.floors.filter(saveObject).slice(0, 5).map((floor) => ({
+      bg: ROOMS.some((r) => r.id === floor.bg) ? floor.bg : 'wood',
+      items: (Array.isArray(floor.items) ? floor.items : []).filter((it) => saveObject(it) && FURNITURE.some((f) => f.id === it.id)).slice(0, 500).map((it) => ({
+        uid: itemUid(it.uid), id: it.id, x: clamp(it.x, 40, 1460, 750), y: clamp(it.y, 420, 1000, 780),
+        flip: it.flip === true, size: clamp(it.size, 0.55, 1.6, 1),
+      })),
+    }));
+    base.house.petFloor = Math.min(base.house.floors.length - 1, safeAmount(house.petFloor));
+  }
+  if (saveObject(saved.quest) && validSaveDay(saved.quest.day)) base.quest = {
+    day: saved.quest.day, done: saved.quest.done === true,
+    games: [...new Set((Array.isArray(saved.quest.games) ? saved.quest.games : []).filter((id) => typeof id === 'string' && /^[a-z][a-z0-9_-]*$/i.test(id)))].slice(0, 20),
+  };
+  if (Array.isArray(saved.outfits)) base.outfits = saved.outfits.slice(0, 3).map((o) => saveObject(o) ? cleanLook(o) : null);
+  if (saveObject(saved.diy)) {
+    const cells = { clothes: 216, hat: 312, neck: 180, held: 234 };
+    base.diy = {};
+    for (const [type, count] of Object.entries(cells)) {
+      const seen = new Set();
+      base.diy[type] = (Array.isArray(saved.diy[type]) ? saved.diy[type] : []).filter((d) => {
+        if (!saveObject(d) || typeof d.id !== 'string' || !/^diy_[a-z0-9_-]+$/i.test(d.id) || seen.has(d.id)
+          || typeof d.px !== 'string' || d.px.length !== count || !/^[0-9a-o]+$/.test(d.px)) return false;
+        seen.add(d.id); return true;
+      }).slice(0, 8).map((d) => ({ id: d.id, name: typeof d.name === 'string' ? d.name.slice(0, 16) : '', px: d.px }));
+    }
+  }
+  return base;
+}
+
+function validBackup(d) {
+  return saveObject(d) && Number.isFinite(d.coins) && d.coins >= 0 && saveObject(d.look)
+    && (d.house === undefined || (saveObject(d.house) && Array.isArray(d.house.floors) && d.house.floors.some(saveObject)));
+}
+
 function loadSave() {
   const base = defaultSave();
   try {
     const saved = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null');
-    if (saved) {
-      // 舊存檔只有一層 room，轉成多樓層 house
-      if (saved.room && !saved.house) saved.house = { petFloor: 0, floors: [saved.room] };
-      delete saved.room;
-      return { ...base, ...saved, look: { ...base.look, ...saved.look } };
-    }
+    if (saved) return normalizeSave(saved);
     // 從第一版換裝遊戲帶過來的搭配
     const v1 = JSON.parse(localStorage.getItem('hamster-dressup-v1') || 'null');
-    if (v1) base.look = { ...base.look, species: v1.species || 'golden', name: v1.name || '' };
+    if (saveObject(v1)) return normalizeSave({ look: v1 });
   } catch { /* 存檔壞掉就用預設 */ }
   return base;
 }
@@ -58,27 +127,40 @@ function syncStoredSave() {
     const house = save.house;
     Object.assign(look, latest.look);
     Object.assign(house, latest.house);
+    for (const key of Object.keys(save)) if (!Object.hasOwn(latest, key)) delete save[key];
     Object.assign(save, latest, { look, house });
     lastStoredSave = raw;
-    saveListeners.forEach((fn) => fn());
+    notifySaveListeners();
     return true;
   } catch { return false; }
 }
 
+let storageFailed = false;
+function notifySaveListeners() {
+  for (const fn of saveListeners) {
+    try { fn(); } catch (err) { console.error('存檔畫面更新失敗', err); }
+  }
+}
+
 function persist() {
+  let stored = false;
   try {
     const raw = JSON.stringify(save);
     localStorage.setItem(SAVE_KEY, raw);
     lastStoredSave = raw;
-  } catch { /* 無痕模式等情況下忽略 */ }
-  saveListeners.forEach((fn) => fn());
+    stored = true;
+  } catch { /* 仍保留記憶體中的進度，讓玩家可以匯出備份 */ }
+  storageFailed = !stored;
+  notifySaveListeners();
+  return stored;
 }
 
 const isOwned = (cat, item) => !item.price || !!save.owned[itemKey(cat, item.id)];
 
 function addCoins(n) {
+  if (!Number.isFinite(n)) return;
   syncStoredSave();
-  save.coins = Math.max(0, save.coins + Math.round(n));
+  save.coins = safeAmount(save.coins + Math.round(n));
   persist();
 }
 
@@ -107,7 +189,7 @@ function checkCollection(cat) {
   const items = shopItemsOf(cat);
   if (!items.length || save.collected?.[cat] || !items.every((it) => isOwned(cat, it))) return;
   (save.collected ||= {})[cat] = 1;
-  save.coins += COLLECT_REWARD;
+  save.coins = safeAmount(save.coins + COLLECT_REWARD);
   setTimeout(() => { toast(`🏅 全部收集完成！再送 ${COLLECT_REWARD} 鼠鼠幣`); updateCoins?.(); sfx.win(); }, 600);
 }
 
@@ -120,11 +202,12 @@ const BLIND_BOXES = {
 const itemCurrencyIcon = (item) => item.currency === 'moon' ? '<span class="moon-icon" aria-label="月亮金幣">☾</span>' : HAMSTER_COIN_ICON;
 
 function claimDailyMoonCoins(now = new Date()) {
+  if (!(now instanceof Date) || Number.isNaN(now.getTime())) return false;
   syncStoredSave();
   // 依玩家所在地的日曆日期；倒轉時鐘也不能重領已經領過的日期。
   const day = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
   if (save.lastMoonLogin >= day) return false;
-  save.moonCoins += DAILY_MOON_COINS;
+  save.moonCoins = safeAmount(save.moonCoins + DAILY_MOON_COINS);
   save.lastMoonLogin = day;
   persist();
   return true;
@@ -141,17 +224,19 @@ function questState() {
 }
 // 玩完一局時呼叫；剛好完成任務時回傳 true
 function questPlayed(game) {
+  if (typeof game !== 'string' || (typeof GAMES !== 'undefined' && !Object.hasOwn(GAMES, game))) return false;
   syncStoredSave();
   const q = questState();
   if (!q.games.includes(game)) q.games.push(game);
   if (q.done || q.games.length < QUEST_GAMES) { persist(); return false; }
   q.done = true;
-  save.coins += QUEST_REWARD;
+  save.coins = safeAmount(save.coins + QUEST_REWARD);
   persist();
   return true;
 }
 
 function boxItems(type) {
+  if (!Object.hasOwn(BLIND_BOXES, type)) return [];
   const box = BLIND_BOXES[type];
   return CATEGORIES.flatMap((cat) => cat.items
     .filter((item) => item.boxOnly && (item.currency || 'coins') === box.currency)
@@ -163,6 +248,7 @@ function boxPool(type) {
 }
 
 function openBlindBox(type) {
+  if (!Object.hasOwn(BLIND_BOXES, type)) return null;
   syncStoredSave();
   const box = BLIND_BOXES[type];
   const pool = boxPool(type);
@@ -176,7 +262,7 @@ function openBlindBox(type) {
   const bonusCoins = bonusRoll < 0.05 ? box.bonusCoins[2]
     : bonusRoll < 0.20 ? box.bonusCoins[1]
       : bonusRoll < 0.50 ? box.bonusCoins[0] : 0;
-  save.coins += bonusCoins;
+  save.coins = safeAmount(save.coins + bonusCoins);
   persist();
   return { ...prize, bonusCoins };
 }
@@ -185,6 +271,8 @@ const normalBoxPool = () => boxPool('normal');
 const openNormalBox = () => openBlindBox('normal');
 
 function recordBest(game, score) {
+  if (typeof game !== 'string' || !/^[a-z][a-z0-9_-]*$/i.test(game) || !Number.isFinite(score) || score < 0) return false;
+  score = safeAmount(score);
   syncStoredSave();
   const prev = save.best[game] || 0;
   if (score > prev) {

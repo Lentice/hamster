@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>鼠鼠小屋</title>
   <meta name="description" content="可愛的寵物鼠養成換裝遊戲：換裝、蓋小屋、出門玩小遊戲賺鼠鼠幣！">
   <meta name="theme-color" content="#FF8FA3">
@@ -16,12 +16,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Huninn&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=32">
+  <link rel="stylesheet" href="css/style.css?v=33">
 </head>
 <body>
   <header class="topbar">
     <button class="logo" id="settings" aria-label="設定與備份">🐹 <span>鼠鼠小屋</span></button>
-    <nav class="nav">
+    <nav class="nav" aria-label="主要畫面">
       <button class="nav-btn" data-screen="wardrobe"><span>👗</span>換裝</button>
       <button class="nav-btn" data-screen="home"><span>🏠</span>我的家</button>
       <button class="nav-btn" data-screen="outdoor"><span>🌳</span>出門玩</button>
@@ -39,7 +39,7 @@
     <section id="screen-wardrobe" class="screen">
       <div class="layout">
         <div class="card stage-wrap">
-          <div id="stage" class="stage" aria-label="鼠鼠預覽，點一下會跳跳"></div>
+          <div id="stage" class="stage" role="button" tabindex="0" aria-label="鼠鼠預覽，點一下會跳跳"></div>
           <div class="name-row">
             <label for="name">名字</label>
             <input id="name" type="text" maxlength="12" placeholder="幫鼠鼠取個名字～" autocomplete="off">
@@ -51,8 +51,8 @@
           </div>
         </div>
         <div class="card closet">
-          <nav id="tabs" class="tabs" role="tablist"></nav>
-          <div id="grid" class="grid"></div>
+          <nav id="tabs" class="tabs" role="tablist" aria-label="換裝分類"></nav>
+          <div id="grid" class="grid" role="tabpanel" aria-label="換裝物品"></div>
         </div>
       </div>
     </section>
@@ -114,37 +114,37 @@
           <p><img class="hamster-coin" src="assets/coin_hamster.svg" alt=""> 鼠鼠幣買小屋、家具與普通盲盒；銀色月亮金幣開月亮盲盒，抽夢幻稀有配飾。</p>
           <p class="daily-moon-note"><span class="moon-icon">☾</span> 每天登入送 12 枚月亮金幣，今天的獎勵已自動放進錢包！</p>
         </div>
-        <nav id="shop-tabs" class="tabs"></nav>
-        <div id="shop-grid" class="shop-grid"></div>
+        <nav id="shop-tabs" class="tabs" role="tablist" aria-label="商店分類"></nav>
+        <div id="shop-grid" class="shop-grid" role="tabpanel" aria-label="商店商品"></div>
       </div>
     </section>
   </main>
 
-  <div id="toasts" class="toasts"></div>
+  <div id="toasts" class="toasts" role="status" aria-live="polite" aria-atomic="false"></div>
 
-  <script src="assets/manifest.js?v=32"></script>
-  <script src="js/svg.js?v=32"></script>
-  <script src="js/pets.js?v=32"></script>
-  <script src="js/items.js?v=32"></script>
-  <script src="js/items-more.js?v=32"></script>
-  <script src="js/stickers-more.js?v=32"></script>
-  <script src="js/look.js?v=32"></script>
-  <script src="js/furniture-more.js?v=32"></script>
-  <script src="js/store.js?v=32"></script>
-  <script src="js/pricing.js?v=32"></script>
-  <script src="js/diy.js?v=32"></script>
-  <script src="js/ui.js?v=32"></script>
-  <script src="js/wardrobe.js?v=32"></script>
-  <script src="js/shop.js?v=32"></script>
-  <script src="js/home.js?v=32"></script>
-  <script src="js/games.js?v=32"></script>
-  <script src="js/games-more.js?v=32"></script>
-  <script src="js/games-park.js?v=32"></script>
-  <script src="js/net-config.js?v=32"></script>
-  <script src="js/net.js?v=32"></script>
-  <script src="js/outdoor.js?v=32"></script>
-  <script src="js/online.js?v=32"></script>
-  <script src="js/party.js?v=32"></script>
-  <script src="js/app.js?v=32"></script>
+  <script src="assets/manifest.js?v=33"></script>
+  <script src="js/svg.js?v=33"></script>
+  <script src="js/pets.js?v=33"></script>
+  <script src="js/items.js?v=33"></script>
+  <script src="js/items-more.js?v=33"></script>
+  <script src="js/stickers-more.js?v=33"></script>
+  <script src="js/look.js?v=33"></script>
+  <script src="js/furniture-more.js?v=33"></script>
+  <script src="js/store.js?v=33"></script>
+  <script src="js/pricing.js?v=33"></script>
+  <script src="js/diy.js?v=33"></script>
+  <script src="js/ui.js?v=33"></script>
+  <script src="js/wardrobe.js?v=33"></script>
+  <script src="js/shop.js?v=33"></script>
+  <script src="js/home.js?v=33"></script>
+  <script src="js/games.js?v=33"></script>
+  <script src="js/games-more.js?v=33"></script>
+  <script src="js/games-park.js?v=33"></script>
+  <script src="js/net-config.js?v=33"></script>
+  <script src="js/net.js?v=33"></script>
+  <script src="js/outdoor.js?v=33"></script>
+  <script src="js/online.js?v=33"></script>
+  <script src="js/party.js?v=33"></script>
+  <script src="js/app.js?v=33"></script>
 </body>
 </html>
