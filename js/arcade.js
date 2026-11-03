@@ -25,18 +25,28 @@ const Arcade = (() => {
   }
   function draw() {
     $('.arcade-count').textContent = `${Object.keys(GAMES).length} 種小冒險`;
-    const entries = Object.entries(GAMES).filter(([id, game]) => arcadeMatches(id, game, kind, $('#arcade-search').value));
+    const entries = Object.entries(GAMES).filter(([id, game]) => arcadeMatches(id, game, kind === 'favorites' ? 'all' : kind, $('#arcade-search').value)
+      && (kind !== 'favorites' || save.favoriteGames?.[id]));
     $('#arcade-results').textContent = `找到 ${entries.length} 個遊戲`;
     grid.innerHTML = entries.map(([id, game]) => {
       const info = gameDetails(id);
       return `<article class="arcade-card" style="--game-color:${info.color}">
-        <div class="arcade-art" aria-hidden="true">${game.icon}</div><div class="arcade-card-body">
+        <div class="arcade-art"><span aria-hidden="true">${game.icon}</span><button class="favorite-game" data-favorite="${id}" aria-pressed="${!!save.favoriteGames?.[id]}" aria-label="收藏${game.name}">${save.favoriteGames?.[id] ? '♥' : '♡'}</button></div><div class="arcade-card-body">
         <div class="arcade-meta"><span>${GAME_KINDS[info.kind]}</span><span>${info.time}</span></div>
         <h2>${game.name}</h2><p>${info.tip}</p><div class="arcade-record">${save.best[id] ? `最佳 ${save.best[id]} 分` : '第一個紀錄，等你來創造'}</div>
         <button class="btn btn-pink" data-play="${id}" aria-label="玩${game.name}">開始玩 <span aria-hidden="true">↗</span></button></div></article>`;
     }).join('') || '<div class="empty-state soft-panel">還沒找到這種小冒險。<br><button class="btn btn-gray" data-clear-search>看看全部遊戲</button></div>';
   }
   grid.addEventListener('click', (e) => {
+    const favorite = e.target.closest('[data-favorite]');
+    if (favorite) {
+      const id = favorite.dataset.favorite;
+      syncStoredSave(); save.favoriteGames ||= {};
+      if (save.favoriteGames[id]) delete save.favoriteGames[id]; else save.favoriteGames[id] = true;
+      persist(); draw();
+      ($(`[data-favorite="${id}"]`, grid) || $('[data-kind=favorites]')).focus();
+      return;
+    }
     const button = e.target.closest('[data-play]'); if (button) launch(button.dataset.play);
     if (e.target.closest('[data-clear-search]')) { kind = 'all'; $('#arcade-search').value = ''; syncFilters(); draw(); }
   });

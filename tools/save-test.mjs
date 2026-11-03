@@ -90,6 +90,8 @@ corrupt.run('const GAMES = { catch: {} };');
 assert.equal(corrupt.run('questPlayed("unknown")'), false);
 assert.equal(corrupt.run('questPlayed(null)'), false);
 const legacy = boot();
+assert.equal(corrupt.run('normalizeSave({ favoriteGames: { catch: true, bad: "yes" } }).favoriteGames.catch'), true);
+assert.equal(corrupt.run('normalizeSave({ favoriteGames: { bad: "yes" } }).favoriteGames.bad'), undefined);
 legacy.data.set('hamster-dressup-v1', JSON.stringify({ name: '舊鼠鼠', species: 'golden' }));
 assert.equal(legacy.run('loadSave().look.name'), '舊鼠鼠');
 assert.equal(corrupt.run('normalizeSave({ owned: { valid: true, old: 1, broken: "yes", constructor: true } }).owned.valid'), true);

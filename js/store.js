@@ -52,7 +52,7 @@ function normalizeSave(saved) {
   if (saved.pricingV === 1) base.pricingV = 1;
   base.lastMoonLogin = validSaveDay(saved.lastMoonLogin) ? saved.lastMoonLogin : '';
   base.look = cleanLook(saved.look);
-  for (const key of ['owned', 'fresh', 'collected', 'played']) base[key] = saveFlags(saved[key]);
+  for (const key of ['owned', 'fresh', 'collected', 'played', 'favoriteGames']) base[key] = saveFlags(saved[key]);
   if (saveObject(saved.best)) base.best = Object.fromEntries(Object.entries(saved.best)
     .filter(([id, score]) => /^[a-z][a-z0-9_-]*$/i.test(id) && Number.isFinite(score) && score >= 0)
     .map(([id, score]) => [id, safeAmount(score)]));

@@ -29,6 +29,8 @@ body { background-color: #fff8f0; background-size: 100px 100px; }
 .arcade-card { border: 1px solid #e9dce2; border-radius: 26px; overflow: hidden; background: #fff; box-shadow: 0 5px 0 #eddee3; }
 .arcade-art { position: relative; display: grid; place-items: center; font-size: 66px; height: 140px; background: radial-gradient(ellipse at 50% 100%, #ffffffb0, transparent 70%), var(--game-color); }
 .arcade-card-body { padding: 20px; }
+.favorite-game { position: absolute; right: 12px; top: 12px; width: 44px; height: 44px; border: 1px solid #ffffffb0; border-radius: 50%; background: #ffffffd9; color: #a43b64; font-size: 25px; }
+.favorite-game[aria-pressed=true] { background: #fff; color: #af305c; }
 .arcade-meta { display: flex; justify-content: space-between; gap: 8px; color: #765c65; font-size: 12px; }
 .arcade-card h2 { margin-top: 12px; font-size: 22px; }
 .arcade-card p { margin: 8px 0 14px; color: var(--soft); font-size: 14px; }
