@@ -1,9 +1,15 @@
 // 短局型新遊戲共用暫停時鐘、回饋與既有結算介面。
 const DELIVERY_FOODS = [
   { icon: '🥕', name: '紅蘿蔔', lane: 0 }, { icon: '🥦', name: '花椰菜', lane: 0 }, { icon: '🌽', name: '玉米', lane: 0 },
-  { icon: '🌻', name: '葵花子', lane: 1 }, { icon: '🌰', name: '栗子', lane: 1 }, { icon: '🥜', name: '花生', lane: 1 },
+  { icon: '🌻', img: 'g_seed', name: '葵花子', lane: 1 }, { icon: '🌰', name: '栗子', lane: 1 }, { icon: '🥜', name: '花生', lane: 1 },
   { icon: '🍰', name: '蛋糕', lane: 2 }, { icon: '🍩', name: '甜甜圈', lane: 2 }, { icon: '🧁', name: '杯子蛋糕', lane: 2 },
 ];
+const DELIVERY_LANES = [
+  { name: '鮮蔬', icon: '🥕', hint: '紅蘿蔔・花椰菜・玉米', color: '#e7f2df' },
+  { name: '堅果', icon: '🌰', hint: '葵花子・栗子・花生', color: '#f4e5d6' },
+  { name: '甜點', icon: '🧁', hint: '蛋糕・甜甜圈', color: '#fce3eb' },
+];
+const deliveryFoodArt = (food) => food.img ? `<img src="${assetUrl(food.img)}" alt="" class="delivery-food-img">` : food.icon;
 const deliveryOrder = (rng = Math.random) => DELIVERY_FOODS[Math.floor(rng() * DELIVERY_FOODS.length)];
 function shuffledList(values, rng = Math.random) {
   const out = [...values];
@@ -66,12 +72,12 @@ function cozySession(area, ctl, seconds, content) {
 
 function startDelivery(area, ctl) {
   const session = cozySession(area, ctl, 35, `<div class="delivery-counter"><span class="eyebrow">鼠鼠的點心訂單</span><div class="delivery-order"></div><div class="delivery-next" aria-label="接下來的訂單"></div></div>
-    <div class="delivery-lanes">${['🥕 鮮蔬', '🌰 堅果', '🧁 甜點'].map((name, i) => `<button class="delivery-lane" data-lane="${i}"><span>${name}</span><small>按 ${i + 1}</small></button>`).join('')}</div><p class="section-note">連續送對 5 份，額外加 3 分。慢慢看準再送！</p>`);
+    <div class="delivery-lanes">${DELIVERY_LANES.map((lane, i) => `<button class="delivery-lane" style="--lane-color:${lane.color}" data-lane="${i}" title="${lane.hint}"><span>${lane.icon} ${lane.name}</span><small>按 ${i + 1}</small></button>`).join('')}</div><p class="delivery-legend">鮮蔬吃新鮮、堅果有瓜子，甜點香甜甜。</p>`);
   const queue = Array.from({ length: 4 }, () => deliveryOrder());
   let streak = 0;
   function draw() {
-    $('.delivery-order', area).innerHTML = `<span aria-hidden="true">${queue[0].icon}</span><b>${queue[0].name}</b>`;
-    $('.delivery-next', area).innerHTML = `接下來 ${queue.slice(1).map((food) => `<span aria-label="${food.name}">${food.icon}</span>`).join('')}`;
+    $('.delivery-order', area).innerHTML = `<span aria-hidden="true">${deliveryFoodArt(queue[0])}</span><b>${queue[0].name}</b>`;
+    $('.delivery-next', area).innerHTML = `接下來 ${queue.slice(1).map((food) => `<span aria-label="${food.name}">${deliveryFoodArt(food)}</span>`).join('')}`;
   }
   function deliver(lane) {
     if (!session.active()) return;
@@ -82,7 +88,11 @@ function startDelivery(area, ctl) {
       session.award(bonus ? 4 : 1);
       session.feedback(bonus ? `連續 ${streak} 份！額外 +3 分` : `送到了！連續 ${streak} 份`);
       sfx.pop();
-    } else { streak = 0; session.award(-1); session.feedback('送錯籃子了，下一份再試試！', false); sfx.bad(); }
+    } else {
+      streak = 0; session.award(-1);
+      session.feedback(`${queue[0].name}要送到「${DELIVERY_LANES[queue[0].lane].name}」籃，這份再試一次！`, false);
+      sfx.bad(); return;
+    }
     queue.shift(); queue.push(deliveryOrder()); draw();
   }
   area.addEventListener('click', (e) => { const lane = e.target.closest('[data-lane]'); if (lane) deliver(Number(lane.dataset.lane)); });

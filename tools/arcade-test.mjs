@@ -11,6 +11,7 @@ assert.equal(run('deliveryOrder(() => 0).lane'), 0);
 assert.equal(run('deliveryOrder(() => 0.5).lane'), 1);
 assert.equal(run('deliveryOrder(() => 0.999).lane'), 2);
 assert.equal(run('DELIVERY_FOODS.every(food => [0, 1, 2].includes(food.lane))'), true);
+assert.equal(run('DELIVERY_LANES[DELIVERY_FOODS.find(food => food.name === "葵花子").lane].name'), '堅果');
 assert.equal(run('new Set(shuffledList([1,2,3,4,5,6,7,8,9])).size'), 9);
 assert.equal(run('shuffledList([1,2,3], () => 0).join(",")'), '2,3,1');
 assert.equal(run('shuffledList([]).length'), 0);

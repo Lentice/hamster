@@ -25,3 +25,4 @@
 | 19 | Move mobile navigation within thumb reach and compact daily panels | JavaScript syntax + available Node regression suites passed |
 | 20 | Start cozy game clocks on first input and show remaining-time bars | JavaScript syntax + available Node regression suites passed |
 | 21 | Add untimed practice without changing records quests or rewards | JavaScript syntax + available Node regression suites passed |
+| 22 | Teach snack categories with clear seed art and recoverable mistakes | JavaScript syntax + available Node regression suites passed |
