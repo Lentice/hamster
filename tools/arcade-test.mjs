@@ -27,6 +27,9 @@ for (const [score, stars] of [[0, 0], [9, 0], [10, 1], [25, 2], [45, 3], [NaN, 0
   assert.equal(run('earnedStars("delivery", score)'), stars);
 }
 assert.equal(run('dailyGameId("2026-11-03", [])'), null);
+assert.equal(run('adventureStats(["delivery", "starlight"], {delivery: 45, obsolete: 999}, {starlight:true}).stars'), 3);
+assert.equal(run('adventureStats(["delivery", "starlight"], {delivery: 45}, {starlight:true}).explored'), 2);
+assert.equal(run('adventureStats(["delivery", "starlight"]).totalStars'), 6);
 assert.equal(run('dailyGameId("2026-11-03", ["catch"])'), 'catch');
 assert.equal(run('dailyGameId("2026-11-03", ["catch", "wheel"])'), run('dailyGameId("2026-11-03", ["wheel", "catch"])'));
 assert.equal(run('arcadeMatches("stack", {name:"疊疊蛋糕"}, "reaction", " 蛋糕 ")'), true);

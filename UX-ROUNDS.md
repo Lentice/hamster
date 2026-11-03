@@ -21,3 +21,4 @@
 | 15 | Let players undo their last ten outfit changes | JavaScript syntax + available Node regression suites passed |
 | 16 | Filter the shop by ownership budget and item name | JavaScript syntax + available Node regression suites passed |
 | 17 | Add companion interactions and contextual home controls | JavaScript syntax + available Node regression suites passed |
+| 18 | Create an adventure passport with stars badges and game milestones | JavaScript syntax + available Node regression suites passed |

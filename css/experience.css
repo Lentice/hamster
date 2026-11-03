@@ -102,6 +102,21 @@ body { background-color: #fff8f0; background-size: 100px 100px; }
 .shop-tools > span { grid-column: 1 / -1; }
 .companion-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; margin-top: 18px; padding: 18px; border-radius: 20px; background: #fff3f5; border: 1px solid #efdce3; }
 .companion-bar p { margin: 8px 0 0; max-width: 560px; font-size: 14px; color: #80626c; line-height: 1.7; }
+.arcade-header-tools { display: grid; gap: 12px; justify-items: end; flex: 0 0 auto; }
+.passport-modal { width: min(700px, 100%); }
+.passport { padding: 14px 0; }
+.passport h2 { margin-top: 10px; font-size: clamp(22px, 4vw, 29px); }
+.passport-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 20px 0; }
+.passport-stats > div { display: grid; text-align: center; gap: 6px; padding: 16px 4px; background: #fff0d9; border-radius: 18px; }
+.passport-stats b { font-size: 25px; color: #815735; }.passport-stats span { font-size: 12px; }
+.passport-badges { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 0 0 26px; }
+.passport-badge { border: 1px dashed #d8cbd3; border-radius: 20px; padding: 18px 10px; display: grid; text-align: center; gap: 8px; background: #faf6f8; }
+.passport-badge > span { font-size: 34px; filter: grayscale(1); opacity: .5; }
+.passport-badge small { color: var(--soft); font-size: 12px; }.passport-badge em { font-size: 12px; font-style: normal; color: #80646f; }
+.passport-badge.unlocked { background: #fff8e7; border: 1px solid #ddc080; }.passport-badge.unlocked > span { filter: none; opacity: 1; }
+.passport-games { display: grid; gap: 8px; margin-top: 16px; }
+.passport-games button { border: 1px solid #eadce3; border-radius: 12px; background: #fff; min-height: 48px; padding: 12px; display: flex; justify-content: space-between; gap: 12px; }
+@media (max-width: 600px) { .passport-badges { grid-template-columns: repeat(2, 1fr); }.arcade-header-tools { justify-items: start; } }
 .arcade-meta { display: flex; justify-content: space-between; gap: 8px; color: #765c65; font-size: 12px; }
 .arcade-card h2 { margin-top: 12px; font-size: 22px; }
 .arcade-card p { margin: 8px 0 14px; color: var(--soft); font-size: 14px; }

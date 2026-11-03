@@ -30,10 +30,31 @@ function gameStars(id, score, cls = '') {
   const count = earnedStars(id, score);
   return `<div class="game-stars ${cls}" role="img" aria-label="${count} / 3 顆星">${[1, 2, 3].map((n) => `<span class="${n <= count ? 'earned' : ''}" aria-hidden="true">★</span>`).join('')}</div>`;
 }
+function adventureStats(ids, best = {}, played = {}) {
+  return { explored: ids.filter((id) => played[id] || best[id] > 0).length,
+    stars: ids.reduce((total, id) => total + earnedStars(id, best[id] || 0), 0), totalStars: ids.length * 3 };
+}
 
 const Arcade = (() => {
   const grid = $('#arcade-grid');
   let kind = 'all';
+  function passport() {
+    const ids = Object.keys(GAMES), stats = adventureStats(ids, save.best, save.played);
+    const designs = Object.values(save.diy || {}).reduce((total, list) => total + list.length, 0);
+    const badges = [
+      { title: '第一步冒險', hint: '體驗 1 款遊戲', done: stats.explored >= 1, icon: '🌱' },
+      { title: '小小探險家', hint: '體驗 5 款不同遊戲', done: stats.explored >= 5, icon: '🧭' },
+      { title: '星光收藏家', hint: '累積收集 10 顆星', done: stats.stars >= 10, icon: '🌟' },
+      { title: '遊戲大旅行', hint: `體驗全部 ${ids.length} 款遊戲`, done: stats.explored === ids.length, icon: '🎡' },
+      { title: '小小設計師', hint: '畫出 1 件自己的作品', done: designs > 0, icon: '🎨' },
+      { title: '夢想小屋', hint: '把小屋加蓋到 2 層', done: save.house.floors.length >= 2, icon: '🏡' },
+    ];
+    const m = modal(`<div class="passport"><span class="eyebrow">YOUR ADVENTURE PASSPORT</span><h2>每一點快樂，都值得收藏</h2><p class="section-note">不趕時間，照自己的步調收集小成就。</p>
+      <div class="passport-stats"><div><b>${stats.explored}/${ids.length}</b><span>遊戲足跡</span></div><div><b>${stats.stars}/${stats.totalStars}</b><span>收藏星光</span></div><div><b>${badges.filter((b) => b.done).length}/6</b><span>成就印章</span></div></div>
+      <div class="passport-badges">${badges.map((badge) => `<div class="passport-badge ${badge.done ? 'unlocked' : ''}"><span aria-hidden="true">${badge.icon}</span><b>${badge.title}</b><small>${badge.hint}</small><em>${badge.done ? '已達成 ✓' : '等待你的冒險'}</em></div>`).join('')}</div>
+      <h3>下一顆星，在哪裡？</h3><div class="passport-games">${ids.map((id) => `<button data-pass-game="${id}"><span>${GAMES[id].icon} ${GAMES[id].name}</span><b>${earnedStars(id, save.best[id] || 0)} / 3 ★</b></button>`).join('')}</div></div>`, { cls: 'passport-modal' });
+    m.box.addEventListener('click', (e) => { const button = e.target.closest('[data-pass-game]'); if (button) { m.close(); launch(button.dataset.passGame); } });
+  }
   function launch(id) {
     if (!Object.hasOwn(GAMES, id)) return;
     openGame(id, () => { if (currentScreen === 'arcade') draw(); });
@@ -74,6 +95,7 @@ const Arcade = (() => {
   });
   function syncFilters() { $$('#arcade-filters [data-kind]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.kind === kind))); }
   $('#arcade-search').addEventListener('input', draw);
+  $('#adventure-passport').addEventListener('click', passport);
   $('#arcade-spotlight').addEventListener('click', (e) => {
     const pick = e.target.closest('[data-spotlight]'); if (pick) launch(pick.dataset.spotlight);
     if (e.target.closest('[data-surprise]')) {
