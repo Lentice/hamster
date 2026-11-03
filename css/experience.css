@@ -23,6 +23,15 @@ body { background-color: #fff8f0; background-size: 100px 100px; }
 .section-note { font-size: 14px; line-height: 1.7; color: var(--soft); }
 .arcade-count { border-radius: 999px; padding: 9px 15px; background: #f5e6eb; color: #85415b; white-space: nowrap; }
 .arcade-toolbar { display: grid; gap: 14px; margin-bottom: 24px; }
+.arcade-spotlight { display: grid; grid-template-columns: 1.25fr 1fr; gap: 18px; margin-bottom: 22px; }
+.daily-pick, .daily-pass { padding: 26px; border-radius: 26px; border: 1px solid #e8d5e0; background: linear-gradient(120deg, #f8ebf3, #f0efff); }
+.daily-pass { background: linear-gradient(120deg, #fff5d9, #fffaf0); border-color: #ead8ae; }
+.arcade-spotlight h2 { margin: 12px 0; font-size: 22px; }
+.arcade-spotlight p { line-height: 1.7; color: #775e67; font-size: 14px; }
+.quest-stamps { display: flex; gap: 12px; margin-top: 18px; }
+.quest-stamps span { display: grid; place-items: center; width: 44px; height: 44px; border: 2px dashed #ccb688; border-radius: 50%; color: #856b42; }
+.quest-stamps .stamped { color: #fff; border-style: solid; border-color: #477557; background: #477557; }
+@media (max-width: 700px) { .arcade-spotlight { grid-template-columns: 1fr; } .daily-pick, .daily-pass { padding: 20px; } }
 .arcade-search { display: grid; gap: 8px; font-size: 13px; color: var(--soft); }
 .arcade-search .field-search { max-width: 480px; }
 .arcade-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; }

@@ -1,0 +1,14 @@
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import vm from 'node:vm';
+const source = readFileSync(new URL('../js/arcade.js', import.meta.url), 'utf8');
+const context = vm.createContext({});
+vm.runInContext(source.slice(0, source.indexOf('const Arcade =')), context);
+const run = (code) => vm.runInContext(code, context);
+assert.equal(run('dailyGameId("2026-11-03", [])'), null);
+assert.equal(run('dailyGameId("2026-11-03", ["catch"])'), 'catch');
+assert.equal(run('dailyGameId("2026-11-03", ["catch", "wheel"])'), run('dailyGameId("2026-11-03", ["wheel", "catch"])'));
+assert.equal(run('arcadeMatches("stack", {name:"疊疊蛋糕"}, "reaction", " 蛋糕 ")'), true);
+assert.equal(run('arcadeMatches("stack", {name:"疊疊蛋糕"}, "puzzle", "")'), false);
+assert.equal(run('arcadeMatches("stack", {name:"疊疊蛋糕"}, "all", "不存在")'), false);
+console.log('Arcade tests passed: search, categories and stable daily recommendations.');
