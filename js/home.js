@@ -149,24 +149,36 @@
 
   function drawInventory() {
     $$('.panel-tab').forEach((b) => b.classList.toggle('active', b.dataset.panel === panel));
+    const query = $('#inventory-search').value.trim().toLowerCase(), ownedOnly = $('#inventory-owned').checked;
+    const matches = (cat, item) => item.name.toLowerCase().includes(query) && (!ownedOnly || isOwned(cat, item));
+    let count = 0;
     if (panel === 'furniture') {
       // 已擁有的排前面；右上角顯示這層樓已經擺了幾個
       const placed = {};
       floor().items.forEach((it) => { placed[it.id] = (placed[it.id] || 0) + 1; });
-      const list = [...FURNITURE].sort((a, b) => isOwned('furniture', b) - isOwned('furniture', a));
+      const list = [...FURNITURE].filter((f) => matches('furniture', f)).sort((a, b) => isOwned('furniture', b) - isOwned('furniture', a));
+      count = list.length;
       inventory.innerHTML = list.map((f) => {
         const owned = isOwned('furniture', f);
         return `<button class="inv-item ${owned ? '' : 'locked'}" data-id="${f.id}">
           <img src="${assetUrl(f.img)}" alt="" loading="lazy"><span>${f.name}</span>${owned ? '' : `<em class="price-tag">${HAMSTER_COIN_ICON}${f.price}</em>`}${placed[f.id] ? `<i class="placed-count">×${placed[f.id]}</i>` : ''}</button>`;
       }).join('');
     } else {
-      inventory.innerHTML = ROOMS.map((r) => {
+      const rooms = ROOMS.filter((r) => matches('rooms', r)); count = rooms.length;
+      inventory.innerHTML = rooms.map((r) => {
         const owned = isOwned('rooms', r);
         return `<button class="inv-item wide ${floor().bg === r.id ? 'selected' : ''} ${owned ? '' : 'locked'}" data-id="${r.id}">
           <img src="${assetUrl(r.img)}" alt="" loading="lazy"><span>${r.name}</span>${owned ? '' : `<em class="price-tag">${HAMSTER_COIN_ICON}${r.price}</em>`}</button>`;
       }).join('');
     }
+    $('#inventory-results').textContent = `${panel === 'furniture' ? '家具' : '房間'} · ${count} 件${ownedOnly ? '已擁有' : '可選擇'}`;
+    if (!count) inventory.innerHTML = '<div class="empty-state">沒有符合的物品。<br><button class="btn btn-gray" data-reset-inventory>清除搜尋與篩選</button></div>';
   }
+  $('#inventory-search').addEventListener('input', drawInventory);
+  $('#inventory-owned').addEventListener('change', drawInventory);
+  inventory.addEventListener('click', (e) => {
+    if (e.target.closest('[data-reset-inventory]')) { $('#inventory-search').value = ''; $('#inventory-owned').checked = false; drawInventory(); $('#inventory-search').focus(); }
+  });
 
   function drawSelBar() {
     $('#sel-bar').classList.toggle('has-sel', !!selected);

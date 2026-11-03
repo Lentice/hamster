@@ -28,3 +28,4 @@
 | 22 | Teach snack categories with clear seed art and recoverable mistakes | JavaScript syntax + available Node regression suites passed |
 | 23 | Make five-action combo bonuses visible in delivery and math | JavaScript syntax + available Node regression suites passed |
 | 24 | Protect DIY edits and keep creative actions easy to reach | JavaScript syntax + available Node regression suites passed |
+| 25 | Search furniture and rooms and focus on owned decorations | JavaScript syntax + available Node regression suites passed |

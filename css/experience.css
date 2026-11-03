@@ -77,6 +77,11 @@ body { background-color: #fff8f0; background-size: 100px 100px; }
 .diy > .modal-actions { position: sticky; bottom: -12px; z-index: 4; padding: 14px 8px max(14px, env(safe-area-inset-bottom)); background: #fff8f3f5; border-top: 1px solid #e8d4df; border-radius: 18px; box-shadow: 0 -5px 18px #7043540a; }
 .diy > .modal-actions [data-act=save] { flex: 1; max-width: 360px; }
 .diy-color[aria-pressed=true] { outline: 3px solid #513d40; outline-offset: 2px; }
+.inventory-tools { display: grid; gap: 12px; grid-template-columns: 1fr auto; align-items: end; padding: 16px 0; }
+.inventory-tools > label:first-child { display: grid; gap: 8px; font-size: 13px; color: var(--soft); }
+.inventory-own { display: flex; align-items: center; gap: 8px; min-height: 44px; font-size: 14px; white-space: nowrap; }
+.inventory-own input { width: 20px; height: 20px; accent-color: #a94c72; }
+.inventory-tools > span { grid-column: 1 / -1; }
 .park-heading { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; padding: 8px 4px 20px; }
 .park-heading h2 { margin: 7px 0; }
 .park-heading p { color: var(--soft); font-size: 14px; margin: 0; line-height: 1.6; }
