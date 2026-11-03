@@ -86,8 +86,8 @@
     grid.innerHTML = Array.from({ length: OUTFIT_SLOTS }, (_, i) => {
       const o = outfits()[i];
       if (!o) return `<button class="item outfit-empty" data-outfit-save="${i}"><div class="thumb"><span class="diy-new-icon">＋</span></div><span class="item-name">存下現在的搭配</span></button>`;
-      return `<button class="item outfit" data-outfit-wear="${i}"><div class="thumb">${petSvg({ ...o, background: 'none' })}</div><span class="item-name">搭配 ${i + 1}</span>
-        <span class="diy-edit outfit-del" data-outfit-del="${i}" role="button" aria-label="刪除搭配">✕</span></button>`;
+      return `<div class="outfit-slot"><button class="item outfit" data-outfit-wear="${i}"><div class="thumb">${petSvg({ ...o, background: 'none' })}</div><span class="item-name">搭配 ${i + 1}</span></button>
+        <button class="outfit-delete" data-outfit-del="${i}" aria-label="刪除搭配 ${i + 1}">✕</button></div>`;
     }).join('') + '<p class="outfit-tip">點空格子存下現在的打扮，之後點一下就能整套換上！</p>';
   }
 
@@ -141,7 +141,14 @@
       drawGrid(); $('#closet-search').focus(); return;
     }
     const del = e.target.closest('[data-outfit-del]');
-    if (del) { outfits()[del.dataset.outfitDel] = null; persist(); drawGrid(); sfx.tab(); return; }
+    if (del) {
+      const index = Number(del.dataset.outfitDel);
+      confirmQuit(() => {
+        outfits()[index] = null; persist(); drawGrid(); sfx.tab();
+        $(`[data-outfit-save="${index}"]`, grid)?.focus();
+      }, `要刪除搭配 ${index + 1} 嗎？衣服和作品都會保留。`, ['保留搭配', '刪除搭配']);
+      return;
+    }
     const sv = e.target.closest('[data-outfit-save]');
     if (sv) {
       const { name, ...rest } = look;

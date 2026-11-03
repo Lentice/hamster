@@ -33,3 +33,4 @@
 | 27 | Simplify shop browsing while keeping blind-box odds clear | JavaScript syntax + available Node regression suites passed |
 | 28 | Let park visitors choose travel or instant play from the map | JavaScript syntax + available Node regression suites passed |
 | 29 | Improve the original memory game with readable previews and pair feedback | JavaScript syntax + available Node regression suites passed |
+| 30 | Polish mobile layouts protect saved outfits and verify the whole app | JavaScript syntax + available Node regression suites passed |

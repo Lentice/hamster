@@ -40,4 +40,4 @@ assert.equal(run('dailyGameId("2026-11-03", ["catch", "wheel"])'), run('dailyGam
 assert.equal(run('arcadeMatches("stack", {name:"疊疊蛋糕"}, "reaction", " 蛋糕 ")'), true);
 assert.equal(run('arcadeMatches("stack", {name:"疊疊蛋糕"}, "puzzle", "")'), false);
 assert.equal(run('arcadeMatches("stack", {name:"疊疊蛋糕"}, "all", "不存在")'), false);
-console.log('Arcade tests passed: search, categories and stable daily recommendations.');
+console.log('Arcade tests passed: search, daily picks, stars, shuffled boards, arithmetic choices and combo boundaries.');

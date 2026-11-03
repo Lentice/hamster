@@ -18,3 +18,18 @@ Observations guiding the follow-up rounds:
 - Beginners need a relaxed way to learn without competing for scores or coins.
 
 Screenshots were inspected from the dedicated local test session; generated screenshots and test saves are excluded from Git.
+
+## Existing app flows tried
+
+- Drew a blue shirt using the palette and fill tool, tested undo/redo and work codes, saved and wore the design, saved an outfit, reset clothing, and restored the outfit.
+- Dragged, flipped, enlarged and removed furniture; verified furniture search, owned-only filtering, placement undo and drag undo.
+- Purchased a normal blind box with coins earned in the test save and immediately wore the prize. Verified complete bonus probabilities remain available.
+- Opened the park map, checked all destinations and used direct launch. Completed the original memory game from its visible opening preview with a normal clock: 100 points, three stars.
+- Checked all three untimed practice modes: playing and ending practice preserves coins, records and daily quest state.
+- Checked keyboard activation and cancellation of outfit deletion, DIY name-only unsaved changes, and DIY deletion protection.
+
+## Final verification
+
+The four Node suites cover economy, save validation, asset handling, arcade search/recommendations, shuffle uniqueness, arithmetic choices, combo boundaries and star thresholds. Three browser scripts cover original flows, the new games and cross-feature usage. Responsive checks use 375, 768 and 1360 px widths; mobile navigation is measured against the viewport bottom.
+
+The feature tests use a dedicated local save. No public chat messages or multiplayer invitations were sent. Live multiplayer sessions and actual iOS/Safari devices were not validated.

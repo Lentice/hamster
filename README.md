@@ -10,6 +10,7 @@ iPad / iPhone 用 Safari 開啟後按「分享 → 加入主畫面」，就能�
 
 | 畫面 | 內容 |
 |---|---|
+| 🎮 遊戲室 | 13 款遊戲一點即玩；可搜尋、依玩法分類、加入最愛。每日推薦與集章卡幫你挑下一款，冒險護照記錄遊戲足跡、銅銀金星與成就。結算可接著挑戰其他遊戲 |
 | 👗 換裝 | 21 種鼠鼠、25 種表情，加上帽子、衣服、眼鏡、頸飾、手持物、特效（每類 30 件以上）與背景。依精美程度定價，清單由便宜排到貴。鼠鼠會跟著游標轉頭、做各種小動作。可以取名字、存成 PNG。「💾 我的搭配」可以存 3 套造型，點一下整套換上。買之前會先試穿；新拿到的東西掛 NEW，可以只看已擁有的 |
 | 🎨 自己畫 | 在衣服、帽子、頸飾、手持分類點「自己畫」，用像素畫筆彩繪自己的衣服、帽子、領巾、小旗子：24 色、畫筆／填滿／橡皮擦／取色、復原／重做、粗細、左右對稱，即時預覽（點一下可放大）。「🔗 作品代碼」可以複製代碼傳給朋友，朋友貼上就能載入同樣的作品。每類最多 8 件，點作品上的 ✏️ 可以再修改。作品只存在自己的瀏覽器 |
 | 🏠 我的家 | 最多 5 層樓，每層自由擺放家具（拖曳、翻轉、縮放、收起）、換房間背景，用梯子上下樓。鼠鼠會自己走動、跑滾輪、吃飯、睡覺、鑽隧道、彈琴、盪鞦韆、跳彈跳床、泡澡…，每件家具使用時都有動畫（家具搖晃發光、飄出音符泡泡等）；也可以切換成自己操控。點鼠鼠會撒嬌；晚上牠比較常去睡覺 |
@@ -29,6 +30,19 @@ iPad / iPhone 用 Safari 開啟後按「分享 → 加入主畫面」，就能�
 
 進度（兩種金幣、每日領取日期、買過的東西、搭配、房間擺設）都存在瀏覽器的 localStorage。點左上角「🐹 鼠鼠小屋」可以把存檔備份成檔案，換裝置時再從檔案還原。
 
+### 新的小冒險與操作改善
+
+- **點心快遞**：35 秒把食物送到正確籃子，有訂單預告、五次連擊獎勵；送錯會告訴你正確分類，原訂單可以重試。
+- **星光尋寶**：45 秒依 1 → 9 找星星，每片星空完成再加 5 分。
+- **甜點算算**：45 秒解加減法，隨答對題數逐步提高難度，五次連擊再加分。
+- 三款新遊戲都從第一次操作後才開始倒數，也可先玩**無限時練習**；練習不更新最佳紀錄、收藏星星、每日任務或金幣獎勵。
+- 衣櫃與商店可搜尋；換裝可復原最近十次調整，刪除儲存搭配會先確認。DIY 改名字或圖案後離開會提醒，刪除作品也會確認。
+- 小屋可搜尋家具／房間、只看已擁有，並復原最近十次擺放、拖曳、縮放或房間變更。購買的物品仍保留。
+- 公園地圖可以選「到攤位」或「直接玩」。翻牌配對延長為 3 秒預覽，提供配對進度與可讀的卡牌名稱。
+- 手機有底部主導覽，商店與換裝分類可橫向捲動。介面沿用奶油粉彩插畫風格，支援鍵盤、縮放與減少動態效果。
+
+本次每輪一個 commit 的紀錄見 [30 輪改善](UX-ROUNDS.md)，正常計時及跨功能試用紀錄見 [試玩與調整](PLAYTEST.md)。
+
 ## 本機執行
 
 需要用本機伺服器開啟（存圖和小遊戲會讀取圖片素材）：
@@ -46,9 +60,10 @@ python -m http.server 8000
 node tools/economy-test.mjs
 node tools/save-test.mjs
 node tools/assets-test.mjs
+node tools/arcade-test.mjs
 ```
 
-依序檢查經濟系統與跨分頁同步、損壞存檔與作品代碼、素材併發載入與失敗重試。
+依序檢查經濟系統與跨分頁同步、損壞存檔與作品代碼、素材併發載入與失敗重試，以及遊戲室推薦、星級、算術與連擊邊界。
 載入與匯入會清理無效欄位並保留有效進度，支援舊版單層房間與定價遷移；匯入檔案上限為 2 MB。
 瀏覽器無法儲存進度時會提示下載備份，備份直接包含記憶體中的最新進度。
 
@@ -57,6 +72,8 @@ node tools/assets-test.mjs
 ```bash
 playwright-cli -s=hamster-test open http://127.0.0.1:8000
 playwright-cli -s=hamster-test run-code --filename=tools/browser-test.js
+playwright-cli -s=hamster-test run-code --filename=tools/ux-browser-test.js
+playwright-cli -s=hamster-test run-code --filename=tools/app-browser-test.js
 playwright-cli -s=hamster-test close
 ```
 
@@ -95,7 +112,7 @@ node tools/party-rules-test.mjs
 ## 發布到 GitHub Pages
 
 1. 在 GitHub 建立 repository，推上這個資料夾（`.gitignore` 已排除原始大圖）
-   - 更新程式後，把 `index.html` 裡所有 CSS / JavaScript 的 `?v=` 版本號一起加一（目前為 `33`），玩家的瀏覽器才會抓新版
+   - 更新程式後，把 `index.html` 裡所有 CSS / JavaScript 的 `?v=` 版本號一起加一（目前為 `63`），玩家的瀏覽器才會抓新版
 2. **Settings → Pages → Source** 選 `Deploy from a branch`，Branch 選 `main`、資料夾 `/ (root)`
 3. 約一分鐘後就能在 `https://<帳號>.github.io/<repository>/` 遊玩
 
@@ -104,6 +121,7 @@ node tools/party-rules-test.mjs
 ```
 index.html            頁面骨架
 css/style.css         樣式與所有動畫
+css/experience.css    粉彩介面、遊戲室、手機導覽與新遊戲樣式
 js/svg.js             SVG 繪圖工具、素材載入
 js/pets.js            鼠鼠物種（體型參數）與表情
 js/items.js           衣服、帽子、眼鏡、頸飾、手持、特效、背景、家具、房間
@@ -122,6 +140,9 @@ firebase/             資料庫安全規則與模擬器設定
 js/games.js           小遊戲（接瓜子、滾輪、翻牌）
 js/games-more.js      小遊戲（打地鼠、跑酷、迷宮）
 js/games-park.js      小遊戲（疊疊蛋糕、音樂會、釣魚、戳泡泡）
+js/games-cozy.js      點心快遞、星光尋寶、甜點算算與無限時練習
+js/arcade.js          遊戲室、每日推薦、收藏與冒險護照
+js/experience.js      個人化歡迎與跨畫面入口
 js/items-more.js      更多 SVG 服飾配件
 js/stickers-more.js   更多點陣貼紙配件
 js/furniture-more.js  更多家具與家具使用動畫設定

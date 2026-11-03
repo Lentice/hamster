@@ -6,6 +6,7 @@ async (page) => {
   page.on('pageerror', (error) => errors.push(error.message));
   await page.unrouteAll({ behavior: 'wait' });
   await page.route('**/*', (route) => route.continue());
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.setViewportSize({ width: 1360, height: 900 });
   await page.goto('http://127.0.0.1:8000');
   await page.evaluate(() => { localStorage.clear(); localStorage.setItem('hamster-welcomed', '1'); });
@@ -35,6 +36,9 @@ async (page) => {
     await page.locator(`[data-play=${id}]`).click();
     await page.locator('[role=dialog][aria-modal=true] [data-act=start]').click();
     await page.waitForFunction(() => document.querySelector('.game-area')?.getAttribute('aria-busy') === 'false');
+    const readyTime = await page.locator('.h-time').innerText();
+    await page.evaluate(() => new Promise((resolve) => setTimeout(resolve, 220)));
+    check(await page.locator('.h-time').innerText() === readyTime, `${id} 等待第一次操作才計時`);
   };
   const settle = async () => {
     await page.evaluate(() => { window.cozyTimeOffset = 60000; });
