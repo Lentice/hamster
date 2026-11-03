@@ -20,3 +20,4 @@
 | 14 | Find wardrobe items by name with clear result counts | JavaScript syntax + available Node regression suites passed |
 | 15 | Let players undo their last ten outfit changes | JavaScript syntax + available Node regression suites passed |
 | 16 | Filter the shop by ownership budget and item name | JavaScript syntax + available Node regression suites passed |
+| 17 | Add companion interactions and contextual home controls | JavaScript syntax + available Node regression suites passed |

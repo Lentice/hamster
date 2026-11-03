@@ -14,6 +14,11 @@
   let panel = 'furniture';
   let raf = 0, lastT = 0;
   let near = null;
+  function updateHomeGuide() {
+    $('#home-guide').textContent = editing ? '佈置模式：點選家具拖曳，用下方按鈕翻轉或調整大小。' : control ? '你來帶路：方向鍵移動，空白鍵使用身旁家具。也能點地板走過去。' : '自由活動中：點家具邀請牠去玩，或摸摸牠看看反應。';
+    $('#edit-toggle').setAttribute('aria-pressed', String(editing));
+    $('#control-toggle').setAttribute('aria-pressed', String(control));
+  }
   const keys = {};
 
   const pet = { x: 700, y: 820, tx: 700, ty: 820, state: 'idle', until: 0, use: null, el: null, expr: null, useEnds: false };
@@ -244,6 +249,7 @@
 
   $('#edit-toggle').addEventListener('click', () => {
     editing = !editing;
+    updateHomeGuide();
     selected = null;
     $('#edit-toggle').textContent = editing ? '✅ 佈置完成' : '🔨 佈置房間';
     $('#edit-panel').classList.toggle('open', editing);
@@ -254,6 +260,7 @@
   $('#control-toggle').addEventListener('click', () => {
     control = !control;
     $('#control-toggle').textContent = control ? '🐹 讓牠自由活動' : '🎮 我來控制';
+    updateHomeGuide();
     $('#control-hint').classList.toggle('show', control);
     stopUsing();
     room.focus();
@@ -362,17 +369,8 @@
       return;
     }
     if (e.target.closest('.room-pet')) {
-      // 摸摸鼠鼠：動作、表情隨機，每摸 5 下說一句話
-      pats++;
-      const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
-      petAct($('.pet-svg', pet.el), pick(['hop', 'wiggle', 'tilt', 'wave']), 850); // 最長的動畫 .8s，讓它播完
-      sfx.squeak();
       const r = room.getBoundingClientRect();
-      floatText(room, e.clientX - r.left, e.clientY - r.top, pick(['💗', '💕', '✨', '🥰', '🌸']), 'emoji');
-      if (pats % 5 === 0) {
-        const name = save.look.name.trim();
-        floatText(room, e.clientX - r.left, e.clientY - r.top - 40, pick(['最喜歡你了！', '好舒服～', '再摸一下嘛', name ? `${escapeXml(name)}好開心！` : '好開心！', '嘿嘿～']), 'coin-pop');
-      }
+      patPet(e.clientX - r.left, e.clientY - r.top);
       return;
     }
     if (editing) {
@@ -393,6 +391,20 @@
   });
   let holding = false;
   let pats = 0;
+  function patPet(x, y) {
+    if (!pet.el) return;
+    pats++;
+    const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+    petAct($('.pet-svg', pet.el), pick(['hop', 'wiggle', 'tilt', 'wave']), 850);
+    sfx.squeak();
+    floatText(room, x, y, pick(['💗', '💕', '✨', '🥰', '🌸']), 'emoji');
+    if (pats % 5 === 0) floatText(room, x, y - 40, pick(['最喜歡你了！', '好舒服～', '再摸一下嘛', '今天也好開心！']), 'coin-pop');
+  }
+  $('#home-pat').addEventListener('click', () => {
+    const r = room.getBoundingClientRect(), p = pet.el?.getBoundingClientRect();
+    if (p) patPet(p.left - r.left + p.width / 2, p.top - r.top + p.height / 2);
+  });
+  $('#home-call').addEventListener('click', () => { stopUsing(); walkTo(750, 850); sfx.squeak(); });
 
   // 點擊位置下有沒有可使用的家具（用家具的外框判斷）
   function usableAt(p) {
@@ -718,6 +730,7 @@
       pet.state = 'idle';
       pet.until = performance.now() + 800;
       drawAll();
+      updateHomeGuide();
       lastT = performance.now();
       raf = requestAnimationFrame(tick);
     },
