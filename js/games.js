@@ -125,8 +125,11 @@ function runGame(id, m) {
       area.innerHTML = `<div class="game-result">
         <div class="game-icon">${record ? '🏆' : '🎉'}</div>
         <h2>${record ? '新紀錄！' : '完成！'}</h2>
+        ${gameStars(id, score, 'result-stars')}
+        <p class="result-cheer">${earnedStars(id, score) === 3 ? '三顆星到手！今天的你閃閃發亮。' : earnedStars(id, score) > 0 ? '小小努力，收集一點星光。' : '每一次練習，都是下一次進步的開始。'}</p>
         <p class="score">分數 <b>${score}</b></p>
         <p class="best-line">${bestLine}</p>
+        ${gameDetails(id).goals.find((goal) => goal > score) ? `<p class="next-star">再多 ${gameDetails(id).goals.find((goal) => goal > score) - score} 分，就能拿下一顆星</p>` : ''}
         <p class="reward">獲得 <b>${HAMSTER_COIN_ICON} ${coins}</b> 鼠鼠幣</p>
         ${questDone ? `<p class="quest-done">🎯 完成今日任務！再送 ${HAMSTER_COIN_ICON} ${QUEST_REWARD}</p>`
     : questState().done ? '' : `<p class="quest-line">🎯 今日任務 ${questState().games.length} / ${QUEST_GAMES}：再玩 ${QUEST_GAMES - questState().games.length} 種不同的遊戲送 ${QUEST_REWARD}</p>`}

@@ -14,6 +14,10 @@ assert.equal(run('DELIVERY_FOODS.every(food => [0, 1, 2].includes(food.lane))'),
 assert.equal(run('new Set(shuffledList([1,2,3,4,5,6,7,8,9])).size'), 9);
 assert.equal(run('shuffledList([1,2,3], () => 0).join(",")'), '2,3,1');
 assert.equal(run('shuffledList([]).length'), 0);
+for (const [score, stars] of [[0, 0], [9, 0], [10, 1], [25, 2], [45, 3], [NaN, 0], [Infinity, 0]]) {
+  context.score = score;
+  assert.equal(run('earnedStars("delivery", score)'), stars);
+}
 assert.equal(run('dailyGameId("2026-11-03", [])'), null);
 assert.equal(run('dailyGameId("2026-11-03", ["catch"])'), 'catch');
 assert.equal(run('dailyGameId("2026-11-03", ["catch", "wheel"])'), run('dailyGameId("2026-11-03", ["wheel", "catch"])'));
