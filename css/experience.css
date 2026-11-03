@@ -1,0 +1,33 @@
+/* 鼠鼠小屋：奶油色的玩具小鎮。沿用現有插圖與 Huninn 字體。 */
+:root { --ink: #513d40; --soft: #80666a; --pink-deep: #bc3e65; --radius: 26px; }
+body { background-color: #fff8f0; background-size: 100px 100px; }
+.topbar { border-bottom-width: 2px; box-shadow: 0 4px 24px #8b576810; }
+.logo { border: 0; background: transparent; padding: 6px; }
+.card { border-width: 2px; box-shadow: 0 7px 0 #f1dce0, 0 14px 32px #8b57680a; }
+.btn { transition: transform .15s, box-shadow .15s, background .15s; min-height: 44px; }
+.btn:active:not(:disabled) { transform: translateY(2px) scale(.98); }
+.btn-pink, .nav-btn.active { color: #67213c; background: #ffb4ca; }
+.tab.active { color: #67213c; }
+.nav-btn { min-height: 46px; }
+.screen { scroll-margin-top: calc(var(--topbar-h, 90px) + 16px); }
+.experience-heading { display: flex; justify-content: space-between; gap: 20px; align-items: center; margin: 0 0 22px; }
+.experience-heading h1 { margin: 5px 0 8px; font-size: clamp(26px, 4vw, 36px); line-height: 1.3; }
+.experience-heading p { margin: 0; color: var(--soft); line-height: 1.7; }
+.eyebrow { color: #9b4862; font-size: 12px; font-weight: bold; letter-spacing: .12em; }
+.soft-panel { border: 1px solid #eadbe0; border-radius: 22px; background: #fff; padding: 20px; }
+.empty-state { grid-column: 1 / -1; text-align: center; padding: 28px; color: var(--soft); line-height: 1.8; }
+.field-search { width: 100%; min-height: 44px; border: 2px solid #eadbe0; border-radius: 14px; padding: 10px 14px; color: var(--ink); background: #fffdfb; font: inherit; }
+.chip-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.choice-chip { min-height: 42px; border: 1px solid #e8dce3; border-radius: 999px; padding: 8px 15px; font: inherit; background: #fff; }
+.choice-chip[aria-pressed=true] { background: #fce3ec; border-color: #b85274; color: #7a2948; }
+.section-note { font-size: 14px; line-height: 1.7; color: var(--soft); }
+@media (hover: hover) {
+  .btn:hover:not(:disabled) { filter: brightness(1.025); }
+  .item:hover { border-color: #d599ae; }
+}
+@media (max-width: 600px) {
+  main { padding: 0 10px 28px; margin-top: 12px; }
+  .experience-heading { align-items: flex-start; gap: 12px; flex-direction: column; }
+  .soft-panel { padding: 16px; }
+  .nav-btn { padding: 8px 10px; }
+}
