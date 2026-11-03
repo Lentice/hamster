@@ -10,10 +10,20 @@ function shuffledList(values, rng = Math.random) {
   for (let i = out.length - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); [out[i], out[j]] = [out[j], out[i]]; }
   return out;
 }
+function snackQuestion(level = 0, rng = Math.random) {
+  const max = Math.min(20, 5 + Math.floor(Math.max(0, level) / 5) * 3);
+  let a = 1 + Math.floor(rng() * max), b = 1 + Math.floor(rng() * max);
+  const subtract = rng() < 0.5;
+  if (subtract && b > a) [a, b] = [b, a];
+  const answer = subtract ? a - b : a + b;
+  const wrong = shuffledList([-3, -2, -1, 1, 2, 3, 4].map((offset) => answer + offset).filter((value) => value >= 0), rng).slice(0, 3);
+  return { a, b, subtract, answer, choices: shuffledList([answer, ...wrong], rng) };
+}
 
 Object.assign(GAMES, {
   delivery: { name: '點心快遞', icon: '🧺', desc: '把桌上的食物送進正確籃子：鮮蔬、堅果或甜點。<br>送對 +1 分，連續 5 次正確再 +3！送錯扣 1 分。<br>點籃子，或按鍵盤 1 / 2 / 3。', start: startDelivery },
   starlight: { name: '星光尋寶', icon: '🌟', desc: '依照 1 → 9 的順序，找出藏在夜空裡的星星！<br>每顆 +1 分，找齊一片星空再 +5 分。點錯扣 1 分。<br>可點選星星，也能用 Tab 與 Enter 操作。', start: startStarlight },
+  snackmath: { name: '甜點算算', icon: '🍪', desc: '幫點心店算出正確的加減法答案！<br>答對 +2 分，每連續 5 題再 +3 分；答錯扣 1 分。<br>點答案，或按鍵盤 1 / 2 / 3 / 4。', start: startSnackMath },
 });
 
 function cozySession(area, ctl, seconds, content) {
@@ -89,4 +99,28 @@ function startStarlight(area, ctl) {
     } else { session.feedback(`找到 ${n} 了！再找 ${next}`); prompt(); }
   });
   board();
+}
+
+function startSnackMath(area, ctl) {
+  const session = cozySession(area, ctl, 45, '<div class="snack-blackboard"><span class="eyebrow">點心店的小小算術師</span><div class="snack-equation"></div><p class="snack-level"></p></div><div class="snack-answers"></div><p class="section-note">每答對 5 題，算式會變得更有挑戰。沒有負數答案。</p>');
+  let solved = 0, streak = 0, question;
+  function next() {
+    question = snackQuestion(solved);
+    $('.snack-equation', area).textContent = `${question.a} ${question.subtract ? '−' : '+'} ${question.b} = ?`;
+    $('.snack-level', area).textContent = `已完成 ${solved} 題 · ${solved < 5 ? '暖身時間' : '漸入佳境'}`;
+    $('.snack-answers', area).innerHTML = question.choices.map((answer, i) => `<button class="snack-answer" data-answer-index="${i}" aria-label="選項 ${i + 1}：${answer}"><small>${i + 1}</small><b>${answer}</b></button>`).join('');
+  }
+  area.addEventListener('click', (e) => {
+    const button = e.target.closest('[data-answer-index]'); if (!button || button.disabled || !session.active()) return;
+    const answer = question.choices[Number(button.dataset.answerIndex)];
+    if (answer !== question.answer) { streak = 0; session.award(-1); session.feedback('差一點點，再想一想！', false); button.disabled = true; sfx.bad(); return; }
+    solved++; streak++; const bonus = streak % 5 === 0;
+    session.award(bonus ? 5 : 2); session.feedback(bonus ? `連續 ${streak} 題！額外 +3 分` : '算對了！點心店謝謝你'); sfx.coin();
+    const hadFocus = button === document.activeElement;
+    next(); if (hadFocus) $('.snack-answer', area).focus();
+  });
+  const onKey = (e) => { if (!e.repeat && ['1', '2', '3', '4'].includes(e.key) && session.active()) { e.preventDefault(); $(`[data-answer-index="${Number(e.key) - 1}"]`, area)?.click(); } };
+  window.addEventListener('keydown', onKey);
+  ctl.onStop(() => window.removeEventListener('keydown', onKey));
+  next();
 }

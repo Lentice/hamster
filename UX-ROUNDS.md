@@ -15,3 +15,4 @@
 | 9 | Connect new games to the park and add a direct arcade entrance | JavaScript syntax + available Node regression suites passed |
 | 10 | Add Starlight Hunt with shuffled constellations and board bonuses | JavaScript syntax + available Node regression suites passed |
 | 11 | Celebrate results with collectible stars and reachable next goals | JavaScript syntax + available Node regression suites passed |
+| 12 | Add Snack Math with adaptive addition and subtraction puzzles | JavaScript syntax + available Node regression suites passed |

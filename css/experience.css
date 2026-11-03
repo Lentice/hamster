@@ -82,6 +82,15 @@ body { background-color: #fff8f0; background-size: 100px 100px; }
 .game-result .result-cheer { font-size: 16px; color: #795767; }
 .next-star { padding: 12px 18px; border-radius: 15px; background: #fff2d6; color: #735528; font-size: 14px; }
 @keyframes star-arrive { from { opacity: 0; transform: translateY(12px) scale(.5) rotate(-15deg); } to { opacity: 1; transform: none; } }
+.snack-blackboard { padding: 30px 16px; border: 8px solid #d9bc94; border-radius: 24px; background: #315f52; color: #fffaf0; box-shadow: inset 0 0 30px #193f3a40; }
+.snack-blackboard .eyebrow { color: #dcebd9; }
+.snack-equation { margin: 35px 0 25px; font-size: clamp(32px, 8vw, 58px); letter-spacing: .05em; }
+.snack-level { font-size: 14px; color: #d6e7dc; }
+.snack-answers { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 24px 0; }
+.snack-answer { position: relative; border: 2px solid #d5c2a5; background: #fff4df; border-radius: 20px; min-height: 85px; box-shadow: 0 5px 0 #e3cfac; }
+.snack-answer b { font-size: 30px; }
+.snack-answer small { position: absolute; top: 6px; left: 10px; color: #876b45; }
+.snack-answer:active:not(:disabled) { transform: translateY(3px); }
 .arcade-meta { display: flex; justify-content: space-between; gap: 8px; color: #765c65; font-size: 12px; }
 .arcade-card h2 { margin-top: 12px; font-size: 22px; }
 .arcade-card p { margin: 8px 0 14px; color: var(--soft); font-size: 14px; }
