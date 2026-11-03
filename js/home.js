@@ -25,6 +25,25 @@
 
   const pct = (v, total) => `${(v / total) * 100}%`;
   const floor = () => house.floors[house.petFloor];
+  const layoutHistory = [];
+  const layoutSnapshot = () => JSON.stringify({ bg: floor().bg, items: floor().items });
+  function rememberLayout(snapshot = layoutSnapshot(), floorIndex = house.petFloor) {
+    const previous = layoutHistory.at(-1);
+    if (previous?.snapshot === snapshot && previous.floorIndex === floorIndex) return;
+    layoutHistory.push({ snapshot, floorIndex });
+    if (layoutHistory.length > 10) layoutHistory.shift();
+    $('#home-undo').disabled = false;
+  }
+  $('#home-undo').addEventListener('click', () => {
+    const previous = layoutHistory.pop(); if (!previous) return;
+    if (house.floors[previous.floorIndex]) {
+      if (house.petFloor !== previous.floorIndex) goFloor(previous.floorIndex);
+      stopUsing(); selected = null;
+      Object.assign(floor(), JSON.parse(previous.snapshot));
+      persist(); drawAll(); sfx.tab();
+    }
+    $('#home-undo').disabled = !layoutHistory.length;
+  });
   const furnitureOf = (it) => byId(FURNITURE, it.id);
   const sizeOf = (it) => {
     const f = furnitureOf(it);
@@ -290,6 +309,7 @@
     showScreen('home');
     if (!editing) $('#edit-toggle').click();
     if (kind === 'rooms') {
+      rememberLayout();
       panel = 'rooms';
       floor().bg = byId(ROOMS, id).id;
       persist();
@@ -300,6 +320,7 @@
     }
     panel = 'furniture';
     const it = { uid: nextUid(), id, x: 700 + Math.random() * 100, y: 780 + Math.random() * 60, flip: false, size: 1 };
+    rememberLayout();
     floor().items.push(it);
     selected = it;
     persist();
@@ -314,6 +335,7 @@
     if (panel === 'furniture') {
       const f = byId(FURNITURE, b.dataset.id);
       const add = () => {
+        rememberLayout();
         const it = { uid: nextUid(), id: f.id, x: 600 + Math.random() * 300, y: 760 + Math.random() * 120, flip: false, size: 1 };
         floor().items.push(it);
         selected = it;
@@ -326,6 +348,7 @@
     } else {
       const r = byId(ROOMS, b.dataset.id);
       const apply = () => {
+        rememberLayout();
         floor().bg = r.id;
         persist();
         drawRoom();
@@ -340,6 +363,7 @@
   $('#sel-bar').addEventListener('click', (e) => {
     const act = e.target.closest('[data-act]')?.dataset.act;
     if (!act || !selected) return;
+    rememberLayout();
     if (act === 'flip') selected.flip = !selected.flip;
     if (act === 'bigger') selected.size = Math.min(1.6, (selected.size || 1) + 0.15);
     if (act === 'smaller') selected.size = Math.max(0.55, (selected.size || 1) - 0.15);
@@ -370,7 +394,7 @@
       $$('.furniture', room).forEach((f) => f.classList.toggle('selected', f === el));
       drawSelBar();
       const p = toRoom(e);
-      drag = { it, el, dx: it.x - p.x, dy: it.y - p.y };
+      drag = { it, el, dx: it.x - p.x, dy: it.y - p.y, before: layoutSnapshot(), floorIndex: house.petFloor };
       el.setPointerCapture(e.pointerId);
       e.preventDefault();
       return;
@@ -443,6 +467,7 @@
   const endDrag = () => {
     holding = false;
     if (!drag) return;
+    if (layoutSnapshot() !== drag.before) rememberLayout(drag.before, drag.floorIndex);
     drag = null;
     persist();
   };
