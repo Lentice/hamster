@@ -21,6 +21,14 @@ body { background-color: #fff8f0; background-size: 100px 100px; }
 .choice-chip { min-height: 42px; border: 1px solid #e8dce3; border-radius: 999px; padding: 8px 15px; font: inherit; background: #fff; }
 .choice-chip[aria-pressed=true] { background: #fce3ec; border-color: #b85274; color: #7a2948; }
 .section-note { font-size: 14px; line-height: 1.7; color: var(--soft); }
+.welcome-banner { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 24px 28px; margin-bottom: 22px; border: 1px solid #f2d7df; border-radius: 28px; background: radial-gradient(circle at 95% 10%, #ffe1a8 0, transparent 42%), linear-gradient(110deg, #fff, #fff0f4); }
+.welcome-banner h1 { margin: 7px 0 10px; font-size: clamp(23px, 3vw, 32px); }
+.welcome-banner p { color: var(--soft); margin: 0; max-width: 540px; line-height: 1.7; }
+.welcome-banner .btn { flex: 0 0 auto; }
+@media (max-width: 600px) {
+  .welcome-banner { padding: 20px; flex-direction: column; align-items: flex-start; }
+  .welcome-banner .btn { width: 100%; }
+}
 @media (hover: hover) {
   .btn:hover:not(:disabled) { filter: brightness(1.025); }
   .item:hover { border-color: #d599ae; }

@@ -5,3 +5,4 @@
 | Round | Product improvement | Validation |
 |---|---|---|
 | 1 | Introduce a cohesive cream and pastel visual system | JavaScript syntax + available Node regression suites passed |
+| 2 | Welcome players with a personal daily adventure banner | JavaScript syntax + available Node regression suites passed |
