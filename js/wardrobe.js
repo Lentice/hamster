@@ -11,6 +11,12 @@
   const tabs = $('#tabs');
   const grid = $('#grid');
   const nameInput = $('#name');
+  const lookHistory = [];
+  function rememberLook() {
+    lookHistory.push(Object.fromEntries(CATEGORIES.map((cat) => [cat.id, look[cat.id]])));
+    if (lookHistory.length > 10) lookHistory.shift();
+    $('#undo-look').disabled = false;
+  }
 
   const stagePet = () => $('.pet-svg', stage);
 
@@ -145,6 +151,7 @@
     }
     const wr = e.target.closest('[data-outfit-wear]');
     if (wr) {
+      rememberLook();
       const o = outfits()[wr.dataset.outfitWear];
       let skipped = 0;
       for (const c of CATEGORIES) {
@@ -169,6 +176,7 @@
     const item = cat.items.find((x) => x.id === btn.dataset.id);
     // full：剛買的要整個格子重畫（拿掉價格、更新篩選數字）；換穿已有的只要換選取框，手機上比較順
     const wear = (full) => {
+      rememberLook();
       wake();
       look[cat.id] = item.id;
       drawStage();
@@ -203,6 +211,7 @@
   });
 
   $('#random').addEventListener('click', () => {
+    rememberLook();
     for (const c of CATEGORIES) {
       const owned = c.items.filter((it) => isOwned(c.id, it));
       look[c.id] = owned[Math.floor(Math.random() * owned.length)].id;
@@ -213,9 +222,20 @@
   });
 
   $('#reset').addEventListener('click', () => {
+    rememberLook();
     Object.assign(look, { ...DEFAULT_LOOK, species: look.species, name: look.name, background: look.background });
     redraw();
     sfx.tab();
+  });
+
+  $('#undo-look').addEventListener('click', () => {
+    const previous = lookHistory.pop(); if (!previous) return;
+    for (const cat of CATEGORIES) {
+      const item = cat.items.find((it) => it.id === previous[cat.id]);
+      if (item && isOwned(cat.id, item)) look[cat.id] = item.id;
+    }
+    $('#undo-look').disabled = !lookHistory.length;
+    wake(); redraw(); sfx.tab();
   });
 
   nameInput.addEventListener('input', () => {
