@@ -89,6 +89,9 @@ body { background-color: #fff8f0; background-size: 100px 100px; }
 .map-stop .map-place { width: 100%; border: 0; border-radius: 0; flex: 1; }
 .map-travel-label { font-size: 11px; color: #81516a; }
 .map-play-now { min-height: 44px; border: 0; border-top: 1px solid #eed8e3; background: #fce8f0; color: #813856; font-size: 14px; }
+.memory-status { width: min(560px, 100%); min-height: 3em; text-align: center; font-size: 14px; color: #79586d; line-height: 1.6; margin: 8px 0; }
+.mcard:focus-visible { outline-offset: 4px; }
+.mcard.done:disabled { opacity: .65; }
 .blindbox-intro .blindbox-icon { font-size: 50px; margin-bottom: 8px; }
 .blindbox-intro > p { font-size: 14px; }
 @media (max-width: 600px) {

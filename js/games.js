@@ -3,7 +3,7 @@
 const GAMES = {
   catch: { name: '接瓜子', icon: '🌻', desc: '左右移動接住掉下來的瓜子！金色瓜子 +5，小心辣椒！<br>連續接 10 個不碰辣椒再 +5！', start: startCatch },
   wheel: { name: '滾輪衝刺', icon: '🎡', desc: '交替按 ← → （或點左右按鈕）讓滾輪越轉越快，10 秒內跑最遠！', start: startWheel },
-  memory: { name: '翻牌配對', icon: '🃏', desc: '開場會先翻開 1.5 秒，快記住位置！<br>翻開兩張一樣的牌就配對成功，步數越少獎勵越多！', start: startMemory },
+  memory: { name: '翻牌配對', icon: '🃏', desc: '先看 3 秒圖案，再找出 8 組相同的牌。<br>8 步完成拿 100 分，每多一步扣 5 分，最低 10 分。<br>慢慢記位置，配對成功的牌會留下來。', start: startMemory },
 };
 
 function loadImg(src) {
@@ -403,23 +403,29 @@ function startWheel(area, ctl) {
 
 function startMemory(area, ctl) {
   const faces = ['g_seed', 'g_seed_gold', 'g_coin', 'held_icecream', 'held_teddy', 'held_lollipop', 'held_sunflower', 'hat_cupcake'];
-  const deck = [...faces, ...faces].map((f, i) => ({ f, i })).sort(() => Math.random() - 0.5);
+  const names = ['瓜子', '金瓜子', '鼠鼠幣', '冰淇淋', '小熊', '棒棒糖', '向日葵', '杯子蛋糕'];
+  const faceName = (face) => names[faces.indexOf(face)];
+  const deck = shuffledList([...faces, ...faces]).map((f, i) => ({ f, i }));
   area.innerHTML = `${hudHtml('<span>👣 <b class="h-moves">0</b></span>')}
-    <div class="memory-grid">${deck.map((c, k) => `<button class="mcard" data-k="${k}">
+    <p class="memory-status" role="status">先看清楚圖案，3 秒後開始；不用急著按。</p>
+    <div class="memory-grid">${deck.map((c, k) => `<button class="mcard" data-k="${k}" aria-pressed="false" aria-label="第 ${k + 1} 張：${faceName(c.f)}，開場預覽">
       <span class="mback"><img src="${assetUrl('g_card_back')}" alt=""></span>
       <span class="mface"><img src="${c.f === 'g_coin' ? 'assets/coin_hamster.svg' : assetUrl(c.f)}" alt=""></span></button>`).join('')}</div>`;
   let open = [], moves = 0, matched = 0, lock = true;
   // 開場先全部翻開 1.5 秒讓大家記位置，蓋回去才開始計時
   const cards = $$('.mcard', area);
+  $('.h-score', area).parentElement.insertAdjacentHTML('beforeend', ' / 8 組');
+  const labelCard = (card, revealed) => card.setAttribute('aria-label', `第 ${Number(card.dataset.k) + 1} 張${revealed ? `：${faceName(deck[card.dataset.k].f)}` : '，尚未翻開'}${card.disabled ? '，已配對' : ''}`);
   cards.forEach((c) => c.classList.add('flip'));
   let start = Infinity;
   const clock = gameClock(ctl);
   clock.later(() => {
-    cards.forEach((c) => c.classList.remove('flip'));
+    cards.forEach((c) => { c.classList.remove('flip'); labelCard(c, false); });
     lock = false;
+    $('.memory-status', area).textContent = '找出一對相同圖案。每次翻兩張，慢慢記位置。';
     start = clock.now();
     sfx.tab();
-  }, 1500);
+  }, 3000);
   const timer = setInterval(() => { $('.h-time', area).textContent = Math.max(0, Math.floor((clock.now() - start) / 1000)); }, 250);
   ctl.onStop(() => clearInterval(timer));
 
@@ -427,6 +433,7 @@ function startMemory(area, ctl) {
     const b = e.target.closest('.mcard');
     if (!b || lock || b.classList.contains('flip')) return;
     b.classList.add('flip');
+    b.setAttribute('aria-pressed', 'true'); labelCard(b, true);
     sfx.tab();
     open.push(b);
     if (open.length < 2) return;
@@ -435,8 +442,10 @@ function startMemory(area, ctl) {
     const [a, c] = open;
     if (deck[a.dataset.k].f === deck[c.dataset.k].f) {
       a.classList.add('done'); c.classList.add('done');
+      a.disabled = true; c.disabled = true; labelCard(a, true); labelCard(c, true);
       open = [];
       matched++;
+      $('.memory-status', area).textContent = matched === faces.length ? '全部找到了！你把回憶都串起來了。' : `找到 ${faceName(deck[a.dataset.k].f)}！已配對 ${matched} / 8 組。`;
       sfx.coin();
       $('.h-score', area).textContent = matched;
       if (matched === faces.length) {
@@ -445,7 +454,11 @@ function startMemory(area, ctl) {
       }
     } else {
       lock = true;
-      clock.later(() => { a.classList.remove('flip'); c.classList.remove('flip'); open = []; lock = false; }, 750);
+      $('.memory-status', area).textContent = '這兩張不一樣，先記住它們的位置。';
+      clock.later(() => {
+        [a, c].forEach((card) => { card.classList.remove('flip'); card.setAttribute('aria-pressed', 'false'); labelCard(card, false); });
+        open = []; lock = false;
+      }, 900);
     }
   });
 }
