@@ -8,7 +8,7 @@
       <p>${q.done ? '今天的小冒險完成了，自由玩喜歡的遊戲吧。' : `換套新衣、佈置小屋，再玩 ${Math.max(0, QUEST_GAMES - q.games.length)} 種遊戲，帶回今日獎勵。`}</p></div>
       <button class="btn btn-pink" data-discover>開始小冒險 <span aria-hidden="true">↗</span></button>`;
   }
-  welcome.addEventListener('click', (e) => { if (e.target.closest('[data-discover]')) showScreen('outdoor'); });
+  welcome.addEventListener('click', (e) => { if (e.target.closest('[data-discover]')) showScreen('arcade'); });
   saveListeners.push(drawWelcome);
   drawWelcome();
 })();

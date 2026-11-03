@@ -1,0 +1,37 @@
+// 遊戲室統一整理玩法資訊；不改變既有遊戲的計分規則。
+const GAME_DETAILS = {
+  catch: { kind: 'reaction', time: '30 秒', tip: '接住瓜子，閃開辣椒', goals: [10, 30, 60], color: '#fff0cf' },
+  wheel: { kind: 'reaction', time: '10 秒', tip: '左右交替，越跑越快', goals: [20, 50, 90], color: '#e5f4e9' },
+  memory: { kind: 'puzzle', time: '慢慢想', tip: '把一樣的圖案找出來', goals: [5, 15, 25], color: '#f3e9fb' },
+  whack: { kind: 'reaction', time: '30 秒', tip: '眼明手快，小心別打錯', goals: [10, 25, 45], color: '#ffe8dd' },
+  runner: { kind: 'reaction', time: '挑戰最遠', tip: '跳過障礙，還能二段跳', goals: [10, 30, 60], color: '#e4f2ff' },
+  maze: { kind: 'puzzle', time: '慢慢找', tip: '探索路線，帶瓜子回家', goals: [10, 30, 60], color: '#e9f5db' },
+  stack: { kind: 'reaction', time: '挑戰最高', tip: '瞄準中心，疊出夢幻蛋糕', goals: [5, 12, 25], color: '#ffe4ef' },
+  music: { kind: 'puzzle', time: '一關接一關', tip: '跟著旋律，記住順序', goals: [3, 6, 10], color: '#eee8ff' },
+  fish: { kind: 'relax', time: '45 秒', tip: '看準時機，釣起金色驚喜', goals: [10, 25, 50], color: '#dff5f5' },
+  bubble: { kind: 'relax', time: '30 秒', tip: '找對顏色，戳出連擊', goals: [15, 40, 80], color: '#e7edff' },
+};
+const GAME_KINDS = { reaction: '手速挑戰', puzzle: '動動腦', relax: '輕鬆玩' };
+const gameDetails = (id) => GAME_DETAILS[id] || { kind: 'relax', time: '輕鬆一局', tip: '一起試試新玩法', goals: [10, 25, 50], color: '#fff0f5' };
+
+const Arcade = (() => {
+  const grid = $('#arcade-grid');
+  function launch(id) {
+    if (!Object.hasOwn(GAMES, id)) return;
+    openGame(id, () => { if (currentScreen === 'arcade') draw(); });
+  }
+  function draw() {
+    $('.arcade-count').textContent = `${Object.keys(GAMES).length} 種小冒險`;
+    grid.innerHTML = Object.entries(GAMES).map(([id, game]) => {
+      const info = gameDetails(id);
+      return `<article class="arcade-card" style="--game-color:${info.color}">
+        <div class="arcade-art" aria-hidden="true">${game.icon}</div><div class="arcade-card-body">
+        <div class="arcade-meta"><span>${GAME_KINDS[info.kind]}</span><span>${info.time}</span></div>
+        <h2>${game.name}</h2><p>${info.tip}</p><div class="arcade-record">${save.best[id] ? `最佳 ${save.best[id]} 分` : '第一個紀錄，等你來創造'}</div>
+        <button class="btn btn-pink" data-play="${id}" aria-label="玩${game.name}">開始玩 <span aria-hidden="true">↗</span></button></div></article>`;
+    }).join('');
+  }
+  grid.addEventListener('click', (e) => { const button = e.target.closest('[data-play]'); if (button) launch(button.dataset.play); });
+  SCREENS.arcade = { enter: draw };
+  return { draw, launch };
+})();

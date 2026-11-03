@@ -21,6 +21,25 @@ body { background-color: #fff8f0; background-size: 100px 100px; }
 .choice-chip { min-height: 42px; border: 1px solid #e8dce3; border-radius: 999px; padding: 8px 15px; font: inherit; background: #fff; }
 .choice-chip[aria-pressed=true] { background: #fce3ec; border-color: #b85274; color: #7a2948; }
 .section-note { font-size: 14px; line-height: 1.7; color: var(--soft); }
+.arcade-count { border-radius: 999px; padding: 9px 15px; background: #f5e6eb; color: #85415b; white-space: nowrap; }
+.arcade-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; }
+.arcade-card { border: 1px solid #e9dce2; border-radius: 26px; overflow: hidden; background: #fff; box-shadow: 0 5px 0 #eddee3; }
+.arcade-art { position: relative; display: grid; place-items: center; font-size: 66px; height: 140px; background: radial-gradient(ellipse at 50% 100%, #ffffffb0, transparent 70%), var(--game-color); }
+.arcade-card-body { padding: 20px; }
+.arcade-meta { display: flex; justify-content: space-between; gap: 8px; color: #765c65; font-size: 12px; }
+.arcade-card h2 { margin-top: 12px; font-size: 22px; }
+.arcade-card p { margin: 8px 0 14px; color: var(--soft); font-size: 14px; }
+.arcade-record { color: #785358; font-size: 13px; margin-bottom: 16px; }
+.arcade-card .btn { width: 100%; display: flex; justify-content: space-between; }
+@media (max-width: 900px) { .arcade-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 520px) {
+  .arcade-grid { gap: 14px; }
+  .arcade-card-body { padding: 14px; }
+  .arcade-art { height: 110px; font-size: 52px; }
+  .arcade-card h2 { font-size: 18px; }
+  .arcade-meta { flex-wrap: wrap; }
+  .nav-btn { font-size: 11px; padding: 7px; }
+}
 .welcome-banner { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 24px 28px; margin-bottom: 22px; border: 1px solid #f2d7df; border-radius: 28px; background: radial-gradient(circle at 95% 10%, #ffe1a8 0, transparent 42%), linear-gradient(110deg, #fff, #fff0f4); }
 .welcome-banner h1 { margin: 7px 0 10px; font-size: clamp(23px, 3vw, 32px); }
 .welcome-banner p { color: var(--soft); margin: 0; max-width: 540px; line-height: 1.7; }
