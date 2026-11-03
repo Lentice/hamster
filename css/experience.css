@@ -96,6 +96,10 @@ body { background-color: #fff8f0; background-size: 100px 100px; }
 .result-discover p { font-size: 14px; color: var(--soft); }
 .closet-search { display: grid; gap: 8px; padding: 16px 4px; font-size: 13px; color: var(--soft); }
 .closet-search[hidden] { display: none; }
+.shop-tools { display: grid; grid-template-columns: 1fr minmax(130px, .4fr); gap: 12px; margin: 18px 0; }
+.shop-tools[hidden] { display: none; }
+.shop-tools label { display: grid; gap: 8px; font-size: 13px; color: var(--soft); }
+.shop-tools > span { grid-column: 1 / -1; }
 .arcade-meta { display: flex; justify-content: space-between; gap: 8px; color: #765c65; font-size: 12px; }
 .arcade-card h2 { margin-top: 12px; font-size: 22px; }
 .arcade-card p { margin: 8px 0 14px; color: var(--soft); font-size: 14px; }

@@ -29,6 +29,7 @@
     $('#shop-tabs').innerHTML = SHOP_TABS.map((t) => `
       <button class="tab ${t.id === current ? 'active' : ''}" data-tab="${t.id}" role="tab" aria-selected="${t.id === current}" tabindex="${t.id === current ? 0 : -1}" aria-controls="shop-grid"><span class="tab-icon">${t.icon}</span><span class="tab-name">${t.name}</span></button>`).join('');
     const tab = SHOP_TABS.find((t) => t.id === current);
+    $('#shop-tools').hidden = tab.kind === 'box';
     if (tab.kind === 'box') {
       const box = BLIND_BOXES[tab.boxType];
       const pool = boxPool(tab.boxType);
@@ -51,14 +52,18 @@
     const buyable = shopItemsOf(tab.id).length;
     const reward = save.collected?.[tab.id] ? '🏅 已集滿' : buyable ? `集滿送 ${COLLECT_REWARD}` : '';
     const progress = `<div class="collect-bar"><span>已收集 <b>${got}</b> / ${entries.length}</span><i style="--p:${entries.length ? (got / entries.length) * 100 : 0}%"></i><small>${reward}</small></div>`;
-    $('#shop-grid').innerHTML = progress + entries.map(({ cat, item }, i) => {
+    const query = $('#shop-search').value.trim().toLowerCase(), filter = $('#shop-filter').value;
+    const visible = entries.filter(({ cat, item }) => item.name.toLowerCase().includes(query)
+      && (filter === 'all' || (!isOwned(cat.id, item) && (filter !== 'affordable' || item.price <= save[item.currency === 'moon' ? 'moonCoins' : 'coins']))));
+    $('#shop-results').textContent = `找到 ${visible.length} / ${entries.length} 件商品`;
+    $('#shop-grid').innerHTML = progress + visible.map(({ cat, item }, i) => {
       const owned = isOwned(cat.id, item);
       return `<div class="shop-item ${owned ? 'owned' : ''}" data-id="${item.id}" data-cat="${cat.id}">
         <div class="shop-thumb">${thumb(cat, item, i)}</div>
         <div class="shop-name">${item.name}</div>
         ${owned ? '<div class="owned-tag">✔ 已擁有</div>' : buyButton(item)}
       </div>`;
-    }).join('');
+    }).join('') + (!visible.length ? '<div class="empty-state">這個條件還沒有商品。<br><button class="btn btn-gray" data-reset-shop>清除篩選</button><p>也可以到遊戲室賺些鼠鼠幣再回來！</p></div>' : '');
   }
 
   // 錢不夠時按鈕變灰，下面寫還差多少
@@ -69,6 +74,8 @@
   }
 
   keyboardTabs($('#shop-tabs'), '[role=tab]');
+  $('#shop-search').addEventListener('input', draw);
+  $('#shop-filter').addEventListener('change', draw);
   $('#shop-tabs').addEventListener('click', (e) => {
     const b = e.target.closest('[data-tab]');
     if (!b) return;
@@ -78,6 +85,7 @@
   });
 
   $('#shop-grid').addEventListener('click', (e) => {
+    if (e.target.closest('[data-reset-shop]')) { $('#shop-search').value = ''; $('#shop-filter').value = 'all'; draw(); $('#shop-search').focus(); return; }
     if (e.target.closest('#earn-coins')) { showScreen('outdoor'); return; }
     if (e.target.closest('#open-blind-box')) {
       const tab = SHOP_TABS.find((t) => t.id === current);
