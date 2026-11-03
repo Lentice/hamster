@@ -141,6 +141,7 @@ function openDiyEditor(type, designId, onDone) {
   }
   const N = t.cols * t.rows;
   let px = existing ? existing.px.padEnd(N, '0').slice(0, N).split('') : Array(N).fill(type === 'clothes' ? '0' : '1');
+  const originalPixels = px.join(''), originalName = existing?.name || '';
   let color = 4, tool = 'pen', mirror = true, size = 1;
   const undo = [], redo = [];
   const sp = byId(SPECIES, save.look.species);
@@ -191,7 +192,10 @@ function openDiyEditor(type, designId, onDone) {
         ${existing ? '<button class="btn btn-gray" data-act="delete">刪除作品</button>' : ''}
         <button class="btn btn-pink" data-act="save">💾 儲存並穿上</button>
       </div>
-    </div>`, { cls: 'diy-modal', fullscreen: true, beforeClose: (close) => { if (!undo.length) return true; confirmQuit(close, '還沒儲存，確定不要這件作品了嗎？', ['繼續畫', '不要了']); return false; } });
+    </div>`, { cls: 'diy-modal', fullscreen: true, beforeClose: (close) => {
+      if (px.join('') === originalPixels && nameInput.value.trim() === originalName.trim()) return true;
+      confirmQuit(close, '作品還沒儲存，要先離開嗎？', ['繼續畫', '放棄修改']); return false;
+    } });
 
   const svg = $('.diy-canvas', m.box);
   // 桌機快捷鍵：Ctrl+Z 復原、Ctrl+Y／Ctrl+Shift+Z 重做（打名字時不攔）
@@ -210,6 +214,12 @@ function openDiyEditor(type, designId, onDone) {
   rects.forEach((_, i) => paint(i));
 
   let previewTimer = 0;
+  m.root.addEventListener('closed', () => clearTimeout(previewTimer));
+  function syncEditorTools() {
+    $$('.diy-color, .diy-tool, .diy-mirror', m.box).forEach((button) => button.setAttribute('aria-pressed', String(button.classList.contains('on'))));
+    $('[data-act=undo]', m.box).disabled = !undo.length;
+    $('[data-act=redo]', m.box).disabled = !redo.length;
+  }
   // 用目前的畫畫出穿上的樣子（uid 不同才不會跟別的預覽撞 id）
   function previewSvg(uid) {
     const item = diyItem(type, { id: 'diy_preview', name: '', px: px.join('') });
@@ -220,6 +230,7 @@ function openDiyEditor(type, designId, onDone) {
     return out;
   }
   function preview() {
+    syncEditorTools();
     clearTimeout(previewTimer);
     previewTimer = setTimeout(() => { $('.diy-preview', m.box).innerHTML = previewSvg('diyp') + '<span class="diy-zoom">🔍</span>'; }, 60);
   }
@@ -284,6 +295,7 @@ function openDiyEditor(type, designId, onDone) {
       tool = color ? 'pen' : 'erase';
       $$('.diy-color', m.box).forEach((x) => x.classList.toggle('on', Number(x.dataset.c) === color));
       $$('.diy-tool', m.box).forEach((x) => x.classList.toggle('on', x.dataset.tool === tool));
+      syncEditorTools();
       sfx.pop();
       return;
     }
@@ -376,16 +388,14 @@ function openDiyEditor(type, designId, onDone) {
       rects.forEach((_, i) => paint(i));
       preview();
     } else if (b.dataset.act === 'delete') {
-      syncStoredSave(); // 別的分頁可能剛存過檔，重新找一次
-      const list = diyDesigns(type);
-      const i = list.findIndex((d) => d.id === designId);
-      if (i >= 0) list.splice(i, 1);
-      if (save.look[type] === designId) save.look[type] = 'none';
-      syncDiyItems();
-      persist();
-      m.close();
-      toast('作品刪掉囉');
-      onDone?.();
+      confirmQuit(() => {
+        syncStoredSave();
+        const list = diyDesigns(type);
+        const i = list.findIndex((d) => d.id === designId);
+        if (i >= 0) list.splice(i, 1);
+        if (save.look[type] === designId) save.look[type] = 'none';
+        syncDiyItems(); persist(); m.close(); toast('作品刪掉囉'); onDone?.();
+      }, '要刪掉這件作品嗎？刪除後無法復原。', ['保留作品', '刪除作品']);
     } else if (b.dataset.act === 'save') {
       if (!px.some((v) => v !== '0')) { toast('先畫一點東西吧！'); return; }
       const name = [...nameInput.value.trim()].slice(0, 8).join('') || `我的${t.name}`;
@@ -410,5 +420,6 @@ function openDiyEditor(type, designId, onDone) {
       toast(`🎨「${escapeXml(name)}」完成了！`);
       onDone?.();
     }
+    syncEditorTools();
   });
 }

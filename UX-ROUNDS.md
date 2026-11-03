@@ -27,3 +27,4 @@
 | 21 | Add untimed practice without changing records quests or rewards | JavaScript syntax + available Node regression suites passed |
 | 22 | Teach snack categories with clear seed art and recoverable mistakes | JavaScript syntax + available Node regression suites passed |
 | 23 | Make five-action combo bonuses visible in delivery and math | JavaScript syntax + available Node regression suites passed |
+| 24 | Protect DIY edits and keep creative actions easy to reach | JavaScript syntax + available Node regression suites passed |
