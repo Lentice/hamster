@@ -27,20 +27,30 @@ Object.assign(GAMES, {
 });
 
 function cozySession(area, ctl, seconds, content) {
-  area.innerHTML = `${hudHtml()}<div class="cozy-game">${content}<p class="play-feedback" role="status">準備好了，開始吧！</p></div>`;
+  area.innerHTML = `${hudHtml()}<div class="cozy-timer" role="progressbar" aria-label="剩餘遊戲時間" aria-valuemin="0" aria-valuemax="${seconds}" aria-valuenow="${seconds}"><i></i></div><div class="cozy-game"><p class="cozy-ready" role="status">看清楚再出發，第一次操作後才開始計時。</p>${content}<p class="play-feedback" role="status">準備好了，開始吧！</p></div>`;
   const clock = gameClock(ctl);
-  let score = 0, ended = false;
+  let score = 0, ended = false, startedAt = null;
+  const elapsed = () => startedAt === null ? 0 : clock.now() - startedAt;
   const tick = () => {
     if (ctl.isStopped() || ended) return;
-    const remaining = Math.max(0, seconds - clock.now() / 1000);
+    const remaining = Math.max(0, seconds - elapsed() / 1000);
     $('.h-time', area).textContent = Math.ceil(remaining);
+    $('.cozy-timer', area).setAttribute('aria-valuenow', String(Math.ceil(remaining)));
+    $('.cozy-timer i', area).style.width = `${(remaining / seconds) * 100}%`;
     if (remaining <= 0) { ended = true; ctl.finish(score, Math.min(150, score * 3)); }
   };
   const timer = setInterval(tick, 100);
   ctl.onStop(() => clearInterval(timer));
   tick();
   return {
-    active: () => !ended && !ctl.isStopped() && !gamePaused() && clock.now() < seconds * 1000,
+    active() {
+      if (ended || ctl.isStopped() || gamePaused() || elapsed() >= seconds * 1000) return false;
+      if (startedAt === null) {
+        startedAt = clock.now();
+        $('.cozy-ready', area).textContent = '計時開始，照自己的節奏挑戰！';
+      }
+      return true;
+    },
     award(points) { score = Math.max(0, score + points); $('.h-score', area).textContent = score; },
     feedback(text, good = true) { const el = $('.play-feedback', area); el.textContent = text; el.dataset.tone = good ? 'good' : 'miss'; },
     clock,

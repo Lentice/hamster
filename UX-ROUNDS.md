@@ -23,3 +23,4 @@
 | 17 | Add companion interactions and contextual home controls | JavaScript syntax + available Node regression suites passed |
 | 18 | Create an adventure passport with stars badges and game milestones | JavaScript syntax + available Node regression suites passed |
 | 19 | Move mobile navigation within thumb reach and compact daily panels | JavaScript syntax + available Node regression suites passed |
+| 20 | Start cozy game clocks on first input and show remaining-time bars | JavaScript syntax + available Node regression suites passed |
