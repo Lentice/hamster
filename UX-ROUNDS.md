@@ -12,3 +12,4 @@
 | 6 | Add daily game recommendations and an adventure stamp card | JavaScript syntax + available Node regression suites passed |
 | 7 | Give game introductions clear rules duration and score goals | JavaScript syntax + available Node regression suites passed |
 | 8 | Add Snack Delivery with quick sorting and streak bonuses | JavaScript syntax + available Node regression suites passed |
+| 9 | Connect new games to the park and add a direct arcade entrance | JavaScript syntax + available Node regression suites passed |

@@ -25,6 +25,7 @@ const PARK = { hooks: { tick: [], enter: [], leave: [] } };
     { img: 'o_booth_fish', x: 1230, y: 1320, w: 320, r: 100, act: 'fish', label: '池塘釣魚' },
     { img: 'o_booth_music', x: 960, y: 1740, w: 320, r: 100, act: 'music', label: '鼠鼠音樂會' },
     { img: 'o_booth_bubble', x: 2000, y: 1180, w: 300, r: 100, act: 'bubble', label: '戳泡泡' },
+    { img: 'o_booth_stack', x: 300, y: 1050, w: 260, r: 80, act: 'delivery', label: '點心快遞' },
     { img: 'o_pond', x: 950, y: 1150, w: 460, r: 0, flat: true, block: { rx: 200, ry: 90, dy: -110 } },
     { img: 'o_bench', x: 1350, y: 900, w: 200, r: 55 },
     { img: 'o_tree', x: 110, y: 230, w: 280, r: 50 }, { img: 'o_tree', x: 580, y: 160, w: 260, r: 50 },

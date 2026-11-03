@@ -9,6 +9,7 @@
       <button class="btn btn-pink" data-discover>開始小冒險 <span aria-hidden="true">↗</span></button>`;
   }
   welcome.addEventListener('click', (e) => { if (e.target.closest('[data-discover]')) showScreen('arcade'); });
+  $('#park-arcade').addEventListener('click', () => showScreen('arcade'));
   saveListeners.push(drawWelcome);
   drawWelcome();
 })();
