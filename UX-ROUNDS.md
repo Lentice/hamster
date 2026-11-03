@@ -26,3 +26,4 @@
 | 20 | Start cozy game clocks on first input and show remaining-time bars | JavaScript syntax + available Node regression suites passed |
 | 21 | Add untimed practice without changing records quests or rewards | JavaScript syntax + available Node regression suites passed |
 | 22 | Teach snack categories with clear seed art and recoverable mistakes | JavaScript syntax + available Node regression suites passed |
+| 23 | Make five-action combo bonuses visible in delivery and math | JavaScript syntax + available Node regression suites passed |

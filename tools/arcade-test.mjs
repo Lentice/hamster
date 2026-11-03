@@ -15,6 +15,10 @@ assert.equal(run('DELIVERY_LANES[DELIVERY_FOODS.find(food => food.name === "่‘ต่
 assert.equal(run('new Set(shuffledList([1,2,3,4,5,6,7,8,9])).size'), 9);
 assert.equal(run('shuffledList([1,2,3], () => 0).join(",")'), '2,3,1');
 assert.equal(run('shuffledList([]).length'), 0);
+for (const [streak, filled, remaining] of [[0,0,5], [4,4,1], [5,5,5], [6,1,4], [10,5,5]]) {
+  assert.equal(run(`comboState(${streak}).filled`), filled);
+  assert.equal(run(`comboState(${streak}).remaining`), remaining);
+}
 for (let level = 0; level < 30; level++) {
   const q = run(`snackQuestion(${level})`);
   assert.equal(q.answer, q.subtract ? q.a - q.b : q.a + q.b);

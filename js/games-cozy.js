@@ -10,6 +10,13 @@ const DELIVERY_LANES = [
   { name: '甜點', icon: '🧁', hint: '蛋糕・甜甜圈', color: '#fce3eb' },
 ];
 const deliveryFoodArt = (food) => food.img ? `<img src="${assetUrl(food.img)}" alt="" class="delivery-food-img">` : food.icon;
+const comboState = (streak) => ({ filled: streak > 0 && streak % 5 === 0 ? 5 : streak % 5, remaining: 5 - streak % 5 });
+function drawCozyCombo(area, streak) {
+  const el = $('.cozy-combo', area); if (!el) return;
+  const state = comboState(streak), complete = streak > 0 && streak % 5 === 0;
+  el.innerHTML = `<div class="combo-caption"><b>${complete ? '連擊獎勵 +3！' : `連續正確 ${streak} 次`}</b><span>再 ${state.remaining} 次，額外 +3 分</span></div><div class="combo-dots" role="img" aria-label="連續正確 ${streak} 次，距離下次獎勵還差 ${state.remaining} 次">${[1, 2, 3, 4, 5].map((n) => `<i class="${n <= state.filled ? 'filled' : ''}" aria-hidden="true"></i>`).join('')}</div>`;
+  el.dataset.complete = String(complete);
+}
 const deliveryOrder = (rng = Math.random) => DELIVERY_FOODS[Math.floor(rng() * DELIVERY_FOODS.length)];
 function shuffledList(values, rng = Math.random) {
   const out = [...values];
@@ -72,7 +79,7 @@ function cozySession(area, ctl, seconds, content) {
 
 function startDelivery(area, ctl) {
   const session = cozySession(area, ctl, 35, `<div class="delivery-counter"><span class="eyebrow">鼠鼠的點心訂單</span><div class="delivery-order"></div><div class="delivery-next" aria-label="接下來的訂單"></div></div>
-    <div class="delivery-lanes">${DELIVERY_LANES.map((lane, i) => `<button class="delivery-lane" style="--lane-color:${lane.color}" data-lane="${i}" title="${lane.hint}"><span>${lane.icon} ${lane.name}</span><small>按 ${i + 1}</small></button>`).join('')}</div><p class="delivery-legend">鮮蔬吃新鮮、堅果有瓜子，甜點香甜甜。</p>`);
+    <div class="delivery-lanes">${DELIVERY_LANES.map((lane, i) => `<button class="delivery-lane" style="--lane-color:${lane.color}" data-lane="${i}" title="${lane.hint}"><span>${lane.icon} ${lane.name}</span><small>按 ${i + 1}</small></button>`).join('')}</div><div class="cozy-combo"></div><p class="delivery-legend">鮮蔬吃新鮮、堅果有瓜子，甜點香甜甜。</p>`);
   const queue = Array.from({ length: 4 }, () => deliveryOrder());
   let streak = 0;
   function draw() {
@@ -91,15 +98,16 @@ function startDelivery(area, ctl) {
     } else {
       streak = 0; session.award(-1);
       session.feedback(`${queue[0].name}要送到「${DELIVERY_LANES[queue[0].lane].name}」籃，這份再試一次！`, false);
-      sfx.bad(); return;
+      drawCozyCombo(area, streak); sfx.bad(); return;
     }
-    queue.shift(); queue.push(deliveryOrder()); draw();
+    drawCozyCombo(area, streak); queue.shift(); queue.push(deliveryOrder()); draw();
   }
   area.addEventListener('click', (e) => { const lane = e.target.closest('[data-lane]'); if (lane) deliver(Number(lane.dataset.lane)); });
   const onKey = (e) => { if (!e.repeat && ['1', '2', '3'].includes(e.key)) { e.preventDefault(); deliver(Number(e.key) - 1); } };
   window.addEventListener('keydown', onKey);
   ctl.onStop(() => window.removeEventListener('keydown', onKey));
   draw();
+  drawCozyCombo(area, streak);
 }
 
 function startStarlight(area, ctl) {
@@ -129,7 +137,7 @@ function startStarlight(area, ctl) {
 }
 
 function startSnackMath(area, ctl) {
-  const session = cozySession(area, ctl, 45, '<div class="snack-blackboard"><span class="eyebrow">點心店的小小算術師</span><div class="snack-equation"></div><p class="snack-level"></p></div><div class="snack-answers"></div><p class="section-note">每答對 5 題，算式會變得更有挑戰。沒有負數答案。</p>');
+  const session = cozySession(area, ctl, 45, '<div class="snack-blackboard"><span class="eyebrow">點心店的小小算術師</span><div class="snack-equation"></div><p class="snack-level"></p></div><div class="snack-answers"></div><div class="cozy-combo"></div><p class="section-note">每答對 5 題，算式會變得更有挑戰。沒有負數答案。</p>');
   let solved = 0, streak = 0, question;
   function next() {
     question = snackQuestion(solved);
@@ -140,9 +148,10 @@ function startSnackMath(area, ctl) {
   area.addEventListener('click', (e) => {
     const button = e.target.closest('[data-answer-index]'); if (!button || button.disabled || !session.active()) return;
     const answer = question.choices[Number(button.dataset.answerIndex)];
-    if (answer !== question.answer) { streak = 0; session.award(-1); session.feedback('差一點點，再想一想！', false); button.disabled = true; sfx.bad(); return; }
+    if (answer !== question.answer) { streak = 0; session.award(-1); session.feedback('差一點點，再想一想！', false); button.disabled = true; drawCozyCombo(area, streak); sfx.bad(); return; }
     solved++; streak++; const bonus = streak % 5 === 0;
     session.award(bonus ? 5 : 2); session.feedback(bonus ? `連續 ${streak} 題！額外 +3 分` : '算對了！點心店謝謝你'); sfx.coin();
+    drawCozyCombo(area, streak);
     const hadFocus = button === document.activeElement;
     next(); if (hadFocus) $('.snack-answer', area).focus();
   });
@@ -150,4 +159,5 @@ function startSnackMath(area, ctl) {
   window.addEventListener('keydown', onKey);
   ctl.onStop(() => window.removeEventListener('keydown', onKey));
   next();
+  drawCozyCombo(area, streak);
 }
