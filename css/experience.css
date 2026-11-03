@@ -63,6 +63,16 @@ body { background-color: #fff8f0; background-size: 100px 100px; }
 .park-heading h2 { margin: 7px 0; }
 .park-heading p { color: var(--soft); font-size: 14px; margin: 0; line-height: 1.6; }
 .park-heading .btn { flex: 0 0 auto; }
+.star-sky { padding: 22px; border-radius: 28px; background: radial-gradient(ellipse at top, #505680, #292e54); color: #fff8e8; }
+.star-sky .eyebrow { color: #e5dafa; }
+.star-prompt { font-size: 26px; margin: 12px 0 22px; }
+.star-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; max-width: 410px; margin: auto; }
+.star-node { position: relative; border: 1px solid #ffffff28; border-radius: 20px; background: #ffffff0a; color: #513e34; aspect-ratio: 1.2; min-height: 68px; display: grid; place-items: center; }
+.star-node > span { position: absolute; font-size: clamp(56px, 13vw, 90px); line-height: 1; color: #ffe2a0; }
+.star-node b { position: relative; font-size: 25px; }
+.star-node[aria-pressed=true] { opacity: .35; }
+.star-node[aria-pressed=true] > span { color: #b0b9df; }
+.star-round { font-size: 13px; color: #e2dcf3; margin: 20px 0 0; }
 .arcade-meta { display: flex; justify-content: space-between; gap: 8px; color: #765c65; font-size: 12px; }
 .arcade-card h2 { margin-top: 12px; font-size: 22px; }
 .arcade-card p { margin: 8px 0 14px; color: var(--soft); font-size: 14px; }
