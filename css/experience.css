@@ -40,6 +40,12 @@ body { background-color: #fff8f0; background-size: 100px 100px; }
 .arcade-card-body { padding: 20px; }
 .favorite-game { position: absolute; right: 12px; top: 12px; width: 44px; height: 44px; border: 1px solid #ffffffb0; border-radius: 50%; background: #ffffffd9; color: #a43b64; font-size: 25px; }
 .favorite-game[aria-pressed=true] { background: #fff; color: #af305c; }
+.intro-art { width: 130px; height: 130px; border-radius: 36px; background: var(--game-color); display: grid; place-items: center; font-size: 70px; margin: 20px auto; transform: rotate(-5deg); box-shadow: 0 7px 0 #00000008; }
+.intro-badges { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin: 18px 0; }
+.intro-badges span { padding: 6px 12px; border-radius: 999px; background: #fff; border: 1px solid #eadfe4; font-size: 13px; }
+.game-intro .intro-lead { font-size: 20px; font-weight: bold; color: #704354; }
+.intro-rules { line-height: 1.9; color: #765f67; background: #fff8; border-radius: 18px; padding: 16px; margin: 12px auto; max-width: 560px; }
+.intro-goals { display: grid; gap: 8px; margin: 20px 0; font-size: 14px; color: #795b36; }
 .arcade-meta { display: flex; justify-content: space-between; gap: 8px; color: #765c65; font-size: 12px; }
 .arcade-card h2 { margin-top: 12px; font-size: 22px; }
 .arcade-card p { margin: 8px 0 14px; color: var(--soft); font-size: 14px; }

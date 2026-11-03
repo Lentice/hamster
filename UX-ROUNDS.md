@@ -10,3 +10,4 @@
 | 4 | Make games searchable by name and play style | JavaScript syntax + available Node regression suites passed |
 | 5 | Save favorite games across visits and backup restores | JavaScript syntax + available Node regression suites passed |
 | 6 | Add daily game recommendations and an adventure stamp card | JavaScript syntax + available Node regression suites passed |
+| 7 | Give game introductions clear rules duration and score goals | JavaScript syntax + available Node regression suites passed |

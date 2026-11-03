@@ -17,9 +17,14 @@ function loadImg(src) {
 
 // 開場說明 → 遊戲 → 結算
 function openGame(id, onDone) {
+  if (!Object.hasOwn(GAMES, id)) return;
   const g = GAMES[id];
+  const info = gameDetails(id);
   const m = modal(`<div class="game-intro">
-      <div class="game-icon">${g.icon}</div><h2>${g.name}</h2><p>${g.desc}</p>
+      <span class="eyebrow">準備好一場小冒險</span><div class="intro-art" style="--game-color:${info.color}">${g.icon}</div><h2>${g.name}</h2>
+      <div class="intro-badges"><span>${GAME_KINDS[info.kind]}</span><span>${info.time}</span><span>完成可賺鼠鼠幣</span></div>
+      <p class="intro-lead">${info.tip}</p><div class="intro-rules">${g.desc}</div>
+      <div class="intro-goals"><b>這次的小目標</b><span>${info.goals.map((goal, i) => `${['銅', '銀', '金'][i]}星 ${goal} 分`).join(' ・ ')}</span></div>
       <p class="best">最佳紀錄：${save.best[id] || 0}</p>
       ${!questState().done && !questState().games.includes(id) ? `<p class="quest-line">🎯 今天還沒玩過這款，拿到分數就算今日任務的一種（${questState().games.length}/${QUEST_GAMES}）</p>` : ''}
       <div class="modal-actions"><button class="btn btn-pink" data-act="start">開始！</button></div>
