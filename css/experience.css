@@ -85,6 +85,10 @@ body { background-color: #fff8f0; background-size: 100px 100px; }
 .box-odds { text-align: left; border: 1px solid #e8d8e6; border-radius: 14px; margin: 14px 0; background: #fff9; font-size: 13px; }
 .box-odds summary { min-height: 44px; padding: 12px; cursor: pointer; color: #76516b; line-height: 1.6; }
 .box-odds p { padding: 0 12px 12px; margin: 0; }
+.map-stop { border-radius: 18px; border: 1px solid #ecd9e3; overflow: hidden; background: #fff8fb; display: flex; flex-direction: column; }
+.map-stop .map-place { width: 100%; border: 0; border-radius: 0; flex: 1; }
+.map-travel-label { font-size: 11px; color: #81516a; }
+.map-play-now { min-height: 44px; border: 0; border-top: 1px solid #eed8e3; background: #fce8f0; color: #813856; font-size: 14px; }
 .blindbox-intro .blindbox-icon { font-size: 50px; margin-bottom: 8px; }
 .blindbox-intro > p { font-size: 14px; }
 @media (max-width: 600px) {

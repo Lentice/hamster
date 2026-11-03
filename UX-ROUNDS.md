@@ -31,3 +31,4 @@
 | 25 | Search furniture and rooms and focus on owned decorations | JavaScript syntax + available Node regression suites passed |
 | 26 | Undo furniture moves placement resizing and room changes | JavaScript syntax + available Node regression suites passed |
 | 27 | Simplify shop browsing while keeping blind-box odds clear | JavaScript syntax + available Node regression suites passed |
+| 28 | Let park visitors choose travel or instant play from the map | JavaScript syntax + available Node regression suites passed |

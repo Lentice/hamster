@@ -363,13 +363,15 @@ const PARK = { hooks: { tick: [], enter: [], leave: [] } };
     const places = PROPS.filter((p) => p.act);
     const q = questState();
     const quest = q.done ? '🎯 今日任務完成！明天再來喔' : `🎯 今日任務：玩 ${QUEST_GAMES} 種遊戲（至少拿 1 分，${q.games.length}/${QUEST_GAMES}），送 ${QUEST_REWARD} 鼠鼠幣`;
-    const m = modal(`<div class="map-box"><h2>🗺️ 要去哪裡？</h2><p class="map-quest">${quest}</p><div class="map-list">${places.map((p) => {
+    const m = modal(`<div class="map-box"><h2>🗺️ 散步，還是直接開玩？</h2><p class="map-quest">${quest}</p><p class="section-note">「到攤位」會帶鼠鼠過去；「直接玩」馬上開始遊戲。</p><div class="map-list">${places.map((p) => {
       const g = GAMES[p.act];
       const fresh = g && !save.played?.[p.act] && !save.best[p.act];
       const today = g && q.games.includes(p.act) ? '<i class="map-today" title="今天已經算進任務">✅</i>' : '';
-      return `<button class="map-place" data-act="${p.act}"><span class="map-icon">${g ? g.icon : p.act === 'home' ? '🏠' : '🛒'}</span><b>${p.label}</b>${today}${fresh ? '<i class="map-new">NEW</i>' : g && save.best[p.act] ? `<small>🏆 ${save.best[p.act]}</small>` : ''}</button>`;
+      return `<div class="map-stop"><button class="map-place" data-act="${p.act}" aria-label="${g ? '到攤位：' : '到門口：'}${p.label}"><span class="map-icon">${g ? g.icon : p.act === 'home' ? '🏠' : '🛒'}</span><b>${p.label}</b>${today}${fresh ? '<i class="map-new">NEW</i>' : g && save.best[p.act] ? `<small>🏆 ${save.best[p.act]}</small>` : ''}<span class="map-travel-label">${g ? '到攤位 ↗' : '到門口 ↗'}</span></button>${g ? `<button class="map-play-now" data-map-play="${p.act}" aria-label="直接玩${g.name}">直接玩 →</button>` : ''}</div>`;
     }).join('')}</div></div>`, { cls: 'small' });
     m.box.addEventListener('click', (e) => {
+      const play = e.target.closest('[data-map-play]');
+      if (play) { m.close(); interact(play.dataset.mapPlay); return; }
       const b = e.target.closest('[data-act]');
       if (!b) return;
       const p = PROPS.find((q) => q.act === b.dataset.act);
