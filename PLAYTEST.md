@@ -6,6 +6,7 @@
 |---|---|---|
 | 點心快遞 | 12 deliveries, including 1 intentional mistake and a recovered streak | 13 points, normal 35-second round |
 | 星光尋寶 | 3 complete constellations, including 1 intentional wrong tap | 41 points, normal 45-second round |
+| 甜點算算 | 8 solved questions, including 1 incorrect attempt and a recovered five-answer streak | 18 points, normal 45-second round |
 
 Observations guiding the follow-up rounds:
 

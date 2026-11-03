@@ -27,7 +27,8 @@ function openGame(id, onDone) {
       <div class="intro-goals"><b>這次的小目標</b><span>${info.goals.map((goal, i) => `${['銅', '銀', '金'][i]}星 ${goal} 分`).join(' ・ ')}</span></div>
       <p class="best">最佳紀錄：${save.best[id] || 0}</p>
       ${!questState().done && !questState().games.includes(id) ? `<p class="quest-line">🎯 今天還沒玩過這款，拿到分數就算今日任務的一種（${questState().games.length}/${QUEST_GAMES}）</p>` : ''}
-      <div class="modal-actions"><button class="btn btn-pink" data-act="start">開始！</button></div>
+      <div class="modal-actions"><button class="btn btn-pink" data-act="start">開始挑戰！</button>${info.practice ? '<button class="btn btn-gray" data-act="practice">先輕鬆練習</button>' : ''}</div>
+      ${info.practice ? '<p class="section-note">練習沒有倒數，不更新紀錄、星星或獎勵。</p>' : ''}
     </div>`, {
     cls: 'game-modal', fullscreen: true,
     // 遊戲進行中（還沒出結算）按 ✕ 先確認
@@ -39,9 +40,12 @@ function openGame(id, onDone) {
   });
   m.root.addEventListener('closed', () => onDone?.());
   $('[data-act=start]', m.box).onclick = () => runGame(id, m);
+  $('[data-act=start]', m.box).focus({ preventScroll: true });
+  $('[data-act=practice]', m.box)?.addEventListener('click', () => runGame(id, m, { practice: true }));
   // 鍵盤：說明頁按 Enter／空白鍵開始，結算頁按 Enter 再玩一次
   const onKey = (e) => {
     if (gamePaused() || !['Enter', ' '].includes(e.key) || e.repeat) return;
+    if (e.target.closest('button, input, textarea, select, [contenteditable]')) return;
     // 結算剛出現的 0.8 秒內不接受 Enter（疊蛋糕、釣魚會一直按 Enter，不然結算會一閃就被跳過）
     const settled = performance.now() - (Number(m.box.dataset.resultAt) || 0) > 800;
     const btn = $('[data-act=start]', m.box) || (e.key === 'Enter' && settled && $('.game-result [data-act=again]', m.box));
@@ -51,8 +55,9 @@ function openGame(id, onDone) {
   m.root.addEventListener('closed', () => window.removeEventListener('keydown', onKey));
 }
 
-function runGame(id, m) {
+function runGame(id, m, { practice = false } = {}) {
   const g = GAMES[id];
+  practice = practice && gameDetails(id).practice === true;
   m.box.classList.add('playing');
   // 記下玩過哪些遊戲（公園攤位的 NEW 標籤用）
   save.played ||= {};
@@ -103,6 +108,7 @@ function runGame(id, m) {
   stopFns.push(() => hurry.disconnect());
   m.root.addEventListener('closed', () => { stopped = true; stopFns.forEach((f) => f()); });
   Promise.resolve().then(() => g.start(area, {
+    practice,
     isStopped: () => stopped,
     onStop: (f) => stopFns.push(f),
     finish: (score, coins) => {
@@ -112,13 +118,13 @@ function runGame(id, m) {
       stopFns.forEach((f) => f());
       stopFns.length = 0;
       const prevBest = save.best[id] || 0;
-      const record = recordBest(id, score);
-      const questDone = score > 0 && questPlayed(id); // 0 分（掛機等時間到）不算
+      const record = !practice && recordBest(id, score);
+      const questDone = !practice && score > 0 && questPlayed(id); // 練習與 0 分不算任務
       // 沒破紀錄時告訴玩家還差多少，有破就顯示超過舊紀錄多少
-      const bestLine = record
+      const bestLine = practice ? '練習完成！這一局不更新紀錄、星星或獎勵。' : record
         ? (prevBest ? `比舊紀錄 ${prevBest} 多了 ${score - prevBest} 分！` : '第一次的紀錄，下次再挑戰！')
         : bestText(save.best[id] || 0, score);
-      addCoins(coins);
+      if (!practice) addCoins(coins);
       sfx.win();
       m.box.dataset.resultAt = performance.now();
       pauseBtn.remove();
@@ -126,14 +132,14 @@ function runGame(id, m) {
       const nextId = dailyGameId(localDay(), remainingGames.length ? remainingGames : Object.keys(GAMES).filter((other) => other !== id));
       area.innerHTML = `<div class="game-result">
         <div class="game-icon">${record ? '🏆' : '🎉'}</div>
-        <h2>${record ? '新紀錄！' : '完成！'}</h2>
+        <h2>${practice ? '練習完成！' : record ? '新紀錄！' : '完成！'}</h2>
         ${gameStars(id, score, 'result-stars')}
         <p class="result-cheer">${earnedStars(id, score) === 3 ? '三顆星到手！今天的你閃閃發亮。' : earnedStars(id, score) > 0 ? '小小努力，收集一點星光。' : '每一次練習，都是下一次進步的開始。'}</p>
         <p class="score">分數 <b>${score}</b></p>
         <p class="best-line">${bestLine}</p>
         ${gameDetails(id).goals.find((goal) => goal > score) ? `<p class="next-star">再多 ${gameDetails(id).goals.find((goal) => goal > score) - score} 分，就能拿下一顆星</p>` : ''}
-        <p class="reward">獲得 <b>${HAMSTER_COIN_ICON} ${coins}</b> 鼠鼠幣</p>
-        ${questDone ? `<p class="quest-done">🎯 完成今日任務！再送 ${HAMSTER_COIN_ICON} ${QUEST_REWARD}</p>`
+        ${practice ? '<p class="section-note">熟悉了就試試正式挑戰，收集自己的星光吧！</p>' : `<p class="reward">獲得 <b>${HAMSTER_COIN_ICON} ${coins}</b> 鼠鼠幣</p>`}
+        ${practice ? '' : questDone ? `<p class="quest-done">🎯 完成今日任務！再送 ${HAMSTER_COIN_ICON} ${QUEST_REWARD}</p>`
     : questState().done ? '' : `<p class="quest-line">🎯 今日任務 ${questState().games.length} / ${QUEST_GAMES}：再玩 ${QUEST_GAMES - questState().games.length} 種不同的遊戲送 ${QUEST_REWARD}</p>`}
         <div class="modal-actions">
           <button class="btn btn-pink" data-act="again">再玩一次</button>
@@ -141,7 +147,7 @@ function runGame(id, m) {
           <button class="btn btn-blue" data-act="share">📤 分享成績</button>
         </div>
         ${nextId ? `<div class="result-discover"><span class="eyebrow">下一個小冒險</span><h3>${GAMES[nextId].icon} ${GAMES[nextId].name}</h3><p>${gameDetails(nextId).tip}</p><button class="btn btn-blue" data-act="next">換個遊戲玩</button></div>` : ''}</div>`;
-      $('[data-act=again]', area).onclick = () => { area.remove(); runGame(id, m); };
+      $('[data-act=again]', area).onclick = () => { area.remove(); runGame(id, m, { practice }); };
       $('[data-act=back]', area).onclick = () => m.close();
       $('[data-act=next]', area)?.addEventListener('click', () => {
         m.close();
@@ -150,7 +156,7 @@ function runGame(id, m) {
       });
       // 分享成績：手機用系統分享，不支援就複製文字
       $('[data-act=share]', area).onclick = async () => {
-        const text = `我在「鼠鼠小屋」的${g.name}拿到 ${score} 分${record ? '，破紀錄了' : ''}！你也來玩玩看～ ${location.origin}${location.pathname}`;
+        const text = `我在「鼠鼠小屋」的${g.name}${practice ? '練習' : ''}拿到 ${score} 分${record ? '，破紀錄了' : ''}！你也來玩玩看～ ${location.origin}${location.pathname}`;
         try {
           if (navigator.share) await navigator.share({ text });
           else { await navigator.clipboard.writeText(text); toast('成績複製好了，可以貼給朋友！'); }
@@ -169,7 +175,7 @@ function runGame(id, m) {
     area.innerHTML = '<div class="game-intro"><h2>素材暫時載入不了</h2><p>請確認網路連線，再試一次。</p><button class="btn btn-pink" data-act="retry">重新載入遊戲</button></div>';
     $('.game-pause', m.box)?.remove();
     m.box.classList.remove('playing');
-    $('[data-act=retry]', area).onclick = () => { area.remove(); runGame(id, m); };
+    $('[data-act=retry]', area).onclick = () => { area.remove(); runGame(id, m, { practice }); };
   });
 }
 

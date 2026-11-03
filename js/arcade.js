@@ -10,9 +10,9 @@ const GAME_DETAILS = {
   music: { kind: 'puzzle', time: '一關接一關', tip: '跟著旋律，記住順序', goals: [3, 6, 10], color: '#eee8ff' },
   fish: { kind: 'relax', time: '45 秒', tip: '看準時機，釣起金色驚喜', goals: [10, 25, 50], color: '#dff5f5' },
   bubble: { kind: 'relax', time: '40 秒', tip: '找對顏色，戳出連擊', goals: [15, 40, 80], color: '#e7edff' },
-  delivery: { kind: 'reaction', time: '35 秒', tip: '幫鼠鼠把點心送進正確籃子', goals: [10, 25, 45], color: '#fff0d9' },
-  starlight: { kind: 'puzzle', time: '45 秒', tip: '從 1 到 9，找回一整片星空', goals: [10, 30, 55], color: '#eae7ff' },
-  snackmath: { kind: 'puzzle', time: '45 秒', tip: '幫點心店算出剛剛好的答案', goals: [10, 25, 45], color: '#e6f4e8' },
+  delivery: { practice: true, kind: 'reaction', time: '35 秒', tip: '幫鼠鼠把點心送進正確籃子', goals: [10, 25, 45], color: '#fff0d9' },
+  starlight: { practice: true, kind: 'puzzle', time: '45 秒', tip: '從 1 到 9，找回一整片星空', goals: [10, 30, 55], color: '#eae7ff' },
+  snackmath: { practice: true, kind: 'puzzle', time: '45 秒', tip: '幫點心店算出剛剛好的答案', goals: [10, 25, 45], color: '#e6f4e8' },
 };
 const GAME_KINDS = { reaction: '手速挑戰', puzzle: '動動腦', relax: '輕鬆玩' };
 const gameDetails = (id) => GAME_DETAILS[id] || { kind: 'relax', time: '輕鬆一局', tip: '一起試試新玩法', goals: [10, 25, 50], color: '#fff0f5' };
